@@ -36,3 +36,211 @@ Usa serializers per convertire i dati dei modelli in formati JSON per le API e v
 Crea ViewSets per definire la logica di business necessaria per operare sui dati.
 Utilizza Routers per collegare automaticamente i ViewSet alle URL, rendendo le API accessibili al frontend.
 Spero che questa spiegazione ti aiuti a comprendere meglio come ciascuna parte di Django REST Framework funzioni e come questi componenti interagiscono tra loro per costruire API RESTful in un'applicazione Django.
+
+
+Teoria dei Concetti di Base
+1. JWT (JSON Web Token)
+Cos'è JWT:
+
+JSON Web Token (JWT) è uno standard aperto (RFC 7519) che definisce un modo compatto e autonomo per trasmettere informazioni tra le parti come un oggetto JSON.
+Questo oggetto JSON è firmato digitalmente, e quindi può essere verificato e affidabile.
+I JWT possono essere firmati utilizzando un segreto (con l'algoritmo HMAC) o una coppia di chiavi pubblica/privata utilizzando RSA o ECDSA.
+Struttura di un JWT:
+
+Header: Contiene informazioni sulla tipologia di token e l'algoritmo di firma utilizzato.
+Payload: Contiene le dichiarazioni (claims). Queste possono essere di tre tipi: registrate, pubbliche, e private.
+Signature: È il risultato della firma dei due precedenti componenti (header e payload) con un algoritmo specificato e un segreto o chiave privata.
+Uso di JWT:
+
+È comunemente usato per l'autenticazione e l'autorizzazione. Quando un utente effettua il login, viene generato un token JWT che può essere utilizzato per autenticare le richieste successive.
+Questo token viene inviato al client, che lo include in ogni richiesta HTTP successiva nell'header Authorization.
+Esempio di JWT:
+
+json
+Copia codice
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+.
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+.
+[signature]
+Backend e API
+2. API (Application Programming Interface)
+Cos'è un'API:
+
+Un'API è un insieme di regole che consente a diverse applicazioni di comunicare tra loro.
+Le API RESTful usano HTTP per effettuare richieste e ricevere risposte in formati come JSON o XML.
+API nel Nostro Programma:
+
+Le API forniscono un'interfaccia per interagire con il nostro backend Django. Queste interfacce sono implementate utilizzando Django REST Framework (DRF).
+Attraverso le API, i client (ad esempio, un'applicazione frontend) possono inviare richieste al server per creare, leggere, aggiornare ed eliminare dati.
+Django REST Framework e Implementazione
+3. Django REST Framework (DRF)
+Cos'è DRF:
+
+Django REST Framework è una potente libreria di toolkit per costruire API web in modo semplice e rapido con Django.
+Fornisce classi e funzioni per creare API, gestire la serializzazione, l'autenticazione, i permessi, e altro.
+Componenti Principali di DRF:
+
+Serializers: Convertono i dati complessi (come le istanze dei modelli Django) in tipi di dati primitivi (come JSON) e viceversa.
+ViewSets: Classi che forniscono un'implementazione completa per le operazioni CRUD su un modello.
+Routers: Generano automaticamente le URL per le ViewSets.
+Implementazione nel Progetto
+4. ModelViewSet
+Cos'è ModelViewSet:
+
+ModelViewSet è una classe fornita da DRF che combina le funzionalità di ModelView e ViewSet.
+Fornisce metodi predefiniti per le operazioni CRUD (create, retrieve, update, partial_update, destroy, list).
+Gestisce automaticamente le operazioni CRUD per un determinato modello Django, riducendo la quantità di codice che dobbiamo scrivere.
+Esempio di ModelViewSet:
+
+python
+Copia codice
+from rest_framework import viewsets, permissions
+from .models import Game
+from .serializers import GameSerializer
+
+class GameViewSet(viewsets.ModelViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    permission_classes = [permissions.IsAuthenticated]
+Spiegazione:
+
+queryset: Specifica l'insieme di dati che il ViewSet utilizzerà. In questo caso, tutti gli oggetti Game.
+serializer_class: Specifica quale serializer utilizzare per convertire i dati del modello Game.
+permission_classes: Definisce chi può accedere a queste API. In questo caso, solo gli utenti autenticati.
+Gestione delle Rotte con Routers
+5. Routers
+Cos'è un Router:
+
+Un router in DRF genera automaticamente le URL per le operazioni CRUD definite nei ViewSet.
+Elimina la necessità di definire manualmente le URL per ogni operazione, semplificando la configurazione delle rotte.
+Esempio di Router:
+
+python
+Copia codice
+from rest_framework.routers import DefaultRouter
+from .views import GameViewSet
+
+router = DefaultRouter()
+router.register(r'games', GameViewSet)
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
+Spiegazione:
+
+DefaultRouter: È un router fornito da DRF che gestisce automaticamente le rotte CRUD per i ViewSet registrati.
+router.register: Registra il GameViewSet con il prefisso URL games, generando URL come /games/, /games/<id>/, ecc.
+Configurazione degli URL e Token JWT
+6. Configurazione degli URL per JWT
+Abbiamo aggiunto le rotte per ottenere e aggiornare i token JWT:
+
+Esempio:
+
+python
+Copia codice
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+urlpatterns = [
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+Spiegazione:
+
+TokenObtainPairView: Gestisce la richiesta per ottenere un token di accesso e un token di aggiornamento.
+TokenRefreshView: Gestisce la richiesta per aggiornare il token di accesso utilizzando il token di aggiornamento.
+Prossimi Passi per Creare una SPA
+7. Single Page Application (SPA)
+Cos'è una SPA:
+
+Una Single Page Application è un'applicazione web che carica una singola pagina HTML e aggiorna dinamicamente il contenuto della pagina in risposta alle interazioni dell'utente senza ricaricare l'intera pagina.
+Passi per Creare una SPA con Django e Bootstrap:
+
+Frontend: Utilizzeremo Bootstrap per creare l'interfaccia utente e JavaScript per gestire le interazioni dinamiche e le chiamate API.
+Integrazione con le API: Collegheremo il frontend alle API create con Django REST Framework per gestire i dati delle partite e dei punteggi.
+Creare la Struttura del Frontend:
+
+Crea una pagina HTML di base con Bootstrap.
+Aggiungi form per il login, visualizzazione delle partite e aggiornamento dei punteggi.
+Gestire le Chiamate API con JavaScript:
+
+Utilizza JavaScript per effettuare chiamate API asincrone (AJAX) per ottenere, creare, aggiornare ed eliminare dati.
+Gestisci le risposte delle API e aggiorna dinamicamente il contenuto della pagina.
+Esempio di file home.html con Bootstrap e JavaScript:
+
+html
+Copia codice
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Pong Game</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <div id="login-message"></div>
+
+        <!-- Aggiungi altre sezioni per visualizzare e gestire le partite -->
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access) {
+                    document.getElementById('login-message').innerText = 'Login successful!';
+                    // Save the token and use it for further authenticated requests
+                    localStorage.setItem('access_token', data.access);
+                } else {
+                    document.getElementById('login-message').innerText = 'Login failed!';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
+Spiegazione:
+
+Form di Login: Consente agli utenti di inserire il nome utente e la password.
+JavaScript: Gestisce l'invio del form e la richiesta di autenticazione JWT.
+Riepilogo
+Siamo a buon punto con il backend, avendo configurato l'autenticazione, le API e la struttura di base del frontend. I prossimi passi includeranno l'ulteriore sviluppo del frontend per renderlo una SPA completa, integrando Bootstrap e JavaScript per interagire con le API e aggiornare dinamicamente il contenuto della pagina.
