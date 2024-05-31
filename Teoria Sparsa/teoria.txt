@@ -244,3 +244,46 @@ Form di Login: Consente agli utenti di inserire il nome utente e la password.
 JavaScript: Gestisce l'invio del form e la richiesta di autenticazione JWT.
 Riepilogo
 Siamo a buon punto con il backend, avendo configurato l'autenticazione, le API e la struttura di base del frontend. I prossimi passi includeranno l'ulteriore sviluppo del frontend per renderlo una SPA completa, integrando Bootstrap e JavaScript per interagire con le API e aggiornare dinamicamente il contenuto della pagina.
+
+Navigazione tra le API e Funzionalità del Codice
+La navigazione tra le API che vedi quando utilizzi un DefaultRouter in Django REST Framework non è solo una comodità visiva; rappresenta direttamente le varie funzionalità del backend esposte tramite le API. Ogni endpoint API mappa a una serie di operazioni che puoi eseguire sul server, manipolando o recuperando dati dal database sottostante.
+
+1. Accesso alle Funzionalità Specifiche
+Ogni URL mostrato nella navigazione API rappresenta un punto di accesso diretto a una funzionalità specifica del tuo server. Per esempio:
+
+/api/games/:
+
+GET: Recupera un elenco di tutte le partite registrate nel sistema.
+POST: Crea una nuova partita inviando dati specifici (come i giocatori partecipanti).
+/api/games/{id}/:
+
+GET: Recupera i dettagli di una partita specifica usando il suo ID.
+PUT/PATCH: Aggiorna i dettagli di una partita specifica.
+DELETE: Elimina una partita specifica dal sistema.
+Questi endpoint sono collegati direttamente alle funzionalità del codice che gestiscono queste operazioni nel backend. Per esempio, in Django REST Framework, un ModelViewSet definisce questi metodi per te e li mappa agli endpoint appropriati del router.
+
+2. Come Funziona la Mappatura
+Quando crei un ModelViewSet e lo registri con un Router, DRF configura automaticamente i seguenti metodi e mappature URL:
+
+list(): Mappato a GET /api/{plural_model_name}/
+create(): Mappato a POST /api/{plural_model_name}/
+retrieve(): Mappato a GET /api/{plural_model_name}/{id}/
+update(): Mappato a PUT /api/{plural_model_name}/{id}/
+partial_update(): Mappato a PATCH /api/{plural_model_name}/{id}/
+destroy(): Mappato a DELETE /api/{plural_model_name}/{id}/
+Ogni uno di questi metodi è una funzione nel ViewSet che puoi sovrascrivere per personalizzare il comportamento. Ad esempio, il metodo list() in un ModelViewSet è definito per recuperare e serializzare un insieme di istanze del modello dal database.
+
+3. Interazione con il Database
+Dietro le quinte, quando invii una richiesta a uno di questi endpoint:
+
+DRF riceve la richiesta e determina quale metodo del ViewSet deve essere chiamato.
+Il ViewSet esegue l'operazione richiesta, che potrebbe includere interazioni con il database come recupero, aggiornamento o eliminazione di dati.
+I dati risultanti (se presenti) sono serializzati in JSON e restituiti al client.
+Esempio Pratico
+Quando visiti l'URL http://127.0.0.1:8000/api/games/ nel tuo browser e esegui una richiesta GET:
+
+Il metodo list() del tuo GameViewSet viene chiamato.
+Questo metodo recupera tutte le partite dal database.
+Le partite vengono serializzate in JSON utilizzando il GameSerializer.
+Il JSON è poi inviato al tuo browser come risposta HTTP.
+Questo processo dimostra come la navigazione tra le API non sia solo un mezzo per visualizzare gli endpoint, ma una rappresentazione diretta delle funzionalità del codice sottostante che gestisce i dati.
