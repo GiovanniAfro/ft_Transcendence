@@ -1,6 +1,10 @@
 from rest_framework import viewsets, permissions
 from .models import Game, Score, Tournament, User
 from .serializers import GameSerializer, ScoreSerializer, TournamentSerializer, UserSerializer
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'index.html')
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
