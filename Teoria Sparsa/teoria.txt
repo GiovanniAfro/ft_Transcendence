@@ -287,3 +287,65 @@ Questo metodo recupera tutte le partite dal database.
 Le partite vengono serializzate in JSON utilizzando il GameSerializer.
 Il JSON è poi inviato al tuo browser come risposta HTTP.
 Questo processo dimostra come la navigazione tra le API non sia solo un mezzo per visualizzare gli endpoint, ma una rappresentazione diretta delle funzionalità del codice sottostante che gestisce i dati.
+
+Metodi di ModelViewSet e Mappature URL
+1. list()
+Metodo HTTP Corrispondente: GET
+URL Tipico: /api/{plural_model_name}/
+Descrizione: Il metodo list() è usato per recuperare e restituire una lista di tutte le istanze del modello dal database. È tipicamente una richiesta GET senza un identificatore perché vuoi una lista di risorse, non una specifica.
+Funzionamento: Quando invii una richiesta GET all'URL corrispondente, DRF esegue una query sul database per recuperare tutte le istanze del modello specificato e le serializza in JSON prima di inviarle come risposta HTTP.
+2. create()
+Metodo HTTP Corrispondente: POST
+URL Tipico: /api/{plural_model_name}/
+Descrizione: Il metodo create() gestisce la creazione di una nuova istanza del modello basata sui dati inviati con la richiesta POST.
+Funzionamento: Invii una richiesta POST con un corpo JSON contenente i dati necessari per creare una nuova istanza. DRF deserializza questi dati nel formato appropriato e crea una nuova istanza nel database, restituendo una risposta con i dettagli dell'istanza appena creata, incluso il suo ID.
+3. retrieve()
+Metodo HTTP Corrispondente: GET
+URL Tipico: /api/{plural_model_name}/{id}/
+Descrizione: Utilizzato per recuperare i dettagli di una singola istanza del modello usando un identificatore unico (come l'ID).
+Funzionamento: Invii una richiesta GET all'URL con l'ID specifico dell'istanza che desideri recuperare. DRF ricerca nel database l'istanza con quell'ID, la serializza e restituisce i dati serializzati come risposta JSON.
+4. update()
+Metodo HTTP Corrispondente: PUT
+URL Tipico: /api/{plural_model_name}/{id}/
+Descrizione: Gestisce l'aggiornamento completo di un'istanza esistente. È necessario fornire tutti i dati richiesti dell'istanza, poiché l'aggiornamento è completo e sostituisce tutti i valori esistenti.
+Funzionamento: Invii una richiesta PUT con l'ID dell'istanza e un corpo JSON che contiene tutti i dati aggiornati. DRF aggiorna l'istanza nel database con i nuovi dati e restituisce l'istanza aggiornata.
+5. partial_update()
+Metodo HTTP Corrispondente: PATCH
+URL Tipico: /api/{plural_model_name}/{id}/
+Descrizione: Simile a update(), ma usato per aggiornamenti parziali. Solo i campi forniti nella richiesta PATCH verranno aggiornati.
+Funzionamento: Invii una richiesta PATCH con l'ID dell'istanza e un corpo JSON contenente solo i campi che desideri aggiornare. DRF aggiorna solo quei campi dell'istanza nel database, lasciando inalterati gli altri valori.
+6. destroy()
+Metodo HTTP Corrispondente: DELETE
+URL Tipico: /api/{plural_model_name}/{id}/
+Descrizione: Utilizzato per eliminare un'istanza specifica dal database.
+Funzionamento: Invii una richiesta DELETE all'URL con l'ID dell'istanza che desideri eliminare. DRF rimuove quell'istanza dal database e di solito restituisce una risposta HTTP senza contenuto per indicare che l'operazione è stata completata con successo.
+
+
+
+Esattamente! Ora nel tuo progetto Django hai strutture separate per gestire le partite (Game), i punteggi (Score) e i tornei (Tournament). Queste strutture includono:
+
+Modelli nel file models.py che definiscono le entità nel database.
+Serializers nel file serializers.py che aiutano a convertire i dati dei modelli in formati JSON e viceversa, per facilitare la comunicazione tra il backend e il frontend.
+ViewSet nel file views.py che forniscono le logiche per le operazioni CRUD (Creare, Leggere, Aggiornare, Eliminare) per ogni entità.
+Router nel file urls.py che mappa le URL agli specifici ViewSet, permettendo al tuo API di rispondere a richieste HTTP appropriate.
+Ecco una breve descrizione di ciascuna parte che hai ora nel tuo sistema:
+
+1. Modelli
+Game: Tiene traccia delle partite individuali, inclusi i giocatori coinvolti e i loro punteggi.
+Score: Registra i punteggi associati a ciascuna partita e a ciascun giocatore.
+Tournament: Gestisce informazioni sui tornei, come il nome del torneo, la data di inizio, lo stato di attività, e l'elenco dei giocatori partecipanti.
+2. Serializers
+Ogni modello ha un ModelSerializer associato che gestisce la serializzazione dei dati del modello per trasferirli come JSON e deserializza i dati JSON ricevuti in formati utilizzabili dai modelli Django.
+3. ViewSets
+GameViewSet: Gestisce tutte le richieste CRUD relative alle partite.
+ScoreViewSet: Gestisce tutte le richieste CRUD relative ai punteggi.
+TournamentViewSet: Gestisce tutte le richieste CRUD relative ai tornei.
+4. URL Routing
+Le rotte sono definite per collegare le URL agli endpoint specifici per le partite, i punteggi e i tornei. Questo permette agli utenti e agli sviluppatori di interagire con l'API per eseguire operazioni specifiche attraverso richieste HTTP.
+Utilizzo Pratico
+Questo setup ti permette di:
+
+Creare, visualizzare, modificare ed eliminare partite tramite l'API.
+Registrare e modificare i punteggi associati a ciascuna partita.
+Organizzare tornei, aggiungere giocatori ai tornei e gestire la logica specifica dei tornei tramite metodi personalizzati nel modello Tournament o nel TournamentViewSet.
+Con queste strutture in atto, il tuo backend è ben organizzato per supportare una varietà di operazioni legate alla gestione di un sistema di giochi e tornei. Se c'è qualche altra funzionalità che vorresti aggiungere o se hai domande su come espandere ulteriormente il progetto, sentiti libero di chiedere!

@@ -1,0 +1,13 @@
+Ottieni un Token di Accesso JWT
+
+Prima di tutto, devi autenticarti e ottenere un token di accesso valido. Ecco un esempio di come ottenere il token:
+bash
+curl -X POST http://127.0.0.1:8000/api/token/ -H "Content-Type: application/json" -d '{"username": "yourusername", "password": "yourpassword"}'
+
+Usa il Token per Fare Richieste Autenticate
+
+Una volta ottenuto il token, includilo nelle tue richieste agli endpoint protetti:
+bash
+Copia codice
+curl -X GET http://127.0.0.1:8000/api/games/ -H "Authorization: Bearer your_access_token"
+Sostituisci your_access_token con il token di accesso ottenuto dal passo precedente.

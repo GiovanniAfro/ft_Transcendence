@@ -1,6 +1,14 @@
 from rest_framework import viewsets, permissions
-from .models import Game, Score
-from .serializers import GameSerializer, ScoreSerializer
+from .models import Game, Score, Tournament, User
+from .serializers import GameSerializer, ScoreSerializer, TournamentSerializer, UserSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class TournamentViewSet(viewsets.ModelViewSet):
+    queryset = Tournament.objects.all()
+    serializer_class = TournamentSerializer
 
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
