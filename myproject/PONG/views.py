@@ -1,11 +1,12 @@
 from rest_framework import viewsets, permissions
-from .models import Game, Score, Tournament, User
+from .models import Game, Score, Tournament, UserProfile
 from .serializers import GameSerializer, ScoreSerializer, TournamentSerializer, UserSerializer
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 from django.contrib.auth import authenticate
 import json
 
@@ -35,13 +36,13 @@ def register(request):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-        if not username or not password:
-            return JsonResponse({'error': 'Username and password are required'}, status=400)
-        if User.objects.filter(username=username).exists():
-            return JsonResponse({'error': 'Username is already taken'}, status=400)
-        user = User.objects.create(username=username, password=make_password(password))
-        return JsonResponse({'message': 'User registered successfully'}, status=201)
-    return JsonResponse({'error': 'Invalid method'}, status=405)
+        if username and password:
+            user = User.objects.create_user(username=username, password=password)
+            UserProfile.objects.create(user=user)  # Crea automaticamente un UserProfile
+            return JsonResponse({"message": "Utente registrato con successo"}, status=201)
+        else:
+            return JsonResponse({"error": "Manca username o password"}, status=400)
+    return JsonResponse({"error": "Metodo non supportato"}, status=405)
 
 def login(request):
     if request.method == 'POST':

@@ -37,9 +37,11 @@ class Tournament(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     alias = models.CharField(max_length=100, blank=True)
+    total_score = models.IntegerField(default=0)
+    # Aggiungi qui altri campi specifici del gioco
 
     def __str__(self):
-        return self.user.username    
+        return f'{self.user.username} Profile'   
     
 class Match(models.Model):
     tournament = models.ForeignKey(Tournament, related_name='matches', on_delete=models.CASCADE)
