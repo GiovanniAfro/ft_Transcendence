@@ -36,13 +36,17 @@ def register(request):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-        if username and password:
-            user = User.objects.create_user(username=username, password=password)
-            UserProfile.objects.create(user=user)  # Crea automaticamente un UserProfile
-            return JsonResponse({"message": "Utente registrato con successo"}, status=201)
-        else:
-            return JsonResponse({"error": "Manca username o password"}, status=400)
-    return JsonResponse({"error": "Metodo non supportato"}, status=405)
+
+        # Verifica se il nome utente esiste già
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Il nome utente è già in uso'}, status=400)
+
+        # Se il nome utente non è in uso, crea il nuovo utente
+        user = User.objects.create_user(username=username, password=password)
+        UserProfile.objects.create(user=user)  # Crea automaticamente un UserProfile
+        return JsonResponse({'message': 'Utente registrato con successo'}, status=201)
+    
+    return JsonResponse({'error': 'Richiesta non valida'}, status=400)
 
 def login(request):
     if request.method == 'POST':
