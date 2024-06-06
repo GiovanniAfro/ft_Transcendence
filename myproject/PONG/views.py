@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework_simplejwt.tokens import AccessToken
 from .models import Game, Score, Tournament, UserProfile
 from .serializers import GameSerializer, ScoreSerializer, TournamentSerializer, UserSerializer
 from django.shortcuts import render
@@ -55,8 +56,8 @@ def login(request):
         password = data.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
-            # Puoi implementare la logica di generazione e restituzione del JWT qui
-            return JsonResponse({'message': 'Login successful'}, status=200)
+            token = AccessToken.for_user(user)
+            return JsonResponse({'token': str(token)}, status=200)
         else:
             return JsonResponse({'error': 'Invalid credentials'}, status=400)
     return JsonResponse({'error': 'Invalid method'}, status=405)
