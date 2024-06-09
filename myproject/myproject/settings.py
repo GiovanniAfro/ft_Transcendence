@@ -86,10 +86,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'PONG_database',
+        'USER': 'gcavanna',
+        'PASSWORD': 'gcavanna',
+        'HOST': 'localhost',  # Oppure un altro host, se il database non è locale
+        'PORT': '',  # Lascia vuoto per usare il default port
     }
 }
+
 
 
 # Password validation
