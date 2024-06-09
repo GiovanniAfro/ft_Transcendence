@@ -11,3 +11,6 @@ bash
 Copia codice
 curl -X GET http://127.0.0.1:8000/api/games/ -H "Authorization: Bearer your_access_token"
 Sostituisci your_access_token con il token di accesso ottenuto dal passo precedente.
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"username": "testuser", "password": "password"}' http://127.0.0.1:8000/api/register/

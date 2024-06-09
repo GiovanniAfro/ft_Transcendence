@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 import random
+
+username_validator = RegexValidator(regex=r'^\w+$', message="Username può contenere solo lettere, numeri e underscore.")
 
 class Tournament(models.Model):
     name = models.CharField(max_length=255)
@@ -41,7 +44,7 @@ class UserProfile(models.Model):
     # Aggiungi qui altri campi specifici del gioco
 
     def __str__(self):
-        return f'{self.user.username} Profile'   
+        return f'{self.user.username} Profile'  
     
 class Match(models.Model):
     tournament = models.ForeignKey(Tournament, related_name='matches', on_delete=models.CASCADE)
