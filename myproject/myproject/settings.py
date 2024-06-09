@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'PONG',
     'rest_framework',
     'rest_framework_simplejwt',
+    'sslserver',
 ]
 
 # Configurazione di Django REST Framework
