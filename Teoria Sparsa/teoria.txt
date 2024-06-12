@@ -348,4 +348,4 @@ Questo setup ti permette di:
 Creare, visualizzare, modificare ed eliminare partite tramite l'API.
 Registrare e modificare i punteggi associati a ciascuna partita.
 Organizzare tornei, aggiungere giocatori ai tornei e gestire la logica specifica dei tornei tramite metodi personalizzati nel modello Tournament o nel TournamentViewSet.
-Con queste strutture in atto, il tuo backend è ben organizzato per supportare una varietà di operazioni legate alla gestione di un sistema di giochi e tornei. Se c'è qualche altra funzionalità che vorresti aggiungere o se hai domande su come espandere ulteriormente il progetto, sentiti libero di chiedere!
+Con queste strutture in atto, il tuo backend è ben organizzato per supportare una varietà di operazioni legate alla gestione di un sistema di giochi e tornei. 
