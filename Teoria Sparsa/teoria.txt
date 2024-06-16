@@ -25,7 +25,7 @@ Ordinamento: Puoi ordinare i risultati del QuerySet.
 Aggiornamento: Permette di aggiornare i dati direttamente, operando su tutto il set.
 Routers
 I routers in DRF automatizzano il processo di cablaggio delle URL ai metodi appropriati del ViewSet. In base all'azione richiesta (ottenuta dal metodo HTTP della richiesta), il router indirizza la richiesta al metodo corrispondente del ViewSet.
-
+ 
 Funzioni principali dei Routers:
 
 Automatizzazione delle Route: Crea automaticamente le route necessarie per le operazioni CRUD di un ViewSet.
