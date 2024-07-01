@@ -1,0 +1,89 @@
+services:
+    # python-django:
+    #     container_name: python-django
+    #     build:
+    #         context: ./requirements/nginx
+    #         dockerfile: Dockerfile
+    #     image: python:42
+    #     restart: always
+    #     ports:
+    #         - "443:443"
+    #     depends_on:
+    #         - postgres
+    #     # volumes:
+    #     #     - wordpress_vol:/var/www/html
+    #     networks:
+    #         transcendence_net:
+    #             ipv4_address: 10.0.0.1
+
+    db:
+        container_name: postgres
+        build:
+                context: ./requirements/postgres
+                dockerfile: Dockerfile
+                # args:
+                #     MARIADB_DB_NAME: ${MARIADB_DB_NAME}
+                #     MARIADB_DB_USER: ${MARIADB_DB_USER}
+                #     MARIADB_DB_PASS: ${MARIADB_DB_PASS}
+        # image: postgres:stable
+        restart: always
+        # set shared memory limit when using docker-compose
+        shm_size: 128mb
+        # or set shared memory limit when deploy via swarm stack
+        #volumes:
+        #  - type: tmpfs
+        #    target: /dev/shm
+        #    tmpfs:
+        #      size: 134217728 # 128*2^20 bytes = 128Mb
+        env_file:
+            - .env
+        environment:
+            POSTGRES_PASSWORD: example
+        networks:
+            transcendence_net:
+                ipv4_address: 10.0.0.1
+    
+    # postgres:
+    #     container_name: postgres
+    #     env_file:
+    #         - .env
+    #     build:
+    #         context: ./requirements/postgres
+    #         dockerfile: Dockerfile
+    #         # args:
+    #         #     MARIADB_DB_NAME: ${MARIADB_DB_NAME}
+    #         #     MARIADB_DB_USER: ${MARIADB_DB_USER}
+    #         #     MARIADB_DB_PASS: ${MARIADB_DB_PASS}
+    #     image: postgres:42
+    #     restart: always
+    #     volumes:
+    #         - postgresql_vol:/var/www/html
+        # networks:
+        #     transcendence_net:
+        #         ipv4_address: 10.0.0.2
+
+# volumes:
+#   wordpress_vol:
+#     driver: local
+#     name: wordpress_vol
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/kichkiro/data/wordpress
+#   db_vol:
+#     driver: local
+#     name: db_vol
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/kichkiro/data/db
+
+networks:
+    transcendence_net:
+        name: transcendence_net
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.0.0/24
+                  gateway: 10.0.0.254
