@@ -1,33 +1,30 @@
 services:
-    # backend:
-    #     container_name: python-django
-    #     build:
-    #         context: ./requirements/nginx
-    #         dockerfile: Dockerfile
-    #     image: python:42
-    #     restart: always
-    #     ports:
-    #         - "443:443"
-    #     depends_on:
-    #         - postgres
-    #     # volumes:
-    #     #     - wordpress_vol:/var/www/html
-    #     networks:
-    #         transcendence_net:
-    #             ipv4_address: 10.0.0.1
-
+    backend:
+        container_name: python-django
+        env_file:
+            - ./requirements/python-django/conf/.env
+        build:
+            context: ./requirements/python-django
+            dockerfile: Dockerfile
+        # command: python ft_transcendence/manage.py runserver 10.0.0.1:8000
+        restart: always
+        ports:
+            - "8000:8000"
+        # volumes:
+        #     - 
+        networks:
+            transcendence_net:
+                ipv4_address: 10.0.0.1
+        depends_on:
+            - db
     db:
         container_name: db-postgres
         env_file:
-            - ./requirements/postgres/.env
-        build:
-            context: ./requirements/postgres
-            dockerfile: Dockerfile
-            # args:
-            #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            #     POSTGRES_DB_NAME: ${POSTGRES_DB_NAME} 
-            #     POSTGRES_DB_USER: ${POSTGRES_DB_USER}
-            #     POSTGRES_DB_PASS: ${POSTGRES_DB_PASS}
+            - ./requirements/postgres/conf/.env
+        # build:
+        #     context: ./requirements/postgres
+        #     dockerfile: Dockerfile
+        image: postgres:16-bookworm
         restart: always
         healthcheck:
             test: ["CMD-SHELL", "pg_isready"]
@@ -35,29 +32,10 @@ services:
             timeout: 5s
             retries: 10
         volumes:
-            - db_vol:/var/lib/postgresql/15/main
+            - db_vol:/var/lib/postgresql/data
         networks:
             transcendence_net:
-                ipv4_address: 10.0.0.1
-    
-    # postgres:
-    #     container_name: postgres
-    #     env_file:
-    #         - .env
-    #     build:
-    #         context: ./requirements/postgres
-    #         dockerfile: Dockerfile
-    #         # args:
-    #         #     MARIADB_DB_NAME: ${MARIADB_DB_NAME}
-    #         #     MARIADB_DB_USER: ${MARIADB_DB_USER}
-    #         #     MARIADB_DB_PASS: ${MARIADB_DB_PASS}
-    #     image: postgres:42
-    #     restart: always
-    #     volumes:
-    #         - postgresql_vol:/var/www/html
-        # networks:
-        #     transcendence_net:
-        #         ipv4_address: 10.0.0.2
+                ipv4_address: 10.0.0.2
 
 volumes:
   db_vol:
