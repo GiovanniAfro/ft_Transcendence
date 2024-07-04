@@ -1,0 +1,56 @@
+services:
+    backend:
+        container_name: python-django
+        env_file:
+            - ./requirements/python-django/conf/.env
+        build:
+            context: ./requirements/python-django
+            dockerfile: Dockerfile
+        # command: python ft_transcendence/manage.py runserver 10.0.0.1:8000
+        restart: always
+        ports:
+            - "8000:8000"
+        # volumes:
+        #     - 
+        networks:
+            transcendence_net:
+                ipv4_address: 10.0.0.1
+        depends_on:
+            - db
+    db:
+        container_name: db-postgres
+        env_file:
+            - ./requirements/postgres/conf/.env
+        build:
+            context: ./requirements/postgres
+            dockerfile: Dockerfile
+        restart: always
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready"]
+            interval: 1s
+            timeout: 5s
+            retries: 10
+        volumes:
+            - db_vol:/var/lib/postgresql/data
+        networks:
+            transcendence_net:
+                ipv4_address: 10.0.0.2
+
+volumes:
+  db_vol:
+    driver: local
+    name: db_vol
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/db
+
+networks:
+    transcendence_net:
+        name: transcendence_net
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.0.0/24
+                  gateway: 10.0.0.254
