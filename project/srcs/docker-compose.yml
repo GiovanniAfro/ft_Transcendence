@@ -21,10 +21,9 @@ services:
         container_name: db-postgres
         env_file:
             - ./requirements/postgres/conf/.env
-        # build:
-        #     context: ./requirements/postgres
-        #     dockerfile: Dockerfile
-        image: postgres:16-bookworm
+        build:
+            context: ./requirements/postgres
+            dockerfile: Dockerfile
         restart: always
         healthcheck:
             test: ["CMD-SHELL", "pg_isready"]

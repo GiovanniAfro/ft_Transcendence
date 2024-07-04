@@ -6,7 +6,7 @@
 #    By: kichkiro <kichkiro@student.42firenze.it    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/12 14:53:55 by kichkiro          #+#    #+#              #
-#    Updated: 2024/06/27 15:11:27 by kichkiro         ###   ########.fr        #
+#    Updated: 2024/07/04 20:37:08 by kichkiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,9 +15,18 @@
 .PHONY: all up down start stop re clean banner
 .SILENT:
 
+DATA_DIR := /data
+DB_DIR := $(DATA_DIR)/db
+
 # Rules ----------------------------------------------------------------------->
 
-all: banner up
+all: banner $(DB_DIR) up
+
+$(DB_DIR):
+	@if [ ! -d $(DB_DIR) ]; then \
+		echo "Directory $(DB_DIR) does not exists. Creation..."; \
+		mkdir -p $(DB_DIR); \
+	fi
 
 up: banner
 	docker compose -f ./srcs/docker-compose.yml up -d

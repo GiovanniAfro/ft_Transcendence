@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('PONG', '0002_userprofile_tournament'),
+        ('pong', '0002_userprofile_tournament'),
     ]
 
     operations = [
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('player1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='matches_player1', to=settings.AUTH_USER_MODEL)),
                 ('player2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='matches_player2', to=settings.AUTH_USER_MODEL)),
-                ('tournament', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='matches', to='PONG.tournament')),
+                ('tournament', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='matches', to='pong.tournament')),
                 ('winner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='won_matches', to=settings.AUTH_USER_MODEL)),
             ],
         ),

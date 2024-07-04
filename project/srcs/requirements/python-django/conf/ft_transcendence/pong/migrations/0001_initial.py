@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('score', models.IntegerField(default=0)),
                 ('date', models.DateTimeField(auto_now_add=True)),
-                ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='PONG.game')),
+                ('game', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='pong.game')),
                 ('player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

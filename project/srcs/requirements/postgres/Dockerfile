@@ -1,3 +1,4 @@
 FROM postgres:16-bookworm
 
-COPY conf/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
+COPY tools/add_remote_host.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/add_remote_host.sh
