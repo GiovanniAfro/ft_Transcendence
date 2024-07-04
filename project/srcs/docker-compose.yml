@@ -1,12 +1,11 @@
 services:
     backend:
-        container_name: python-django
+        container_name: django
         env_file:
-            - ./requirements/python-django/conf/.env
+            - ./requirements/django/conf/.env
         build:
-            context: ./requirements/python-django
+            context: ./requirements/django
             dockerfile: Dockerfile
-        # command: python ft_transcendence/manage.py runserver 10.0.0.1:8000
         restart: always
         ports:
             - "8000:8000"
@@ -18,7 +17,7 @@ services:
         depends_on:
             - db
     db:
-        container_name: db-postgres
+        container_name: postgres
         env_file:
             - ./requirements/postgres/conf/.env
         build:
