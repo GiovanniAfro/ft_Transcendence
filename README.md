@@ -1,3 +1,3 @@
-# webserv
+# ft-transcendence
 
 Work in Progress ...
