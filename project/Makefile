@@ -12,7 +12,7 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop re clean banner
+.PHONY: all up down start stop clean fclean banner
 .SILENT:
 
 DATA_DIR := /data
@@ -49,6 +49,10 @@ clean: banner
 	-docker volume rm $$(docker volume ls -q)
 	echo "\nRemoving network..."
 	-docker network rm $$(docker network ls -q) 2>/dev/null
+
+fclean: banner clean
+	rm -rf /data
+	docker system prune -a
 
 banner:
 	${info }
