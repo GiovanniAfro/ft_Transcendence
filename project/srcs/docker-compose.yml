@@ -6,7 +6,6 @@ services:
         build:
             context: ./requirements/django
             dockerfile: Dockerfile
-        # command: ["python", "ft_transcendence/manage.py", "runserver", "10.0.0.1:8000"]
         restart: always
         ports:
             - "8000:8000"

@@ -4,11 +4,11 @@ WORKDIR /usr/src/app
 
 COPY conf/requirements.txt ./
 COPY conf/ft_transcendence ./ft_transcendence
+COPY tools/init_django.sh /tmp/
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+	&& chmod +x /tmp/init_django.sh
 
 EXPOSE 8000
 
-# CMD ["python", "ft_transcendence/manage.py", "collectstatic", "--noinput"]
-CMD ["python", "ft_transcendence/manage.py", "migrate"]
-CMD ["python", "ft_transcendence/manage.py", "runserver", "10.0.0.1:8000"]
+ENTRYPOINT ["/tmp/init_django.sh"]
