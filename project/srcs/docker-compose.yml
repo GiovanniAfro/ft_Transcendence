@@ -42,8 +42,8 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /data/db
-
+      device: $HOME/docker_data/db
+      
 networks:
     transcendence_net:
         name: transcendence_net
