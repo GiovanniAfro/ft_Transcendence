@@ -22,4 +22,12 @@ apt-get clean -qq
 rm -rf var/lib/apt/lists/*
 
 python ft_transcendence/manage.py migrate
+python ft_transcendence/manage.py shell <<EOF
+from django.contrib.auth.models import User
+username = "${DJANGO_ADMIN_USER}"
+email = ""
+password = "${DJANGO_ADMIN_PASS}"
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username=username, email=email, password=password)
+EOF
 python ft_transcendence/manage.py runserver 10.0.0.1:8000

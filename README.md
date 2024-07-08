@@ -4,11 +4,6 @@ Work in Progress ...
 
 ## Dependencies (for Ubuntu 24.04LTS)
 
-- make
-``` sh
-sudo apt install make
-```
-
 - docker
 ``` sh
 sudo apt-get update
@@ -22,4 +17,9 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+- make
+``` sh
+sudo apt install make
 ```
