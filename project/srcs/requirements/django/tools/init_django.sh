@@ -30,4 +30,6 @@ password = "${DJANGO_ADMIN_PASS}"
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(username=username, email=email, password=password)
 EOF
+mkdir -p ft_transcendence/static
+python ft_transcendence/manage.py collectstatic --noinput
 python ft_transcendence/manage.py runserver 10.0.0.1:8000

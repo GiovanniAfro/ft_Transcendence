@@ -12,3 +12,18 @@ RUN pip install --no-cache-dir -r requirements.txt \
 EXPOSE 8000
 
 ENTRYPOINT ["/tmp/init_django.sh"]
+
+
+
+
+
+# ------------------------------------------------------------------------------
+
+# COPY TEST/init.sh /tmp/
+# RUN pip install --no-cache-dir -r requirements.txt \
+# 	&& chmod +x /tmp/init.sh
+
+# EXPOSE 8000
+
+# ENTRYPOINT ["/tmp/init.sh"]
+

@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
+import os
 import environ
+from pathlib import Path
 
 # Initialize environment variables
 env = environ.Env()
@@ -98,4 +99,5 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = '/usr/src/app/ft_transcendence/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
