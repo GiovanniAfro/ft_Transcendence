@@ -50,6 +50,7 @@ cd ft_transcendence/project
 - make down: 
   - stop containers
   - remove containers
+  - remove networks
 - make stop: 
   - stop containers
 - make start: 
@@ -57,7 +58,7 @@ cd ft_transcendence/project
 - make clean:
   - remove all container
   - remove all images
-  - remove all volum (not local)
+  - remove all volums (not local)
   - remove all networks
 - make re:
   - make clean
@@ -74,7 +75,7 @@ cd ft_transcendence/project
 
 
 ## ⚖️ - License
-See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)
+See [LICENSE](https://github.com/GiovanniAfro/ft_transcendence-/blob/master/LICENSE)
 
 <br>
 
