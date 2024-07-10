@@ -20,7 +20,7 @@ DB_DIR := $(DATA_DIR)/db
 
 # Rules ----------------------------------------------------------------------->
 
-all: banner $(DB_DIR) up
+all: banner up
 
 $(DB_DIR):
 	@if [ ! -d $(DB_DIR) ]; then \
@@ -28,7 +28,7 @@ $(DB_DIR):
 		mkdir -p $(DB_DIR); \
 	fi
 
-up: banner
+up: banner $(DB_DIR)
 	docker compose -f ./srcs/docker-compose.yml up -d
 
 down: banner

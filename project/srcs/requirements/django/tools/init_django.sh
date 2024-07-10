@@ -2,6 +2,7 @@
 
 set -e
 
+# Check connection with Postgres ---------------------------------------------->
 apt-get update -qq
 apt-get install -y -qq netcat-openbsd
 
@@ -21,6 +22,7 @@ apt-get remove --purge -y -qq netcat-openbsd
 apt-get clean -qq
 rm -rf var/lib/apt/lists/*
 
+# Start Django server ---------------------------------------------------------> 
 python ft_transcendence/manage.py makemigrations
 python ft_transcendence/manage.py migrate
 python ft_transcendence/manage.py shell <<EOF
