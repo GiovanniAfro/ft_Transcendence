@@ -73,3 +73,27 @@ class Score(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
+
+# Postgres integration test -------------------------------------------------->
+class TestDB(models.Model):
+    """
+    - Connect to django container:
+        docker exec -it django bash 
+    - Connect to django shell:
+        python ft_transcendence/manage.py shell
+    - Write into db:
+        from pong.models import TestDB
+        test_db = TestDB(title="Test DB", body="-SUCCESS-")
+        test_db.save()
+    - Read from db:
+        from pong.models import TestDB
+        test_db = TestDB.objects.all()
+        for test in test_db:
+            print(test.title, test.body)
+    """
+    title = models.CharField(max_length=100)
+    body = models.TextField()
+
+    def __str__(self):
+        return self.title
+# -----------------------------------------------------------------------------
