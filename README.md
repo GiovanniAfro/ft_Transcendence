@@ -58,7 +58,7 @@ cd ft_transcendence/project
 - make clean:
   - remove all container
   - remove all images
-  - remove all volumi (not local)
+  - remove all volum (not local)
   - remove all networks
 - make re:
   - make clean
