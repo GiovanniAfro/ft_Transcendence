@@ -5,19 +5,18 @@
 <i>
   <p>
     This project is about doing something you’ve never done before.
-    <br>
   </p>
   <p>
     Remind yourself the beginning of your journey in computer science.
-    <br>
+  </p>
+  <p>
     Look at you now. Time to shine!
-    <br>
   </p>
 </i>
 
 #### <i>[subject](_subject/en.subject.pdf) v.15</i>
 
-## Dependencies (for Ubuntu 24.04LTS)
+## 📌 -  Dependencies (for Ubuntu 24.04LTS)
 
 - docker
 ``` sh
@@ -39,7 +38,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo apt install make
 ```
 
-## 🛠️ - How to use?
+## 🛠️ - Usage
 ```
 git clone https://github.com/kichkiro/ft_transcendence.git
 cd ft_transcendence/project
@@ -67,9 +66,6 @@ cd ft_transcendence/project
   - make clean
   - remove all build cache
   - remove locale volumes (/data/)
-
-
-
 
 ## 📚 - References
 - ELK
