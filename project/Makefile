@@ -12,7 +12,7 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean re fclean banner
+.PHONY: all up down start stop clean re fclean setup_firewall setup_elasticsearch banner
 .SILENT:
 
 DATA_DIR := /data
@@ -20,7 +20,7 @@ DB_DIR := $(DATA_DIR)/db
 
 # Rules ----------------------------------------------------------------------->
 
-all: banner up
+all: banner up setup_firewall
 
 $(DB_DIR):
 	@if [ ! -d $(DB_DIR) ]; then \
@@ -50,13 +50,20 @@ clean: banner
 	echo "\nRemoving network..."
 	-docker network rm $$(docker network ls -q) 2>/dev/null
 
-re: banner clean up
+re: banner clean up setup_firewall
 
 fclean: banner clean
 	rm -rf /data
 	docker system prune -a
 
+setup_firewall:
+	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.0.0/24 -d 10.0.1.2 -p udp --dport 5000 -j ACCEPT
+
+setup_elasticsearch:
+	docker exec elasticsearch /tmp/set_users.sh
+	docker exec elasticsearch rm /tmp/set_users.sh
+	docker exec elasticsearch rm /tmp/lib.sh
+	docker exec elasticsearch rm -rf /tmp/roles
+
 banner:
 	${info }
-
-# ------------------------------------------------------------------------------

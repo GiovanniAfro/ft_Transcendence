@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+# Wait for availability ------------------------------------------------------->
+
+check_availability() {
+	curl -o /dev/null -s --head 127.0.0.1:9200 -w "%{http_code}\n" -u elastic:${ELASTIC_PASSWORD}
+}
+
+echo "Waiting for the Elasticsearch server to be reachable ..."
+
+while [ "$(check_availability)" != "200" ]; do
+    sleep 1
+done
+
+echo "Elasticsearch is reachable at 127.0.0.1:9200"
+
+# Set admin pwd --------------------------------------------------------------->
+
+function set_user_password {
+	local username=$1
+	local password=$2
+
+	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
+		"http://127.0.0.1:9200/_security/user/${username}/_password"
+		'-X' 'POST'
+		'-H' 'Content-Type: application/json'
+		'-d' "{\"password\" : \"${password}\"}"
+		)
+
+	local -i result=1
+	local output
+
+	output="$(curl "${args[@]}")"
+	if [[ "${output: -3}" -eq 200 ]]; then
+		result=0
+	fi
+
+	if ((result)); then
+		echo -e "\n${output::-3}\n"
+	fi
+
+	return $result
+}
+
+set_user_password "logstash_system" ${LOGSTASH_INTERNAL_PASSWORD}
+echo "The password for the user 'logstash' has been set."
+set_user_password "kibana_system" ${KIBANA_SYSTEM_PASSWORD}
+echo "The password for the user 'kibana' has been set."

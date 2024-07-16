@@ -17,10 +17,14 @@ services:
         ports:
             - "8000:8000"
         # volumes:
-        #     - 
+        #     -
         networks:
             backend:
                 ipv4_address: 10.0.0.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.1.2:5000"
         restart: always
         depends_on:
             - postgres
@@ -44,14 +48,19 @@ services:
         networks:
             backend:
                 ipv4_address: 10.0.0.2
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.1.2:5000"
         restart: always
 
     elasticsearch:
         container_name: elasticsearch
         build:
-            context: elasticsearch/
+            context: ./requirements/elasticsearch/
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
+        # command: ["/tmp/init.sh"]
         environment:
             node.name: elasticsearch
             ES_JAVA_OPTS: -Xms512m -Xmx512m
@@ -59,6 +68,13 @@ services:
             # Used to initialize the keystore during the initial startup of
             # Elasticsearch. Ignored on subsequent runs.
             ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+            METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
+            FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
+            HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
+            MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
+            BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
             # Use single node discovery in order to disable production mode and avoid bootstrap checks.
             # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
             discovery.type: single-node
@@ -66,55 +82,55 @@ services:
             - 9200:9200
             - 9300:9300
         volumes:
-            - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+            - ./requirements/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
             - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             elk:
                 ipv4_address: 10.0.1.1
         restart: unless-stopped
 
-    # logstash:
-    #     container_name: logstash
-    #     build:
-    #         context: ./requirements/logstash
-    #         args:
-    #             ELASTIC_VERSION: ${ELASTIC_VERSION}
-    #     ports:
-    #         - 5044:5044
-    #         - 50000:50000/tcp
-    #         - 50000:50000/udp
-    #         - 9600:9600
-    #     volumes:
-    #         - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-    #         - ./requirements/logstash/conf:/usr/share/logstash/pipeline:ro,Z
-    #     environment:
-    #         LS_JAVA_OPTS: -Xms256m -Xmx256m
-    #         LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
-    #     networks:
-    #         elk:
-    #             ipv4_address: 10.0.1.2
-    #     restart: unless-stopped
-    #     depends_on:
-    #         - elasticsearch
+    logstash:
+        container_name: logstash
+        build:
+            context: ./requirements/logstash
+            args:
+                ELASTIC_VERSION: ${ELASTIC_VERSION}
+        ports:
+            - 5044:5044
+            - 50000:50000/tcp
+            - 50000:50000/udp
+            - 9600:9600
+        volumes:
+            - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+            - ./requirements/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
+        environment:
+            LS_JAVA_OPTS: -Xms256m -Xmx256m
+            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+        networks:
+            elk:
+                ipv4_address: 10.0.1.2
+        restart: unless-stopped
+        depends_on:
+            - elasticsearch
 
-    # kibana:
-    #     container_name: kibana
-    #     build:
-    #         context: ./requirements/kibana
-    #         args:
-    #             ELASTIC_VERSION: ${ELASTIC_VERSION}
-    #     volumes:
-    #         - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
-    #     ports:
-    #         - 5601:5601
-    #     environment:
-    #         KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
-    #     networks:
-    #         elk:
-    #             ipv4_address: 10.0.1.3
-    #     restart: unless-stopped
-    #     depends_on:
-    #         - elasticsearch
+    kibana:
+        container_name: kibana
+        build:
+            context: ./requirements/kibana
+            args:
+                ELASTIC_VERSION: ${ELASTIC_VERSION}
+        volumes:
+            - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+        ports:
+            - 5601:5601
+        environment:
+            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        networks:
+            elk:
+                ipv4_address: 10.0.1.3
+        restart: unless-stopped
+        depends_on:
+            - elasticsearch
 
 volumes:
     db:
