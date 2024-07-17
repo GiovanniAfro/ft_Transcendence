@@ -57,13 +57,13 @@ fclean: banner clean
 	docker system prune -a
 
 setup_firewall:
-	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.0.0/24 -d 10.0.1.2 -p udp --dport 5000 -j ACCEPT
+	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.0.0/24 -d 10.0.1.2 -p udp --dport 50000 -j ACCEPT
 
 setup_elasticsearch:
 	docker exec elasticsearch /tmp/set_users.sh
 	docker exec elasticsearch rm /tmp/set_users.sh
 	docker exec elasticsearch rm /tmp/lib.sh
-	docker exec elasticsearch rm -rf /tmp/roles
+	docker exec elasticsearch rm /tmp/logstash_writer.json
 
 banner:
 	${info }
