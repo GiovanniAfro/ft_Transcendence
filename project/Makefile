@@ -58,6 +58,8 @@ fclean: banner clean
 
 setup_firewall:
 	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.0.0/24 -d 10.0.1.2 -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.2.1 -d 10.0.0.1 -p tcp --dport 8000 -j ACCEPT
+	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.2.1 -d 10.0.0.2 -p tcp --dport 5432 -j ACCEPT
 
 setup_elasticsearch:
 	docker exec elasticsearch /tmp/set_users.sh

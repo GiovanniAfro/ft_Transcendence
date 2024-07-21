@@ -1,0 +1,15 @@
+libfuzzy.so.2 libfuzzy2 #MINVER#
+* Build-Depends-Package: libfuzzy-dev
+ edit_distn@Base 2.13
+ find_file_size@Base 2.13
+ fuzzy_clone@Base 2.13
+ fuzzy_compare@Base 2.13
+ fuzzy_digest@Base 2.13
+ fuzzy_free@Base 2.13
+ fuzzy_hash_buf@Base 2.13
+ fuzzy_hash_file@Base 2.13
+ fuzzy_hash_filename@Base 2.13
+ fuzzy_hash_stream@Base 2.13
+ fuzzy_new@Base 2.13
+ fuzzy_set_total_input_length@Base 2.13
+ fuzzy_update@Base 2.13

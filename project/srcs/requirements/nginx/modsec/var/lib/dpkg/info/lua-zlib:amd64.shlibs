@@ -1,0 +1,4 @@
+liblua5.1-zlib 0 lua-zlib (>= 1.2)
+liblua5.2-zlib 0 lua-zlib (>= 1.2)
+liblua5.3-zlib 0 lua-zlib (>= 1.2)
+liblua5.4-zlib 0 lua-zlib (>= 1.2)

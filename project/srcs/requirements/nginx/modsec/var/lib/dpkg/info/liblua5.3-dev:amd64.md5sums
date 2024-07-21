@@ -1,0 +1,13 @@
+2fcb9bf20db9cc4d7b0e9417992cb002  usr/include/lua5.3/lauxlib.h
+8d221247f78c06d7a10f8d39070fdb52  usr/include/lua5.3/lua.h
+9fac7d7bf2a86babec4b57d3904495c8  usr/include/lua5.3/lua.hpp
+dc42a4f9479c09c56da52500cdb07c14  usr/include/lua5.3/luaconf.h
+1149083fce50dd93b2e156e3c87f5b0f  usr/include/lua5.3/lualib.h
+4c524d7f3eb53164793dbae9257c0d45  usr/include/x86_64-linux-gnu/lua5.3-deb-multiarch.h
+c696a670b48792f5d94033283644796f  usr/lib/x86_64-linux-gnu/liblua5.3-c++.a
+6706220e237aa9b4d9fe7d8f181e2dd9  usr/lib/x86_64-linux-gnu/liblua5.3.a
+4f61006ac447f8146706565a3a9982b8  usr/lib/x86_64-linux-gnu/pkgconfig/lua5.3-c++.pc
+ad926da451d5eff7682e443b585237d1  usr/lib/x86_64-linux-gnu/pkgconfig/lua5.3.pc
+34bf541ecfc601e2935b03ee67dadc60  usr/share/doc/liblua5.3-dev/changelog.Debian.gz
+a136ffa5eef06f31b05bfb65f832e172  usr/share/doc/liblua5.3-dev/copyright
+9b5c1d6cb5930c9542b839080e62a128  usr/share/lua5.3/version-script
