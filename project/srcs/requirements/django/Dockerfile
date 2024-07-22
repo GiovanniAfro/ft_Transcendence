@@ -9,7 +9,7 @@ COPY tools/init_django.sh /tmp/
 RUN pip install --no-cache-dir -r requirements.txt \
 	&& chmod +x /tmp/init_django.sh
 
-EXPOSE 8000
+# EXPOSE 8000
 
 ENTRYPOINT ["/tmp/init_django.sh"]
 

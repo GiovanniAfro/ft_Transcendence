@@ -20,7 +20,7 @@ DB_DIR := $(DATA_DIR)/db
 
 # Rules ----------------------------------------------------------------------->
 
-all: banner up setup_firewall
+all: banner up
 
 $(DB_DIR):
 	@if [ ! -d $(DB_DIR) ]; then \
@@ -28,7 +28,7 @@ $(DB_DIR):
 		mkdir -p $(DB_DIR); \
 	fi
 
-up: banner $(DB_DIR)
+up: banner
 	docker compose -f ./srcs/docker-compose.yml up -d
 
 down: banner
@@ -50,16 +50,34 @@ clean: banner
 	echo "\nRemoving network..."
 	-docker network rm $$(docker network ls -q) 2>/dev/null
 
-re: banner clean up setup_firewall
+re: banner clean up setup_elasticsearch
 
 fclean: banner clean
 	rm -rf /data
 	docker system prune -a
 
 setup_firewall:
-	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.0.0/24 -d 10.0.1.2 -p udp --dport 50000 -j ACCEPT
-	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.2.1 -d 10.0.0.1 -p tcp --dport 8000 -j ACCEPT
-	iptables -I DOCKER-ISOLATION-STAGE-2 1 -s 10.0.2.1 -d 10.0.0.2 -p tcp --dport 5432 -j ACCEPT
+	iptables -F DOCKER-USER
+	iptables -A DOCKER-USER -s 0.0.0.0/0 -d 0.0.0.0/0 -j RETURN
+	iptables -I DOCKER-USER -s 10.0.0.0/24 -d 10.0.0.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.1.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.2.0/24 -d 10.0.2.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.3.0/24 -d 10.0.3.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.4.0/24 -d 10.0.4.0/24 -j DROP
+
+	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+
+	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+
+	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
+
+
+
+
+	iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 setup_elasticsearch:
 	docker exec elasticsearch /tmp/set_users.sh
