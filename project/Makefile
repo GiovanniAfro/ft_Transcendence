@@ -12,7 +12,7 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean fclean banner
+.PHONY: all up down start stop clean re fclean banner
 .SILENT:
 
 DATA_DIR := /data
@@ -20,7 +20,7 @@ DB_DIR := $(DATA_DIR)/db
 
 # Rules ----------------------------------------------------------------------->
 
-all: banner $(DB_DIR) up
+all: banner up
 
 $(DB_DIR):
 	@if [ ! -d $(DB_DIR) ]; then \
@@ -28,7 +28,7 @@ $(DB_DIR):
 		mkdir -p $(DB_DIR); \
 	fi
 
-up: banner
+up: banner $(DB_DIR)
 	docker compose -f ./srcs/docker-compose.yml up -d
 
 down: banner
@@ -49,6 +49,8 @@ clean: banner
 	-docker volume rm $$(docker volume ls -q)
 	echo "\nRemoving network..."
 	-docker network rm $$(docker network ls -q) 2>/dev/null
+
+re: banner clean up
 
 fclean: banner clean
 	rm -rf /data

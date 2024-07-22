@@ -10,19 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from os import path
+from environ import Env
 from pathlib import Path
-import environ
 
 # Initialize environment variables
-env = environ.Env()
-environ.Env.read_env(env_file=str(Path(__file__).resolve().parent.parent / '.env'))
+env = Env()
+# environ.Env.read_env(env_file=str(Path(__file__).resolve().parent.parent / '.env'))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
-
+DEBUG = True
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=[])
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,9 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'sslserver',
-    'pong',  # Your application
+    'pong',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -44,9 +42,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'ft_transcendence.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -62,10 +58,8 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
 # ASGI_APPLICATION = 'ft_transcendence.asgi.application'  # Uncomment if using ASGI
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -76,7 +70,6 @@ DATABASES = {
         'PORT': env('DB_PORT'),
     }
 }
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -91,11 +84,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
