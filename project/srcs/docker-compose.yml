@@ -33,8 +33,8 @@ services:
             DB_PORT: ${DB_PORT} 
             DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
             DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
-        # ports:
-            # - "8000:8000"
+        ports:
+            - "8000:8000"
         # volumes:
         #     -
         networks:
@@ -124,7 +124,6 @@ services:
         ports:
             # - 5044:5044
             - 50000:50000/udp
-            # - 50000:50000/udp
             - 9600:9600
         volumes:
             - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
@@ -217,12 +216,6 @@ services:
     
 volumes:
     db:
-        # driver: local
-        # name: db
-        # driver_opts:
-        #     type: none
-        #     o: bind
-        #     device: /data/db
             
     elasticsearch:
     

@@ -22,12 +22,6 @@ DB_DIR := $(DATA_DIR)/db
 
 all: banner up
 
-$(DB_DIR):
-	@if [ ! -d $(DB_DIR) ]; then \
-		echo "Directory $(DB_DIR) does not exists. Creation..."; \
-		mkdir -p $(DB_DIR); \
-	fi
-
 up: banner
 	docker compose -f ./srcs/docker-compose.yml up -d
 
@@ -68,11 +62,15 @@ setup_firewall:
 	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 
 	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --sport 50000 -j ACCEPT
+
+	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
+
 	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
 	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 
-	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
-	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
 
 
 
