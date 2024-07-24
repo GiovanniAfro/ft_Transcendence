@@ -153,7 +153,7 @@ services:
                 ipv4_address: 10.0.2.3
         restart: unless-stopped
         depends_on:
-            - elasticsearch
+            - logstash
     
     # prometheus:
     #     container_name: prometheus
@@ -216,8 +216,8 @@ volumes:
     db:
             
     elasticsearch:
-    
-    grafana: {}
+
+    # grafana: {}
 
 networks:
     proxy-waf:
