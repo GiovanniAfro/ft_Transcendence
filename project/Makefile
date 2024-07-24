@@ -12,43 +12,74 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean re fclean setup_firewall setup_elasticsearch banner
+.PHONY: all up down start stop clean fclean re setup_firewall setup_elasticsearch banner
 .SILENT:
 
-DATA_DIR := /data
-DB_DIR := $(DATA_DIR)/db
+IMAGES?=
+
+WHITE_BOLD=\033[1;37m
+BLUE=\033[0;34m
+NC=\033[0m
 
 # Rules ----------------------------------------------------------------------->
 
 all: banner up
 
-up: banner
-	docker compose -f ./srcs/docker-compose.yml up -d
+up: setup_firewall banner
+	docker compose -p "ft_transcendence" up -d 
 
-down: banner
-	docker compose -f ./srcs/docker-compose.yml down
+down:
+	docker compose down
 
-start: banner
-	docker compose -f ./srcs/docker-compose.yml start
+start:
+	docker compose start
 
-stop: banner
-	docker compose -f ./srcs/docker-compose.yml stop
+stop:
+	docker compose stop
 
-clean: banner
-	echo "Removing all containers..."
-	-docker rm -f $$(docker ps -qa)
-	echo "\nRemoving all images..."
-	-docker rmi -f $$(docker images -qa)
-	echo "\nRemoving all volumes..."
-	-docker volume rm $$(docker volume ls -q)
-	echo "\nRemoving network..."
-	-docker network rm $$(docker network ls -q) 2>/dev/null
+clean:
+	@echo "\n$(BLUE)[+] Removing all containers$(NC)"
+	@docker ps -qa | while read id; do \
+		name=$$(docker inspect --format='{{.Name}}' $$id | sed 's/^\/\(.*\)/\1/'); \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+		docker rm -f $$id > /dev/null 2>&1; \
+	done
+	@if [ -z "$(IMAGES)" ]; then \
+		echo "\n$(BLUE)[+] Removing all images$(NC)"; \
+		docker images -q | while read id; do \
+			name=$$(docker inspect --format='{{.RepoTags}}' $$id); \
+			echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+			docker rmi -f $$id > /dev/null 2>&1; \
+		done; \
+	else \
+		echo "\n$(BLUE)[+] Removing specified images$(NC)";\
+		for image in $(IMAGES); do \
+			id=$$(docker images -q $$image 2>/dev/null); \
+			if [ ! -z "$$id" ]; then \
+				name=$$(docker inspect --format="{{.RepoTags}}" $$id); \
+				echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+				docker rmi -f $$id > /dev/null 2>&1; \
+			fi; \
+		done; \
+	fi
 
-re: banner clean up setup_elasticsearch
+fclean: clean
+	@echo "\n$(BLUE)[+] Removing all networks$(NC)"
+	@docker network ls -q | while read id; do \
+		name=$$(docker network inspect --format='{{.Name}}' $$id); \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+		docker network rm $$id > /dev/null 2>&1; \
+	done
+	@echo "\n$(BLUE)[+] Removing all volumes$(NC)"
+	@docker volume ls -q | while read id; do \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$id$(NC)"; \
+		docker volume rm $$id > /dev/null 2>&1; \
+	done
+	@echo "\n$(BLUE)[+] Removing all build cache$(NC)"
+	@-docker builder prune --all --force > /dev/null 2>&1
+	@echo "\n$(BLUE)[+] Cleanup complete$(NC)"
 
-fclean: banner clean
-	rm -rf /data
-	docker system prune -a
+re: clean up
 
 setup_firewall:
 	iptables -F DOCKER-USER

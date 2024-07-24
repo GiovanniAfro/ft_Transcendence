@@ -43,9 +43,11 @@ sudo apt install make
 git clone https://github.com/kichkiro/ft_transcendence.git
 cd ft_transcendence/project
 ```
-- make up: 
-  - creates the /data directory and related subdirectories if they do not exist (for local volumes) 
-  - create images 
+- make up:
+  - make setup_firewall
+  - create images
+  - create volumes
+  - create networks 
   - start containers
 - make down: 
   - stop containers
@@ -55,17 +57,18 @@ cd ft_transcendence/project
 - make start: 
   - start containers
 - make clean:
-  - remove all container
-  - remove all images
-  - remove all volum (not local)
+  - remove all containers
+  - remove specified images (can specify with "make [re|clean] IMAGES=<image_name> ...", otherwise removes all images)
+- make fclean:
+  - make clean
   - remove all networks
+  - remove all volums
+  - remove all build cache
 - make re:
   - make clean
   - make up
-- make fclean:
-  - make clean
-  - remove all build cache
-  - remove locale volumes (/data/)
+- make setup_firewall:
+  - setup iptables
 
 ## 📚 - References
 - ELK

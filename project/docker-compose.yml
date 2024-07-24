@@ -48,7 +48,7 @@ services:
         restart: always
         depends_on:
             - postgres
-            # - logstash
+            - logstash
 
     postgres:
         container_name: postgres
@@ -75,10 +75,8 @@ services:
                 gelf-address: "udp://10.0.2.2:50000"
                 tag: "postgres"
         restart: always
-        # depends_on:
-        #     - logstash
-
-
+        depends_on:
+            - logstash
 
     elasticsearch:
         container_name: elasticsearch
