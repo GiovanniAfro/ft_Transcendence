@@ -81,10 +81,7 @@ cd ft_transcendence/project
 
 ## 🐋- Docker Infrastracture
 
-<div style="background-color: white; display: inline-block;">
-  <img src="_notebook/topology.svg" alt="topology" />
-</div>
-
+<img src="_notebook/topology.svg" alt="topology" />
 
 ## 📚 - References
 - ELK
