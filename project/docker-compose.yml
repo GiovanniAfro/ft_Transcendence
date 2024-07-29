@@ -1,0 +1,274 @@
+services:
+    nginx:
+        profiles:
+            - proxy-waf
+        container_name: nginx
+        build:
+            context: ./requirements/nginx
+            dockerfile: Dockerfile
+        ports:
+            - "8080:8080"
+            - "8443:8443"
+        # volumes:
+            # - ./nginx.conf:/etc/nginx/nginx.conf
+            # - ./modsecurity.conf:/etc/modsecurity/modsecurity.conf
+        networks:
+            proxy-waf:
+                ipv4_address: 10.0.0.1
+        restart: always
+        depends_on:
+            - django
+
+    django:
+        profiles:
+            - app
+        container_name: django
+        build:
+            context: ./requirements/django
+            dockerfile: Dockerfile
+        environment:
+            SECRET_KEY: ${SECRET_KEY} 
+            ALLOWED_HOSTS: ${ALLOWED_HOSTS} 
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            DB_HOST: ${DB_HOST} 
+            DB_PORT: ${DB_PORT} 
+            DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
+            DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
+        ports:
+            - "8000:8000"
+        # volumes:
+        #     -
+        networks:
+            app:
+                ipv4_address: 10.0.1.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:50000"
+                tag: "django"
+        restart: always
+        depends_on:
+            - postgres
+
+    postgres:
+        profiles:
+            - app
+        container_name: postgres
+        build:
+            context: ./requirements/postgres
+            dockerfile: Dockerfile
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready"]
+            interval: 1s
+            timeout: 5s
+            retries: 10
+        volumes:
+            - db:/var/lib/postgresql/data
+        networks:
+            app:
+                ipv4_address: 10.0.1.2
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:50000"
+                tag: "postgres"
+        restart: always
+
+    elasticsearch:
+        profiles:
+            - log-system
+        container_name: elasticsearch
+        build:
+            context: ./requirements/elasticsearch/
+            args:
+                ELASTIC_VERSION: ${ELASTIC_VERSION}
+        entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
+        environment:
+            ELASTIC_VERSION: ${ELASTIC_VERSION:-}
+            node.name: elasticsearch
+            ES_JAVA_OPTS: -Xms512m -Xmx512m
+            # Bootstrap password.
+            # Used to initialize the keystore during the initial startup of
+            # Elasticsearch. Ignored on subsequent runs.
+            ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+            METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
+            FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
+            HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
+            MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
+            BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
+            # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+            # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+            discovery.type: single-node
+        ports:
+            - 9200:9200
+            # - 9300:9300
+        volumes:
+            - ./requirements/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+            - elasticsearch:/usr/share/elasticsearch/data:Z
+        networks:
+            log-system:
+                ipv4_address: 10.0.2.1
+        restart: unless-stopped
+
+    logstash:
+        profiles:
+            - log-system
+        container_name: logstash
+        build:
+            context: ./requirements/logstash
+            args:
+                ELASTIC_VERSION: ${ELASTIC_VERSION}
+        ports:
+            - 50000:50000/udp
+            - 9600:9600
+        volumes:
+            - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+            - ./requirements/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
+        environment:
+            LS_JAVA_OPTS: -Xms256m -Xmx256m
+            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+        networks:
+            log-system:
+                ipv4_address: 10.0.2.2
+        restart: unless-stopped
+        depends_on:
+            - elasticsearch
+
+    kibana:
+        profiles:
+            - log-system
+        container_name: kibana
+        build:
+            context: ./requirements/kibana
+            args:
+                ELASTIC_VERSION: ${ELASTIC_VERSION}
+        volumes:
+            - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+        ports:
+            - 5601:5601
+        environment:
+            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        networks:
+            log-system:
+                ipv4_address: 10.0.2.3
+        restart: unless-stopped
+        depends_on:
+            - logstash
+    
+    # prometheus:
+    #     container_name: prometheus
+    #     build:
+    #         context: ./requirements/prometheus
+    #         # args:
+    #             # ELASTIC_VERSION: ${ELASTIC_VERSION}
+    #     # volumes:
+    #     #     - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    #     ports:
+    #         - 9090:9090
+    #     # environment:
+    #     #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.2.1
+    #     restart: unless-stopped
+
+    # grafana:
+    #     container_name: grafana
+    #     build:
+    #         context: ./requirements/grafana
+    #         # args:
+    #             # ELASTIC_VERSION: ${ELASTIC_VERSION}
+    #     volumes:
+    #         - grafana:/var/lib/grafana
+    #     ports:
+    #         - 3000:3000
+    #     # environment:
+    #     #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.2.2
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
+
+    # hashicorp-vault:
+    #     container_name: hashicorp-vault
+    #     build:
+    #         context: ./requirements/hashicorp-vault
+    #         dockerfile: Dockerfile
+    #     # environment:
+    #     # 
+    #     # volumes:
+    #     #     - db:/var/lib/postgresql/data
+    #     networks:
+    #         app:
+    #             ipv4_address: 10.0.0.3
+    #     logging:
+    #         driver: gelf
+    #         options:
+    #             gelf-address: "udp://10.0.4.1:50000"
+    #             tag: "postgres"
+    #     restart: always
+    #     # depends_on:
+    #     #     - logstash
+    
+volumes:
+    db:
+            
+    elasticsearch:
+
+    # grafana: {}
+
+networks:
+    proxy-waf:
+        name: proxy-waf
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.0.0/24
+                  gateway: 10.0.0.254
+
+    app:
+        name: app
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.1.0/24
+                  gateway: 10.0.1.254
+
+    log-system:
+        name: log-system
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.2.0/24
+                  gateway: 10.0.2.254
+
+    monitor-system:
+        name: monitor-system
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.3.0/24
+                  gateway: 10.0.3.254
+
+    secrets:
+        name: secrets
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.0.4.0/24
+                  gateway: 10.0.4.254

@@ -12,51 +12,108 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean re fclean banner
+.PHONY: all up down start stop clean fclean re setup_firewall dev re-dev
 .SILENT:
 
-DATA_DIR := /data
-DB_DIR := $(DATA_DIR)/db
+IMAGES?=
+
+WHITE_BOLD=\033[1;37m
+BLUE=\033[0;34m
+NC=\033[0m
 
 # Rules ----------------------------------------------------------------------->
 
-all: banner up
+all: up
 
-$(DB_DIR):
-	@if [ ! -d $(DB_DIR) ]; then \
-		echo "Directory $(DB_DIR) does not exists. Creation..."; \
-		mkdir -p $(DB_DIR); \
+up: setup_firewall
+	@echo
+	docker compose -p "ft_transcendence" --profile log-system up -d
+	docker compose -p "ft_transcendence" --profile proxy-waf --profile app up -d
+
+down:
+	docker compose down
+
+start:
+	docker compose start
+
+stop:
+	docker compose stop
+
+clean:
+	@echo "\n$(BLUE)[+] Removing all containers$(NC)"
+	@docker ps -qa | while read id; do \
+		name=$$(docker inspect --format='{{.Name}}' $$id | sed 's/^\/\(.*\)/\1/'); \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+		docker rm -f $$id > /dev/null 2>&1; \
+	done
+	@if [ -z "$(IMAGES)" ]; then \
+		echo "\n$(BLUE)[+] Removing all images$(NC)"; \
+		docker images -q | while read id; do \
+			name=$$(docker inspect --format='{{.RepoTags}}' $$id); \
+			echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+			docker rmi -f $$id > /dev/null 2>&1; \
+		done; \
+	else \
+		echo "\n$(BLUE)[+] Removing specified images$(NC)";\
+		for image in $(IMAGES); do \
+			id=$$(docker images -q $$image 2>/dev/null); \
+			if [ ! -z "$$id" ]; then \
+				name=$$(docker inspect --format="{{.RepoTags}}" $$id); \
+				echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+				docker rmi -f $$id > /dev/null 2>&1; \
+			fi; \
+		done; \
 	fi
 
-up: banner $(DB_DIR)
-	docker compose -f ./srcs/docker-compose.yml up -d
+fclean: clean
+	@echo "\n$(BLUE)[+] Removing all networks$(NC)"
+	@docker network ls -q | while read id; do \
+		name=$$(docker network inspect --format='{{.Name}}' $$id); \
+		if [ "$$name" != "bridge" ] && [ "$$name" != "host" ] && [ "$$name" != "none" ]; then \
+			echo "    $(BLUE)Removing: $(WHITE_BOLD)$$name$(NC)"; \
+			docker network rm $$id > /dev/null 2>&1; \
+		fi \
+	done
+	@echo "\n$(BLUE)[+] Removing all volumes$(NC)"
+	@docker volume ls -q | while read id; do \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$id$(NC)"; \
+		docker volume rm $$id > /dev/null 2>&1; \
+	done
+	@echo "\n$(BLUE)[+] Removing all build cache$(NC)"
+	@-docker builder prune --all --force > /dev/null 2>&1
+	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"
 
-down: banner
-	docker compose -f ./srcs/docker-compose.yml down
+re: clean up
 
-start: banner
-	docker compose -f ./srcs/docker-compose.yml start
+dev:
+	@echo
+	docker compose -p "ft_transcendence" --profile app up -d
 
-stop: banner
-	docker compose -f ./srcs/docker-compose.yml stop
+re-dev: clean dev
 
-clean: banner
-	echo "Removing all containers..."
-	-docker rm -f $$(docker ps -qa)
-	echo "\nRemoving all images..."
-	-docker rmi -f $$(docker images -qa)
-	echo "\nRemoving all volumes..."
-	-docker volume rm $$(docker volume ls -q)
-	echo "\nRemoving network..."
-	-docker network rm $$(docker network ls -q) 2>/dev/null
+setup_firewall:
+	iptables -F DOCKER-USER
+	iptables -A DOCKER-USER -s 0.0.0.0/0 -d 0.0.0.0/0 -j RETURN
+	iptables -I DOCKER-USER -s 10.0.0.0/24 -d 10.0.0.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.1.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.2.0/24 -d 10.0.2.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.3.0/24 -d 10.0.3.0/24 -j DROP
+	iptables -I DOCKER-USER -s 10.0.4.0/24 -d 10.0.4.0/24 -j DROP
 
-re: banner clean up
+	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 
-fclean: banner clean
-	rm -rf /data
-	docker system prune -a
+	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --sport 50000 -j ACCEPT
 
-banner:
-	${info }
+	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
 
-# ------------------------------------------------------------------------------
+	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+
+
+
+
+
+	iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT
