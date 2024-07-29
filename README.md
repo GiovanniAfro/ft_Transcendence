@@ -67,8 +67,24 @@ cd ft_transcendence/project
 - make re:
   - make clean
   - make up
+- make dev:
+  - make setup_firewall
+  - create images (only for app profile)
+  - create volumes (only for app profile)
+  - create networks (only for app profile)
+  - start containers (only for app profile)
+- make re-dev:
+  - make clean
+  - make dev
 - make setup_firewall:
   - setup iptables
+
+## 🐋- Docker Infrastracture
+
+<div style="background-color: white; display: inline-block;">
+  <img src="_notebook/topology.svg" alt="topology" />
+</div>
+
 
 ## 📚 - References
 - ELK

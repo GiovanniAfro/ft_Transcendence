@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="2Z_CETV6rpszF2AJH84o" name="Page-1">
-        <mxGraphModel dx="1849" dy="1428" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1607" dy="1068" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -40,7 +40,7 @@
                 <mxCell id="28" value="10.0.0.1 =&amp;gt; 10.0.1.1 = 8000/tcp&lt;br&gt;10.0.1.1 =&amp;gt; 10.0.0.1 = 80/tcp, 443/tcp" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="430" y="320" width="220" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="80" style="edgeStyle=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.297;entryY=-0.048;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;entryPerimeter=0;" parent="1" source="33" target="77" edge="1">
+                <mxCell id="80" style="edgeStyle=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.298;entryY=0;entryDx=0;entryDy=0;fillColor=#dae8fc;strokeColor=#6c8ebf;entryPerimeter=0;" parent="1" source="33" target="77" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="120" y="360"/>
@@ -103,10 +103,10 @@
                 <mxCell id="53" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="43" vertex="1">
                     <mxGeometry x="40" y="260" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="55" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#1ba1e2;strokeColor=#006EAF;" parent="1" target="44" edge="1">
+                <mxCell id="55" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#1ba1e2;strokeColor=#006EAF;exitX=0.122;exitY=1.02;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" target="44" edge="1" source="34">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-140" y="-30" as="targetPoint"/>
-                        <mxPoint x="-140" y="-40" as="sourcePoint"/>
+                        <mxPoint x="-140" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="44" value="LOG-SYSTEM&lt;br&gt;10.0.2.0/24" style="swimlane;whiteSpace=wrap;html=1;startSize=40;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="1" vertex="1">
