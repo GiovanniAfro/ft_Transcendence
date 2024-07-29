@@ -1,5 +1,7 @@
 services:
     nginx:
+        profiles:
+            - proxy-waf
         container_name: nginx
         build:
             context: ./requirements/nginx
@@ -7,7 +9,6 @@ services:
         ports:
             - "8080:8080"
             - "8443:8443"
-
         # volumes:
             # - ./nginx.conf:/etc/nginx/nginx.conf
             # - ./modsecurity.conf:/etc/modsecurity/modsecurity.conf
@@ -19,6 +20,8 @@ services:
             - django
 
     django:
+        profiles:
+            - app
         container_name: django
         build:
             context: ./requirements/django
@@ -48,9 +51,10 @@ services:
         restart: always
         depends_on:
             - postgres
-            - logstash
 
     postgres:
+        profiles:
+            - app
         container_name: postgres
         build:
             context: ./requirements/postgres
@@ -75,17 +79,18 @@ services:
                 gelf-address: "udp://10.0.2.2:50000"
                 tag: "postgres"
         restart: always
-        depends_on:
-            - logstash
 
     elasticsearch:
+        profiles:
+            - log-system
         container_name: elasticsearch
         build:
             context: ./requirements/elasticsearch/
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
-        # command: ["/tmp/init.sh"]
+        entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
         environment:
+            ELASTIC_VERSION: ${ELASTIC_VERSION:-}
             node.name: elasticsearch
             ES_JAVA_OPTS: -Xms512m -Xmx512m
             # Bootstrap password.
@@ -114,13 +119,14 @@ services:
         restart: unless-stopped
 
     logstash:
+        profiles:
+            - log-system
         container_name: logstash
         build:
             context: ./requirements/logstash
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
         ports:
-            # - 5044:5044
             - 50000:50000/udp
             - 9600:9600
         volumes:
@@ -137,6 +143,8 @@ services:
             - elasticsearch
 
     kibana:
+        profiles:
+            - log-system
         container_name: kibana
         build:
             context: ./requirements/kibana
@@ -239,7 +247,7 @@ networks:
                   gateway: 10.0.1.254
 
     log-system:
-        name: system
+        name: log-system
         driver: bridge
         ipam:
             driver: default
