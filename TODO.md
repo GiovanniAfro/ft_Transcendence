@@ -1,9 +1,10 @@
 TOTAL
-	Major:6
-	Minor:2
-DOUBTFUL
-	Major:
+	Major:8
 	Minor:3
+DOUBTFUL
+	Major:1
+	Minor:2
+
 # Web
 	[*] Major module: Use a Framework as backend.
 	[?] Minor module: Use a front-end framework or toolkit.
@@ -18,12 +19,12 @@ DOUBTFUL
 	[?] Minor module: Game Customization Options.
 	[*] Major module: Live chat.
 # Cybersecurity
-	[] Major module: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.
+	[*] Major module: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.
 	[] Minor module: GDPR Compliance Options with User Anonymization, Local Data Management, and Account Deletion.
 	[*] Major module: Implement Two-Factor Authentication (2FA) and JWT.
 # Devops
 	[*] Major module: Infrastructure Setup for Log Management.
-	[] Minor module: Monitoring system.
+	[*] Minor module: Monitoring system.
 	[] Major module: Designing the Backend as Microservices.
 # Graphics
 	[] Major module: Use of advanced 3D techniques.

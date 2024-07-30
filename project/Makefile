@@ -114,6 +114,4 @@ setup_firewall:
 
 
 
-
-
 	iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT

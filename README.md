@@ -82,6 +82,9 @@ cd ft_transcendence/project
 
 ## 🐋- Docker Infrastracture
 
+<!-- add the following code to topology.svg for white background 
+  <rect width="100%" height="100%" fill="white"/> -->
+
 <img src="_notebook/topology.svg" alt="topology" />
 
 ## 📚 - References
