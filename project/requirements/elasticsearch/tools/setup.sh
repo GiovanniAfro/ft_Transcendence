@@ -51,9 +51,9 @@ sublog "Elasticsearch is running"
 
 source /tmp/set_users.sh
 
-# Create DataStream ----------------------------------------------------------->
+# Set Data Retention Policy --------------------------------------------------->
 
-# source /tmp/create_datastream.sh
+source /tmp/set_data_retention_policy.sh
 
 # Create Flag ----------------------------------------------------------------->
 
