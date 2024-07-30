@@ -15,6 +15,11 @@ services:
     #     networks:
     #         proxy-waf:
     #             ipv4_address: 10.0.0.1
+    #     logging:
+    #         driver: gelf
+    #         options:
+    #             gelf-address: "udp://10.0.2.2:50000"
+    #             tag: "nginx"
     #     restart: always
     #     depends_on:
     #         - django
@@ -69,7 +74,7 @@ services:
             timeout: 5s
             retries: 10
         volumes:
-            - db:/var/lib/postgresql/data
+            - postgres:/var/lib/postgresql/data
         networks:
             app:
                 ipv4_address: 10.0.1.2
@@ -163,45 +168,41 @@ services:
         depends_on:
             - logstash
     
-    # prometheus:
-    #     profiles:
-    #         - monitor-system
-    #     container_name: prometheus
-    #     build:
-    #         context: ./requirements/prometheus
-    #         # args:
-    #             # ELASTIC_VERSION: ${ELASTIC_VERSION}
-    #     # volumes:
-    #     #     - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
-    #     ports:
-    #         - 9090:9090
-    #     # environment:
-    #     #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
-    #     networks:
-    #         monitor-system:
-    #             ipv4_address: 10.0.2.1
-    #     restart: unless-stopped
+    prometheus:
+        profiles:
+            - monitor-system
+        container_name: prometheus
+        build:
+            context: ./requirements/prometheus
+        volumes:
+            - prometheus:/opt/bitnami/prometheus/
+        ports:
+            - 9090:9090
+        # environment:
+        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.1
+        restart: unless-stopped
 
-    # grafana:
-    #     profiles:
-    #         - monitor-system
-    #     container_name: grafana
-    #     build:
-    #         context: ./requirements/grafana
-    #         # args:
-    #             # ELASTIC_VERSION: ${ELASTIC_VERSION}
-    #     volumes:
-    #         - grafana:/var/lib/grafana
-    #     ports:
-    #         - 3000:3000
-    #     # environment:
-    #     #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
-    #     networks:
-    #         monitor-system:
-    #             ipv4_address: 10.0.2.2
-    #     restart: unless-stopped
-    #     depends_on:
-    #         - prometheus
+    grafana:
+        profiles:
+            - monitor-system
+        container_name: grafana
+        build:
+            context: ./requirements/grafana
+        volumes:
+            - grafana:/var/lib/grafana
+        ports:
+            - 3000:3000
+        # environment:
+        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.2
+        restart: unless-stopped
+        depends_on:
+            - prometheus
 
     # hashicorp-vault:
     #     profiles:
@@ -213,7 +214,7 @@ services:
     #     # environment:
     #     # 
     #     # volumes:
-    #     #     - db:/var/lib/postgresql/data
+    #     #     - postgres:/var/lib/postgresql/data
     #     networks:
     #         app:
     #             ipv4_address: 10.0.0.3
@@ -225,11 +226,13 @@ services:
     #     restart: always
     
 volumes:
-    db:
+    postgres:
             
     elasticsearch:
 
-    # grafana: {}
+    prometheus:
+
+    grafana:
 
 networks:
     proxy-waf:
