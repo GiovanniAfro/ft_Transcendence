@@ -27,7 +27,7 @@ all: up
 
 up: setup_firewall
 	@echo
-	docker compose -p "ft_transcendence" --profile log-system up -d
+	# docker compose -p "ft_transcendence" --profile log-system up -d
 	docker compose -p "ft_transcendence" --profile monitor-system up -d
 	docker compose -p "ft_transcendence" --profile app up -d
 
@@ -119,7 +119,8 @@ setup_firewall:
 	# MONITOR-SYSTEM SEGMENT -------------------------------------------------->
 	iptables -I DOCKER-USER -s 10.0.3.2 -d 10.0.3.1 -p tcp --dport 9090 -j ACCEPT
 	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
-	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.3.4 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.4 -p tcp --dport 9187 -j ACCEPT
 
 	# SET IPTABLES IN STATEFUL MODE ------------------------------------------->
 	iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT

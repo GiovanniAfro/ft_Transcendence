@@ -1,10 +1,11 @@
 services:
+    # PROXY-WAF-SEGMENT ------------------------------------------------------->
     # nginx:
     #     profiles:
     #         - proxy-waf
     #     container_name: nginx
     #     build:
-    #         context: ./requirements/nginx
+    #         context: ./requirements/proxy-waf/nginx
     #         dockerfile: Dockerfile
     #     ports:
     #         - "8080:8080"
@@ -24,12 +25,13 @@ services:
     #     depends_on:
     #         - django
 
+    # APP-SEGMENT ------------------------------------------------------------->
     django:
         profiles:
             - app
         container_name: django
         build:
-            context: ./requirements/django
+            context: ./requirements/app/django
             dockerfile: Dockerfile
         environment:
             SECRET_KEY: ${SECRET_KEY} 
@@ -62,7 +64,7 @@ services:
             - app
         container_name: postgres
         build:
-            context: ./requirements/postgres
+            context: ./requirements/app/postgres
             dockerfile: Dockerfile
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
@@ -85,12 +87,13 @@ services:
                 tag: "postgres"
         restart: always
 
+    # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
     elasticsearch:
         profiles:
             - log-system
         container_name: elasticsearch
         build:
-            context: ./requirements/elasticsearch/
+            context: ./requirements/log-system/elasticsearch/
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
         entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
@@ -116,7 +119,7 @@ services:
             - 9200:9200
             # - 9300:9300
         volumes:
-            - ./requirements/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+            - ./requirements/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
             - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             log-system:
@@ -128,15 +131,15 @@ services:
             - log-system
         container_name: logstash
         build:
-            context: ./requirements/logstash
+            context: ./requirements/log-system/logstash
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
         ports:
             - 50000:50000/udp
             - 9600:9600
         volumes:
-            - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-            - ./requirements/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
+            - ./requirements/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+            - ./requirements/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
         environment:
             LS_JAVA_OPTS: -Xms256m -Xmx256m
             LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
@@ -152,11 +155,11 @@ services:
             - log-system
         container_name: kibana
         build:
-            context: ./requirements/kibana
+            context: ./requirements/log-system/kibana
             args:
                 ELASTIC_VERSION: ${ELASTIC_VERSION}
         volumes:
-            - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+            - ./requirements/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
         ports:
             - 5601:5601
         environment:
@@ -168,18 +171,17 @@ services:
         depends_on:
             - logstash
     
+    # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
     prometheus:
         profiles:
             - monitor-system
         container_name: prometheus
         build:
-            context: ./requirements/prometheus
+            context: ./requirements/monitor-system/prometheus
         volumes:
             - prometheus:/opt/bitnami/prometheus/
         ports:
             - 9090:9090
-        # environment:
-        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.1
@@ -190,13 +192,16 @@ services:
             - monitor-system
         container_name: grafana
         build:
-            context: ./requirements/grafana
+            context: ./requirements/monitor-system/grafana
+        entrypoint: bash -c "source /entrypoint/entrypoint.sh"
         volumes:
             - grafana:/var/lib/grafana
         ports:
             - 3000:3000
-        # environment:
-        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        environment:
+            GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-}
+            GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-}
+            DS_PROMETHEUS: ${DS_PROMETHEUS:-}
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.2
@@ -204,12 +209,34 @@ services:
         depends_on:
             - prometheus
 
+    postgres-exporter:
+        profiles:
+            - monitor-system
+        container_name: postgres-exporter
+        build:
+            context: ./requirements/monitor-system/postgres-exporter
+        # volumes:
+        #     - grafana:/var/lib/grafana
+        ports:
+            - "9187:9187"
+        environment:
+            DATA_SOURCE_URI: ${DATA_SOURCE_URI:-}
+            DATA_SOURCE_USER: ${POSTGRES_USER:-}
+            DATA_SOURCE_PASS: ${POSTGRES_PASSWORD:-}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.4
+        restart: unless-stopped
+        depends_on:
+            - prometheus
+
+    # SECRETS-SEGMENT --------------------------------------------------------->
     # hashicorp-vault:
     #     profiles:
     #         - secrets
     #     container_name: hashicorp-vault
     #     build:
-    #         context: ./requirements/hashicorp-vault
+    #         context: ./requirements/secrets/hashicorp-vault
     #         dockerfile: Dockerfile
     #     # environment:
     #     # 
