@@ -19,7 +19,7 @@ done
 source /entrypoint/set_data_source.sh
 
 # Set Dashboards -------------------------------------------------------------->
-
+source /entrypoint/set_dashboards.sh
 
 # Wait for the main process to finish ----------------------------------------->
 wait

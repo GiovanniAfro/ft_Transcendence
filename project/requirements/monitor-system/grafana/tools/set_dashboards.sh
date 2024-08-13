@@ -2,7 +2,13 @@
 
 set -e
 
-curl -X POST http://127.0.0.1:3000/api/dashboards/import \
-     -u "${GF_SECURITY_ADMIN_USER}:${GF_SECURITY_ADMIN_PASSWORD}" \
+POSTGRES_DASHBOARD=$(cat "/var/lib/grafana/dashboards/postgres-dashboard.json")
+
+curl -X POST http://127.0.0.1:3000/api/dashboards/db \
      -H "Content-Type: application/json" \
-	 -d "{\"dashboard\":$(cat /usr/local/grafana/conf/9628_rev7.json)}"
+     -u grafana:grafanapwd \
+     -d @- <<EOF
+     {
+     "dashboard": $POSTGRES_DASHBOARD
+     }
+     EOF

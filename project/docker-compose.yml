@@ -193,9 +193,10 @@ services:
         container_name: grafana
         build:
             context: ./requirements/monitor-system/grafana
-        entrypoint: bash -c "source /entrypoint/entrypoint.sh"
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
         volumes:
             - grafana:/var/lib/grafana
+            - ./requirements/monitor-system/grafana/conf/postgres-dashboard.json:/var/lib/grafana/dashboards/postgres-dashboard.json:ro,Z
         ports:
             - 3000:3000
         environment:
