@@ -12,7 +12,7 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean fclean re setup_firewall dev re-dev
+.PHONY: all up down start stop clean fclean re setup_firewall
 .SILENT:
 
 IMAGES?=
@@ -65,6 +65,11 @@ clean:
 			fi; \
 		done; \
 	fi
+	@echo "\n$(BLUE)[+] Removing all volumes$(NC)"
+	@docker volume ls -q | while read id; do \
+		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$id$(NC)"; \
+		docker volume rm $$id > /dev/null 2>&1; \
+	done
 
 fclean: clean
 	@echo "\n$(BLUE)[+] Removing all networks$(NC)"
@@ -75,22 +80,11 @@ fclean: clean
 			docker network rm $$id > /dev/null 2>&1; \
 		fi \
 	done
-	@echo "\n$(BLUE)[+] Removing all volumes$(NC)"
-	@docker volume ls -q | while read id; do \
-		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$id$(NC)"; \
-		docker volume rm $$id > /dev/null 2>&1; \
-	done
 	@echo "\n$(BLUE)[+] Removing all build cache$(NC)"
 	@-docker builder prune --all --force > /dev/null 2>&1
 	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"
 
 re: clean up
-
-dev:
-	@echo
-	docker compose -p "ft_transcendence" --profile app up -d
-
-re-dev: clean dev
 
 setup_firewall:
 	# CLEAN DOCKER-USER CHAIN ------------------------------------------------->

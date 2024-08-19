@@ -196,7 +196,6 @@ services:
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
         volumes:
             - grafana:/var/lib/grafana
-            - ./requirements/monitor-system/grafana/conf/postgres-dashboard.json:/var/lib/grafana/dashboards/postgres-dashboard.json:ro,Z
         ports:
             - 3000:3000
         environment:
@@ -209,6 +208,23 @@ services:
         restart: unless-stopped
         depends_on:
             - prometheus
+    
+    # alertmanager:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: alertmanager
+    #     build:
+    #         context: ./requirements/monitor-system/alertmanager
+    #     # volumes:
+    #     #     - alertmanager:/opt/bitnami/alertmanager/
+    #     # ports:
+    #     #     - 9090:9090
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.3
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
 
     postgres-exporter:
         profiles:

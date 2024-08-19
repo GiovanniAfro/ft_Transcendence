@@ -59,23 +59,14 @@ cd ft_transcendence/project
 - make clean:
   - remove all containers
   - remove specified images (can specify with "make [re|clean] IMAGES=<image_name> ...", otherwise removes all images)
+  - remove all volums
 - make fclean:
   - make clean
   - remove all networks
-  - remove all volums
   - remove all build cache
 - make re:
   - make clean
   - make up
-- make dev:
-  - make setup_firewall
-  - create images (only for app profile)
-  - create volumes (only for app profile)
-  - create networks (only for app profile)
-  - start containers (only for app profile)
-- make re-dev:
-  - make clean
-  - make dev
 - make setup_firewall:
   - setup iptables
 
