@@ -51,9 +51,10 @@ DOUBTFUL
 
 ## Monitor System
 
-	[ ] Creare un container per ogni exporter (ad eccezione di django che ha django-prometheus un modulo pip)
-	[ ] Settare le regole di iptables
-	[ ] Aggiungere target in prometheus.yml
-	[ ] Impostare password grafana
-	[ ] Impostare data source grafana
-	[ ] ...
+	[v] Settare le regole di iptables
+	[v] Aggiungere target in prometheus.yml
+	[v] Impostare password grafana
+	[v] Impostare data source grafana
+	[ ] Settare exporter per nginx, django e hashicorpvault
+	[ ] Settare alertmanger
+	[ ] Settare autenticazione grafana

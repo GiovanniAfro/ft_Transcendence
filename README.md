@@ -81,6 +81,12 @@ cd ft_transcendence/project
 - ELK
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
   - [Docker ELK](https://github.com/deviantony/docker-elk)
+- Monitoring
+  - [Provision dashboards and data sources](https://grafana.com/tutorials/provision-dashboards-and-data-sources/)
+  - [Dashboard API](https://grafana.com/docs/grafana/latest/developers/http_api/dashboard/)
+  - [Prometheus Alert Manager Setup and Alert Configurations (Slack)](https://medium.com/@krishabh080/prometheus-alert-manager-setup-and-alert-configurations-slack-800f6bb5111e)
+  - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
+
 
 
 ## ⚖️ - License

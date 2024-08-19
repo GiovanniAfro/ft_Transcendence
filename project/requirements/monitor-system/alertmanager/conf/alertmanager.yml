@@ -1,0 +1,19 @@
+
+# --- TODO ---
+
+# global:
+#   resolve_timeout: 5m
+
+# receivers:
+# - name: 'slack-notifications'
+#   slack_configs:
+#   - channel: '#alerts'
+#     send_resolved: true
+#     api_url: 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'
+
+# route:
+#   group_by: ['alertname']
+#   group_wait: 10s
+#   group_interval: 5m
+#   repeat_interval: 3h
+#   receiver: 'slack-notifications'
