@@ -27,8 +27,9 @@ all: up
 
 up: setup_firewall
 	@echo
+	docker compose -p "ft_transcendence" --profile vault up -d
 	# docker compose -p "ft_transcendence" --profile log-system up -d
-	docker compose -p "ft_transcendence" --profile monitor-system up -d
+	# docker compose -p "ft_transcendence" --profile monitor-system up -d
 	docker compose -p "ft_transcendence" --profile app up -d
 	docker compose -p "ft_transcendence" --profile proxy-waf up -d
 
@@ -101,6 +102,9 @@ setup_firewall:
 	iptables -I DOCKER-USER -s 10.0.3.0/24 -d 10.0.3.0/24 -j DROP
 	iptables -I DOCKER-USER -s 10.0.4.0/24 -d 10.0.4.0/24 -j DROP
 
+	# PROXY-WAF SEGMENT ------------------------------------------------------->
+	iptables -I DOCKER-USER -s 10.0.0.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
+
 	# APP SEGMENT ------------------------------------------------------------->
 	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 
@@ -117,6 +121,9 @@ setup_firewall:
 	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
 	iptables -I DOCKER-USER -s 10.0.3.4 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 	iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.4 -p tcp --dport 9187 -j ACCEPT
+
+	# VAULT SEGMENT ----------------------------------------------------------->
+	iptables -I DOCKER-USER -s 10.0.0.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
 
 	# SET IPTABLES IN STATEFUL MODE ------------------------------------------->
 	iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT

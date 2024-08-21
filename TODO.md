@@ -49,6 +49,12 @@ DOUBTFUL
 
 # kichkiro todo
 
+## App
+	[ ] Configurare Django per utilizzare un server WSGI e disabilitare il webserver di sviluppo
+
+## Proxy-Waf
+	[ ] Configurare nginx in modalita solo TLS
+
 ## Monitor System
 
 	[v] Settare le regole di iptables
@@ -58,3 +64,4 @@ DOUBTFUL
 	[ ] Settare exporter per nginx, django e hashicorpvault
 	[ ] Settare alertmanger
 	[ ] Settare autenticazione grafana
+

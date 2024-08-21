@@ -7,12 +7,12 @@ services:
         build:
             context: ./requirements/proxy-waf/nginx
             dockerfile: Dockerfile
+        environment:
+            BACKEND: ${BACKEND}
+            NGINX_ALWAYS_TLS_REDIRECT: ${NGINX_ALWAYS_TLS_REDIRECT}
         ports:
-            - "80:80"
-            - "443:443"
-        # volumes:
-            # - ./nginx.conf:/etc/nginx/nginx.conf
-            # - ./modsecurity.conf:/etc/modsecurity/modsecurity.conf
+            - "80:8080"
+            - "443:8443"
         networks:
             proxy-waf:
                 ipv4_address: 10.0.0.1
@@ -260,27 +260,29 @@ services:
         depends_on:
             - prometheus
 
-    # SECRETS-SEGMENT --------------------------------------------------------->
-    # hashicorp-vault:
-    #     profiles:
-    #         - secrets
-    #     container_name: hashicorp-vault
-    #     build:
-    #         context: ./requirements/secrets/hashicorp-vault
-    #         dockerfile: Dockerfile
-    #     # environment:
-    #     # 
-    #     # volumes:
-    #     #     - postgres:/var/lib/postgresql/data
-    #     networks:
-    #         app:
-    #             ipv4_address: 10.0.0.3
-    #     logging:
-    #         driver: gelf
-    #         options:
-    #             gelf-address: "udp://10.0.4.1:50000"
-    #             tag: "postgres"
-    #     restart: always
+    # VAULT-SEGMENT ----------------------------------------------------------->
+    hashicorp-vault:
+        profiles:
+            - vault
+        container_name: hashicorp-vault
+        build:
+            context: ./requirements/vault/hashicorp-vault
+            dockerfile: Dockerfile
+        environment:
+            VAULT_DEV_ROOT_TOKEN_ID: "root"
+        ports:
+            - 8200:8200
+        # volumes:
+        #     - postgres:/var/lib/postgresql/data
+        networks:
+            app:
+                ipv4_address: 10.0.4.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.4.1:50000"
+                tag: "hashicorp-vault"
+        restart: always
     
 volumes:
     postgres:
@@ -328,8 +330,8 @@ networks:
                 - subnet: 10.0.3.0/24
                   gateway: 10.0.3.254
 
-    secrets:
-        name: secrets
+    vault:
+        name: vault
         driver: bridge
         ipam:
             driver: default
