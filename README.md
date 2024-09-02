@@ -77,6 +77,20 @@ cd ft_transcendence/project
 
 <img src="_notebook/topology.svg" alt="topology" />
 
+## 🛡️ Security
+
+Below are the security measures that have been taken to protect the infrastructure:
+
+- __Network Segmentation__: All east-west traffic in the docker infrastructure was dropped by default through the OS firewall iptables.
+
+- __Web Application Firewall__: ModSecurity's WAF has been implemented as a module of Nginx, it serves to protect the web application from common attacks and vulnerabilities, such as SQL injection, cross-site scripting (XSS) and other known threats.
+
+- __Non-Root Containers__: VMware Bitnami images were used, renowned for its additional security over the official images, including non-root user by default. 
+
+- __Hashicorp Vault__:
+
+- __SSL Certs__:
+
 ## 📚 - References
 - ELK
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
@@ -86,8 +100,6 @@ cd ft_transcendence/project
   - [Dashboard API](https://grafana.com/docs/grafana/latest/developers/http_api/dashboard/)
   - [Prometheus Alert Manager Setup and Alert Configurations (Slack)](https://medium.com/@krishabh080/prometheus-alert-manager-setup-and-alert-configurations-slack-800f6bb5111e)
   - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
-
-
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)
