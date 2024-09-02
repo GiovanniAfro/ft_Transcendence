@@ -1,8 +1,18 @@
-FROM postgres:16-bookworm
+# FROM postgres:16-bookworm
 
-COPY tools/add_remote_host.sh /docker-entrypoint-initdb.d/
 
-RUN chmod +x /docker-entrypoint-initdb.d/add_remote_host.sh \
-	&& service postgresql restart
+# RUN chmod +x /entrypoint/add_remote_host.sh \
+# 	&& service postgresql restart
 
-USER postgres
+# USER postgres
+
+
+FROM bitnami/postgresql:16
+
+USER root
+
+RUN apt-get update && apt-get install -y curl
+
+COPY tools/ /entrypoint/
+
+USER 1001

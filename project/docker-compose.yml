@@ -24,38 +24,38 @@ services:
         restart: always
 
     # APP-SEGMENT ------------------------------------------------------------->
-    django:
-        profiles:
-            - app
-        container_name: django
-        build:
-            context: ./requirements/app/django
-            dockerfile: Dockerfile
-        environment:
-            SECRET_KEY: ${SECRET_KEY} 
-            ALLOWED_HOSTS: ${ALLOWED_HOSTS} 
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            DB_HOST: ${DB_HOST} 
-            DB_PORT: ${DB_PORT} 
-            DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
-            DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
-        ports:
-            - "8000:8000"
-        # volumes:
-        #     -
-        networks:
-            app:
-                ipv4_address: 10.0.1.1
-        logging:
-            driver: gelf
-            options:
-                gelf-address: "udp://10.0.2.2:50000"
-                tag: "django"
-        restart: always
-        depends_on:
-            - postgres
+    # django:
+    #     profiles:
+    #         - app
+    #     container_name: django
+    #     build:
+    #         context: ./requirements/app/django
+    #         dockerfile: Dockerfile
+    #     environment:
+    #         SECRET_KEY: ${SECRET_KEY} 
+    #         ALLOWED_HOSTS: ${ALLOWED_HOSTS} 
+    #         POSTGRES_DB: ${POSTGRES_DB}
+    #         POSTGRES_USER: ${POSTGRES_USER}
+    #         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    #         DB_HOST: ${DB_HOST} 
+    #         DB_PORT: ${DB_PORT} 
+    #         DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
+    #         DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
+    #     ports:
+    #         - "8000:8000"
+    #     # volumes:
+    #     #     -
+    #     networks:
+    #         app:
+    #             ipv4_address: 10.0.1.1
+    #     logging:
+    #         driver: gelf
+    #         options:
+    #             gelf-address: "udp://10.0.2.2:50000"
+    #             tag: "django"
+    #     restart: always
+    #     depends_on:
+    #         - postgres
 
     postgres:
         profiles:
@@ -64,17 +64,18 @@ services:
         build:
             context: ./requirements/app/postgres
             dockerfile: Dockerfile
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready"]
-            interval: 1s
-            timeout: 5s
-            retries: 10
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+        # environment:
+        #     POSTGRES_DB: ${POSTGRES_DB}
+        #     POSTGRES_USER: ${POSTGRES_USER}
+        #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        # healthcheck:
+        #     test: ["CMD-SHELL", "pg_isready"]
+        #     interval: 1s
+        #     timeout: 5s
+        #     retries: 10
         volumes:
-            - postgres:/var/lib/postgresql/data
+            - postgres:/bitnami/postgresql
         networks:
             app:
                 ipv4_address: 10.0.1.2
@@ -253,6 +254,8 @@ services:
         #     DATA_SOURCE_URI: ${DATA_SOURCE_URI:-}
         #     DATA_SOURCE_USER: ${POSTGRES_USER:-}
         #     DATA_SOURCE_PASS: ${POSTGRES_PASSWORD:-}
+        volumes:
+            - vault-data:/vault/data
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.5
@@ -269,14 +272,15 @@ services:
             context: ./requirements/vault/hashicorp-vault
             dockerfile: Dockerfile
         environment:
-            VAULT_DEV_ROOT_TOKEN_ID: "root"
+            VAULT_ADDR: http://10.0.4.1:8200
+        entrypoint: vault server -config=/vault/config/vault.json
         ports:
             - 8200:8200
-        # volumes:
-        #     - postgres:/var/lib/postgresql/data
         networks:
-            app:
+            vault:
                 ipv4_address: 10.0.4.1
+        cap_add:
+            - IPC_LOCK
         logging:
             driver: gelf
             options:
@@ -292,6 +296,8 @@ volumes:
     prometheus:
 
     grafana:
+
+    vault-data:
 
 networks:
     proxy-waf:

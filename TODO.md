@@ -65,3 +65,6 @@ DOUBTFUL
 	[ ] Settare alertmanger
 	[ ] Settare autenticazione grafana
 
+
+## Vault
+	[ ] 

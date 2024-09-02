@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Run EntryPoint in background ------------------------------------------------>
-/run.sh "$@" &
+/run.sh "$@" & # /run.sh is default entrypoint of pre-built image 
 
 # Wait for Grafana ------------------------------------------------------------>
 while true; do
