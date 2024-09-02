@@ -1,17 +1,18 @@
 {
-    "backend":{
-       "file":{
-          "path":"/vault/file"
-       }
-    },
-    "listener":{
-       "tcp":{
-          "address":"10.0.4.1:8200",
-          "tls_disable":1
-       }
-    },
-    "default_lease_ttl":"168h",
-    "max_lease_ttl":"0h",
-    "ui":true,
-    "log_level":"Debug"
+   "backend":{
+      "file":{
+         "path":"/bitnami/vault/"
+      }
+   },
+   "listener":{
+      "tcp":{
+         "address":"10.0.4.1:8200",
+         "tls_disable":1
+      }
+   },
+   "default_lease_ttl":"168h",
+   "max_lease_ttl":"0h",
+   "ui":true,
+   "log_level":"Info",
+   "disable_mlock":"true"
  }

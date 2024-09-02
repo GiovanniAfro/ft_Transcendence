@@ -27,7 +27,7 @@ all: up
 
 up: setup_firewall
 	@echo
-	# docker compose -p "ft_transcendence" --profile vault up -d
+	docker compose -p "ft_transcendence" --profile vault up -d
 	# docker compose -p "ft_transcendence" --profile log-system up -d
 	# docker compose -p "ft_transcendence" --profile monitor-system up -d
 	docker compose -p "ft_transcendence" --profile app up -d

@@ -254,8 +254,8 @@ services:
         #     DATA_SOURCE_URI: ${DATA_SOURCE_URI:-}
         #     DATA_SOURCE_USER: ${POSTGRES_USER:-}
         #     DATA_SOURCE_PASS: ${POSTGRES_PASSWORD:-}
-        volumes:
-            - vault-data:/vault/data
+        # volumes:
+        #     - vault-data:/vault/data
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.5
@@ -273,9 +273,13 @@ services:
             dockerfile: Dockerfile
         environment:
             VAULT_ADDR: http://10.0.4.1:8200
-        entrypoint: vault server -config=/vault/config/vault.json
+            # VAULT_DEV_ROOT_TOKEN_ID: root
+        entrypoint: vault server -config=/bitnami/vault/config/vault.json # prod
+        # entrypoint: vault server -dev
         ports:
             - 8200:8200
+        volumes:
+            - vault:/bitnami/vault/data
         networks:
             vault:
                 ipv4_address: 10.0.4.1
@@ -297,7 +301,7 @@ volumes:
 
     grafana:
 
-    vault-data:
+    vault:
 
 networks:
     proxy-waf:

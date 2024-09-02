@@ -65,6 +65,10 @@ DOUBTFUL
 	[ ] Settare alertmanger
 	[ ] Settare autenticazione grafana
 
+## Vault PROD
 
-## Vault
-	[ ] 
+	- docker exec hashicorp-vault vault operator init
+	- docker exec hashicorp-vault vault operator unseal <key 1>
+	- docker exec hashicorp-vault vault operator unseal <key 2>
+	- docker exec hashicorp-vault vault operator unseal <key 3>	
+	- docker exec hashicorp-vault vault login <root key>

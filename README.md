@@ -100,6 +100,9 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Dashboard API](https://grafana.com/docs/grafana/latest/developers/http_api/dashboard/)
   - [Prometheus Alert Manager Setup and Alert Configurations (Slack)](https://medium.com/@krishabh080/prometheus-alert-manager-setup-and-alert-configurations-slack-800f6bb5111e)
   - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
+- HashiCorp Vault
+  - [Hashicorp Vault - Tutorials](https://developer.hashicorp.com/vault/tutorials)
+  - [Hashicorp Vault - Documentation](https://developer.hashicorp.com/vault/docs)
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)

@@ -1,3 +1,5 @@
-FROM hashicorp/vault:1.17.3
+FROM bitnami/vault:1.17.5
 
-COPY conf/vault.json /vault/config/
+# USER 1001
+
+COPY --chown=vault:root conf/ /bitnami/vault/config/
