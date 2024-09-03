@@ -72,3 +72,5 @@ DOUBTFUL
 	- docker exec hashicorp-vault vault operator unseal <key 2>
 	- docker exec hashicorp-vault vault operator unseal <key 3>	
 	- docker exec hashicorp-vault vault login <root key>
+	- docker exec hashicorp-vault vault secrets enable -path=secret kv
+	- docker exec hashicorp-vault vault kv put secret/mysecret username="example_user" password="example_password"

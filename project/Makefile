@@ -12,10 +12,12 @@
 
 # Config ---------------------------------------------------------------------->
 
-.PHONY: all up down start stop clean fclean re setup_firewall
+.PHONY: all up down start stop clean fclean re setup_vault setup_firewall
 .SILENT:
 
 IMAGES?=
+
+MAKEFLAGS += --no-print-directory
 
 WHITE_BOLD=\033[1;37m
 BLUE=\033[0;34m
@@ -25,13 +27,15 @@ NC=\033[0m
 
 all: up
 
-up: setup_firewall
-	@echo
-	docker compose -p "ft_transcendence" --profile vault up -d
+up: setup_firewall 
+	@echo "\n$(BLUE)[+] Starting $(WHITE_BOLD)VAULT $(BLUE)profile ..." 
+	docker compose -p "ft_transcendence" --profile vault up -d >/dev/null 2>&1 
+	@$(MAKE) setup_vault
 	# docker compose -p "ft_transcendence" --profile log-system up -d
 	# docker compose -p "ft_transcendence" --profile monitor-system up -d
-	docker compose -p "ft_transcendence" --profile app up -d
+	# docker compose -p "ft_transcendence" --profile app up -d
 	# docker compose -p "ft_transcendence" --profile proxy-waf up -d
+	echo
 
 down:
 	docker compose down
@@ -87,6 +91,29 @@ fclean: clean
 	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"
 
 re: clean up
+
+setup_vault:
+	@keys=$$(docker exec hashicorp-vault vault operator init) && \
+	key1=$$(echo "$$keys" | grep 'Unseal Key 1:' | awk '{print $$4}') && \
+	key2=$$(echo "$$keys" | grep 'Unseal Key 2:' | awk '{print $$4}') && \
+	key3=$$(echo "$$keys" | grep 'Unseal Key 3:' | awk '{print $$4}') && \
+	key4=$$(echo "$$keys" | grep 'Unseal Key 4:' | awk '{print $$4}') && \
+	key5=$$(echo "$$keys" | grep 'Unseal Key 5:' | awk '{print $$4}') && \
+	root_token=$$(echo "$$keys" | grep 'Initial Root Token:' | awk '{print $$4}') && \
+	echo "\n$(BLUE)[+] Vault initialized. Here are the keys and the root token:" && \
+	echo "$(BLUE)    UNSEAL KEY 1: $(WHITE_BOLD)$$key1" && \
+	echo "$(BLUE)    UNSEAL KEY 2: $(WHITE_BOLD)$$key2" && \
+	echo "$(BLUE)    UNSEAL KEY 3: $(WHITE_BOLD)$$key3" && \
+	echo "$(BLUE)    UNSEAL KEY 4: $(WHITE_BOLD)$$key4" && \
+	echo "$(BLUE)    UNSEAL KEY 5: $(WHITE_BOLD)$$key5" && \
+	echo "$(BLUE)    ROOT TOKEN:   $(WHITE_BOLD)$$root_token" && \
+	docker exec hashicorp-vault vault operator unseal $$key1 > /dev/null 2>&1 && \
+	docker exec hashicorp-vault vault operator unseal $$key2 > /dev/null 2>&1 && \
+	docker exec hashicorp-vault vault operator unseal $$key3 > /dev/null 2>&1 && \
+	echo "\n$(BLUE)[+] The vault has been unsealed" && \
+	docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault secrets enable -path=secret kv >/dev/null 2>&1 && \
+	echo "\n$(BLUE)[+] Enabled the kv secrets engine at: $(WHITE_BOLD)secret/" && \
+	docker exec -e VAULT_TOKEN=$$root_token -i hashicorp-vault vault kv put secret/app - < secrets/app.json
 
 setup_firewall:
 	# CLEAN DOCKER-USER CHAIN ------------------------------------------------->

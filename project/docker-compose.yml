@@ -274,7 +274,8 @@ services:
         environment:
             VAULT_ADDR: http://10.0.4.1:8200
             # VAULT_DEV_ROOT_TOKEN_ID: root
-        entrypoint: vault server -config=/bitnami/vault/config/vault.json # prod
+        # entrypoint: vault server -config=/bitnami/vault/config/vault.json # prod
+        entrypoint: /bitnami/vault/entrypoint/entrypoint_wrapper.sh
         # entrypoint: vault server -dev
         ports:
             - 8200:8200
