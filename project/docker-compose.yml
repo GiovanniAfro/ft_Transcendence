@@ -19,7 +19,7 @@ services:
         logging:
             driver: gelf
             options:
-                gelf-address: "udp://10.0.2.2:50000"
+                gelf-address: "udp://10.0.2.2:5000"
                 tag: "nginx"
         restart: always
 
@@ -51,7 +51,7 @@ services:
     #     logging:
     #         driver: gelf
     #         options:
-    #             gelf-address: "udp://10.0.2.2:50000"
+    #             gelf-address: "udp://10.0.2.2:5000"
     #             tag: "django"
     #     restart: always
     #     depends_on:
@@ -64,16 +64,8 @@ services:
         build:
             context: ./requirements/app/postgres
             dockerfile: Dockerfile
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
-        # environment:
-        #     POSTGRES_DB: ${POSTGRES_DB}
-        #     POSTGRES_USER: ${POSTGRES_USER}
-        #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        # healthcheck:
-        #     test: ["CMD-SHELL", "pg_isready"]
-        #     interval: 1s
-        #     timeout: 5s
-        #     retries: 10
+        environment:
+            APP_TOKEN: ${APP_TOKEN}
         volumes:
             - postgres:/bitnami/postgresql
         networks:
@@ -82,9 +74,10 @@ services:
         logging:
             driver: gelf
             options:
-                gelf-address: "udp://10.0.2.2:50000"
+                gelf-address: "udp://10.0.2.2:5000"
                 tag: "postgres"
         restart: always
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
     elasticsearch:
@@ -93,37 +86,20 @@ services:
         container_name: elasticsearch
         build:
             context: ./requirements/log-system/elasticsearch/
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
-        entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
+        # entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
         environment:
-            ELASTIC_VERSION: ${ELASTIC_VERSION:-}
-            node.name: elasticsearch
-            ES_JAVA_OPTS: -Xms512m -Xmx512m
-            # Bootstrap password.
-            # Used to initialize the keystore during the initial startup of
-            # Elasticsearch. Ignored on subsequent runs.
-            ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
-            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
-            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
-            METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
-            FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
-            HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
-            MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
-            BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
-            # Use single node discovery in order to disable production mode and avoid bootstrap checks.
-            # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
-            discovery.type: single-node
+            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
         ports:
             - 9200:9200
-            # - 9300:9300
-        volumes:
-            - ./requirements/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
-            - elasticsearch:/usr/share/elasticsearch/data:Z
+            - 9300:9300
+        # volumes:
+        #     - ./requirements/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+        #     - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.1
         restart: unless-stopped
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     logstash:
         profiles:
@@ -131,23 +107,21 @@ services:
         container_name: logstash
         build:
             context: ./requirements/log-system/logstash
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
-        ports:
-            - 50000:50000/udp
-            - 9600:9600
-        volumes:
-            - ./requirements/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-            - ./requirements/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
         environment:
-            LS_JAVA_OPTS: -Xms256m -Xmx256m
-            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
+        ports:
+            - 5000:5000/udp
+            - 9600:9600
+        # volumes:
+        #     - ./requirements/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+        #     - ./requirements/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.2
         restart: unless-stopped
         depends_on:
             - elasticsearch
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     kibana:
         profiles:
@@ -155,20 +129,19 @@ services:
         container_name: kibana
         build:
             context: ./requirements/log-system/kibana
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
-        volumes:
-            - ./requirements/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+        environment:
+            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
         ports:
             - 5601:5601
-        environment:
-            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        # volumes:
+        #     - ./requirements/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.3
         restart: unless-stopped
         depends_on:
             - logstash
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
     # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
     prometheus:
@@ -192,7 +165,6 @@ services:
         container_name: grafana
         build:
             context: ./requirements/monitor-system/grafana
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
         volumes:
             - grafana:/var/lib/grafana
         ports:
@@ -207,6 +179,7 @@ services:
         restart: unless-stopped
         depends_on:
             - prometheus
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
     alertmanager:
         profiles:
@@ -275,7 +248,6 @@ services:
             VAULT_ADDR: http://10.0.4.1:8200
             # VAULT_DEV_ROOT_TOKEN_ID: root
         # entrypoint: vault server -config=/bitnami/vault/config/vault.json # prod
-        entrypoint: /bitnami/vault/entrypoint/entrypoint_wrapper.sh
         # entrypoint: vault server -dev
         ports:
             - 8200:8200
@@ -289,9 +261,10 @@ services:
         logging:
             driver: gelf
             options:
-                gelf-address: "udp://10.0.4.1:50000"
+                gelf-address: "udp://10.0.2.2:5000"
                 tag: "hashicorp-vault"
         restart: always
+        entrypoint: /bitnami/vault/entrypoint/entrypoint_wrapper.sh
     
 volumes:
     postgres:

@@ -133,7 +133,7 @@ curl -X GET 'http://localhost:9200/.ds-logs-generic-default-2024.07.30-000001/_s
 
 - Get last 100 logs for a index:
 ``` sh
-curl -X GET 'http://localhost:9200/.ds-logs-generic-default-2024.07.29-000001/_search?pretty&size=100' -u elastic:elasticpwd
+curl -X GET 'http://localhost:9200/logstash-2024.09.04/_search?pretty&size=100' -u elastic:elasticpwd
 ```
 
 - Get last 100 logs for a index and show only message field:

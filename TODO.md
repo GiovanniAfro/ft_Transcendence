@@ -41,36 +41,79 @@ DOUBTFUL
 	[] Major module: Replacing Basic Pong with Server-Side Pong and Implementing an API.
 	[] Major module: Enabling Pong Gameplay via CLI against Web Users with API Integration.
 
+--------------------------------------------------------------------------------
 
+# kichkiro
 
-
-
-
-
-# kichkiro todo
-
-## App
-	[ ] Configurare Django per utilizzare un server WSGI e disabilitare il webserver di sviluppo
-
-## Proxy-Waf
+[ ] Nginx
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] Settare HTTPS
+	[ ] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard
 	[ ] Configurare nginx in modalita solo TLS
 
-## Monitor System
+[ ] Hashicorp-Vault 
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] Settare HTTPS
+		[ ] 
+	[ ] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard
 
-	[v] Settare le regole di iptables
-	[v] Aggiungere target in prometheus.yml
-	[v] Impostare password grafana
-	[v] Impostare data source grafana
-	[ ] Settare exporter per nginx, django e hashicorpvault
-	[ ] Settare alertmanger
-	[ ] Settare autenticazione grafana
+[ ] Django
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] Settare HTTPS
+		[ ] 
+	[ ] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard
+	[ ] Utilizzare un server WSGI e disabilitare il webserver di sviluppo
 
-## Vault PROD
+[ ] Postgres
+	[v] Usare immagine non-root
+	[v] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
+	[ ] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard
 
-	- docker exec hashicorp-vault vault operator init
-	- docker exec hashicorp-vault vault operator unseal <key 1>
-	- docker exec hashicorp-vault vault operator unseal <key 2>
-	- docker exec hashicorp-vault vault operator unseal <key 3>	
-	- docker exec hashicorp-vault vault login <root key>
-	- docker exec hashicorp-vault vault secrets enable -path=secret kv
-	- docker exec hashicorp-vault vault kv put secret/mysecret username="example_user" password="example_password"
+[ ] Elasticsearch
+	[v] Usare immagine non-root
+	[v] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[v] Settare password login
+		[ ] Settare HTTPS e TLS
+
+[ ] Logstash
+	[v] Usare immagine non-root
+	[v] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] 
+
+[ ] Kibana
+	[v] Usare immagine non-root
+	[v] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[ ] Settare HTTPS e TLS
+		[ ] Settare dataview di defualt per pattern log*
+
+[ ] Prometheus
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[v] Aggiungere target in prometheus.yml
+		[ ] Settare alertmanger
+		[ ] Settare HTTPS
+
+[ ] Grafana
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da hashicorp-vault
+	[ ] Configurare servizio
+		[v] Impostare password grafana
+		[v] Impostare data source grafana
+		[ ] Settare autenticazione grafana
+		[ ] Settare HTTPS

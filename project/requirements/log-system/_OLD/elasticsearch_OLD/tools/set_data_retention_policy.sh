@@ -3,7 +3,7 @@
 set -eu
 
 # Create ILM Policy ----------------------------------------------------------->
-curl -X PUT '127.0.0.1:9200/_ilm/policy/ft-transcendence-policy' \
+curl -X PUT '10.0.2.1:9200/_ilm/policy/ft-transcendence-policy' \
      -u elastic:elasticpwd \
      -H 'Content-Type: application/json' \
      -d '
@@ -37,7 +37,7 @@ curl -X PUT '127.0.0.1:9200/_ilm/policy/ft-transcendence-policy' \
 }'
 
 # Create a Index Template ----------------------------------------------------->
-curl -X PUT "127.0.0.1:9200/_index_template/ft-transcendence-logs?pretty" \
+curl -X PUT "localhost:9200/_index_template/ft-transcendence-logs?pretty" \
      -u elastic:elasticpwd \
      -H 'Content-Type: application/json' \
      -d '

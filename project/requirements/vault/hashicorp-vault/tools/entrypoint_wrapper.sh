@@ -3,8 +3,6 @@
 # Run EntryPoint in background ------------------------------------------------>
 vault server -config=/bitnami/vault/config/vault.json "$@" & 
 
-echo CIAOOOOOOOOOOOOOOOOOOOOOOOO
-
 # # Set Data Source ------------------------------------------------------------->
 # source /entrypoint/set_data_source.sh
 

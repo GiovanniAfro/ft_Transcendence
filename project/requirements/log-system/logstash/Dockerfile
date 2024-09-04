@@ -1,4 +1,9 @@
-ARG ELASTIC_VERSION=8.14.3
+FROM bitnami/logstash:8.15.0
 
-# https://www.docker.elastic.co/
-FROM docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
+USER root
+
+RUN apt-get update && apt-get install -y curl jq
+
+USER 1001
+
+COPY tools/ /entrypoint/

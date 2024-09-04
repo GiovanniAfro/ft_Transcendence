@@ -31,10 +31,11 @@ up: setup_firewall
 	@echo "\n$(BLUE)[+] Starting $(WHITE_BOLD)VAULT $(BLUE)profile ..." 
 	docker compose -p "ft_transcendence" --profile vault up -d >/dev/null 2>&1 
 	@$(MAKE) setup_vault
-	# docker compose -p "ft_transcendence" --profile log-system up -d
+	docker compose -p "ft_transcendence" --profile log-system up -d
 	# docker compose -p "ft_transcendence" --profile monitor-system up -d
-	# docker compose -p "ft_transcendence" --profile app up -d
+	docker compose -p "ft_transcendence" --profile app up -d
 	# docker compose -p "ft_transcendence" --profile proxy-waf up -d
+	rm -rf .env
 	echo
 
 down:
@@ -113,7 +114,20 @@ setup_vault:
 	echo "\n$(BLUE)[+] The vault has been unsealed" && \
 	docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault secrets enable -path=secret kv >/dev/null 2>&1 && \
 	echo "\n$(BLUE)[+] Enabled the kv secrets engine at: $(WHITE_BOLD)secret/" && \
-	docker exec -e VAULT_TOKEN=$$root_token -i hashicorp-vault vault kv put secret/app - < secrets/app.json
+	docker exec -e VAULT_TOKEN=$$root_token -i hashicorp-vault vault kv put secret/app - < secrets/app.json > /dev/null && \
+	echo "\n$(BLUE)[+] Add $(WHITE_BOLD)app $(BLUE)secrets to vault at $(WHITE_BOLD)/secret/app" && \
+	docker exec -e VAULT_TOKEN=$$root_token -i hashicorp-vault vault kv put secret/log-system - < secrets/log-system.json > /dev/null && \
+	echo "\n$(BLUE)[+] Add $(WHITE_BOLD)log-system $(BLUE)secrets to vault at $(WHITE_BOLD)/secret/log-system" && \
+	docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault policy write app-policy /bitnami/vault/config/app-policy.hcl > /dev/null && \
+	echo "\n$(BLUE)[+] Uploaded policy: $(WHITE_BOLD)app-policy" && \
+	docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault policy write log-system-policy /bitnami/vault/config/log-system-policy.hcl > /dev/null && \
+	echo "\n$(BLUE)[+] Uploaded policy: $(WHITE_BOLD)log-system-policy" && \
+	app_token=$$(docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault token create -policy="app-policy" -format=json | jq -r .auth.client_token) && \
+	echo "\n$(BLUE)[+] Created token with access to $(WHITE_BOLD)/secret/app: $(WHITE_BOLD)$$app_token" && \
+	logsystem_token=$$(docker exec -e VAULT_TOKEN=$$root_token hashicorp-vault vault token create -policy="log-system-policy" -format=json | jq -r .auth.client_token) && \
+	echo "\n$(BLUE)[+] Created token with access to $(WHITE_BOLD)/secret/log-system: $(WHITE_BOLD)$$logsystem_token" && \
+	echo "APP_TOKEN=$$app_token" >> .env && \
+	echo "LOG_SYSTEM_TOKEN=$$logsystem_token" >> .env
 
 setup_firewall:
 	# CLEAN DOCKER-USER CHAIN ------------------------------------------------->
@@ -134,13 +148,18 @@ setup_firewall:
 
 	# APP SEGMENT ------------------------------------------------------------->
 	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.1.2 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
 
 	# LOG-SYSTEM SEGMENT ------------------------------------------------------>
 	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
 	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
-	iptables -I DOCKER-USER -p udp --dport 50000 -j ACCEPT
-	iptables -I DOCKER-USER -p udp --sport 50000 -j ACCEPT
-	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 50000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --dport 5000 -j ACCEPT
+	iptables -I DOCKER-USER -p udp --sport 5000 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 5000 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.1 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
+	iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
 
 	# MONITOR-SYSTEM SEGMENT -------------------------------------------------->
 	iptables -I DOCKER-USER -s 10.0.3.2 -d 10.0.3.1 -p tcp --dport 9090 -j ACCEPT

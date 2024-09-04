@@ -1,7 +1,9 @@
-ARG ELASTIC_VERSION=8.14.3
+FROM bitnami/kibana:8.15.0
 
-# https://www.docker.elastic.co/
-FROM docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+USER root
 
-# Add your kibana plugins setup here
-# Example: RUN kibana-plugin install <name|url>
+RUN apt-get update && apt-get install -y curl jq
+
+USER 1001
+
+COPY tools/ /entrypoint/
