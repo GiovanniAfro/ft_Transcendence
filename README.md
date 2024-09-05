@@ -44,7 +44,6 @@ git clone https://github.com/kichkiro/ft_transcendence.git
 cd ft_transcendence/project
 ```
 - make up:
-  - make setup_firewall
   - create images
   - create volumes
   - create networks 
@@ -67,8 +66,6 @@ cd ft_transcendence/project
 - make re:
   - make clean
   - make up
-- make setup_firewall:
-  - setup iptables
 
 ## 🐋- Docker Infrastracture
 
@@ -92,17 +89,24 @@ Below are the security measures that have been taken to protect the infrastructu
 - __SSL Certs__:
 
 ## 📚 - References
-- ELK
+- Log System
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
   - [Docker ELK](https://github.com/deviantony/docker-elk)
-- Monitoring
+- Monitor System
   - [Provision dashboards and data sources](https://grafana.com/tutorials/provision-dashboards-and-data-sources/)
   - [Dashboard API](https://grafana.com/docs/grafana/latest/developers/http_api/dashboard/)
   - [Prometheus Alert Manager Setup and Alert Configurations (Slack)](https://medium.com/@krishabh080/prometheus-alert-manager-setup-and-alert-configurations-slack-800f6bb5111e)
   - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
-- HashiCorp Vault
+- Vault
   - [Hashicorp Vault - Tutorials](https://developer.hashicorp.com/vault/tutorials)
   - [Hashicorp Vault - Documentation](https://developer.hashicorp.com/vault/docs)
+  - [Hashicorp Vault - Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
+- Bitnami Images
+  - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
+  - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)
+  - [Logstash](https://github.com/bitnami/containers/tree/main/bitnami/logstash)
+  - [Kibana](https://github.com/bitnami/containers/tree/main/bitnami/kibana)
+  - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)

@@ -1,13 +1,12 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-# Run EntryPoint in background ------------------------------------------------>
-vault server -config=/bitnami/vault/config/vault.json "$@" & 
+set -e
 
-# # Set Data Source ------------------------------------------------------------->
-# source /entrypoint/set_data_source.sh
+# Generate TLS Certificates --------------------------------------------------->
+# mkdir -p /bitnami/vault/certs/ && cd /bitnami/vault/certs/
+# openssl genpkey -algorithm RSA -out server-key.pem
+# openssl req -new -key server-key.pem -out server.csr
+# openssl x509 -req -days 365 -in server.csr -signkey server-key.pem -out server-cert.pem
 
-# # Set Dashboards -------------------------------------------------------------->
-# source /entrypoint/set_dashboards.sh
-
-# Wait for the main process to finish ----------------------------------------->
-wait
+# Run EntryPoint -------------------------------------------------------------->
+vault server -config=/bitnami/vault/config/vault.json

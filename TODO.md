@@ -67,6 +67,7 @@ DOUBTFUL
 	[ ] Usare immagine non-root
 	[ ] Prendere segreti da hashicorp-vault
 	[ ] Configurare servizio
+		[ ] Hashare password db
 		[ ] Settare HTTPS
 		[ ] 
 	[ ] Collegare al log-system

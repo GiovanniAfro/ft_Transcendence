@@ -246,13 +246,10 @@ services:
             dockerfile: Dockerfile
         environment:
             VAULT_ADDR: http://10.0.4.1:8200
-            # VAULT_DEV_ROOT_TOKEN_ID: root
-        # entrypoint: vault server -config=/bitnami/vault/config/vault.json # prod
-        # entrypoint: vault server -dev
         ports:
             - 8200:8200
         volumes:
-            - vault:/bitnami/vault/data
+            - vault:/bitnami/vault
         networks:
             vault:
                 ipv4_address: 10.0.4.1

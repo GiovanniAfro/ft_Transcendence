@@ -1,0 +1,20 @@
+{
+    "backend":{
+        "file":{
+            "path":"/bitnami/vault/"
+        }
+    },
+    "listener":{
+        "tcp":{
+            "address":"10.0.4.1:8200",
+            "tls_disable":0,
+            "tls_cert_file": "/bitnami/vault/certs/server-cert.pem",
+            "tls_key_file": "/bitnami/vault/certs/server-key.pem"
+        }
+    },
+    "default_lease_ttl":"168h",
+    "ui":true,
+    "log_level":"Info",
+    "disable_mlock":"true"
+}
+ 

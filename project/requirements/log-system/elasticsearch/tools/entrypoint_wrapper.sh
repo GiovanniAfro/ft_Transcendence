@@ -8,6 +8,10 @@ secrets=$(curl -H "X-Vault-Token: ${LOG_SYSTEM_TOKEN}" \
 unset LOG_SYSTEM_TOKEN
 
 # Run EntryPoint -------------------------------------------------------------->
+# ELASTICSEARCH_ENABLE_SECURITY=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_ENABLE_SECURITY') \
+# ELASTICSEARCH_KEYSTORE_PASSWORD=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_KEYSTORE_PASSWORD') \
+# ELASTICSEARCH_TRUSTSTORE_PASSWORD=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_TRUSTSTORE_PASSWORD') \
+# ELASTICSEARCH_KEYSTORE_LOCATION=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_KEYSTORE_LOCATION') \
+# ELASTICSEARCH_TRUSTSTORE_LOCATION=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_TRUSTSTORE_LOCATION') \
 ELASTICSEARCH_PASSWORD=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_PASSWORD') \
-ELASTICSEARCH_ENABLE_SECURITY=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_ENABLE_SECURITY') \
 /opt/bitnami/scripts/elasticsearch/entrypoint.sh /opt/bitnami/scripts/elasticsearch/run.sh
