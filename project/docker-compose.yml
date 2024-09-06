@@ -246,6 +246,7 @@ services:
             dockerfile: Dockerfile
         environment:
             VAULT_ADDR: http://10.0.4.1:8200
+            # VAULT_CACERT: /tmp/intermediate.cert.pem
         ports:
             - 8200:8200
         volumes:

@@ -8,8 +8,8 @@
         "tcp":{
             "address":"10.0.4.1:8200",
             "tls_disable":0,
-            "tls_cert_file": "/bitnami/vault/certs/server-cert.pem",
-            "tls_key_file": "/bitnami/vault/certs/server-key.pem"
+            "tls_cert_file": "/bitnami/vault/config/vault.crt",
+            "tls_key_file": "/bitnami/vault/config/vault.key"
         }
     },
     "default_lease_ttl":"168h",
