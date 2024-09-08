@@ -174,13 +174,13 @@ echo -e "\n$BLUE[+] Created a role for the intermediate CA"
 # Create Certificates for vault-setup ---------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write -format=json pki_int/issue/ft-transcendence-42 \
-	common_name="vault.ft-transcendence.42" ip_sans="10.0.0.1" ttl="24h" > setup/.tmp/vault-cert.json
+	common_name="vault.ft-transcendence.42" ip_sans="10.0.0.1" ttl="24h"\
+	> setup/.tmp/vault-cert.json
 
 jq -r '.data.certificate' setup/.tmp/vault-cert.json > setup/.tmp/vault.crt
 jq -r '.data.private_key' setup/.tmp/vault-cert.json > setup/.tmp/vault.key
 docker cp setup/.tmp/vault.crt vault-setup:/bitnami/vault/tls/vault.crt > /dev/null
 docker cp setup/.tmp/vault.key vault-setup:/bitnami/vault/tls/vault.key > /dev/null
-# docker cp ./services/vault/vault-setup/conf/vault-tls.json vault-setup:/bitnami/vault/tls/vault.json > /dev/null
 echo -e "\n$BLUE[+] Created certificates for vault-setup"
 
 # Copy TLS Configfile to Vault ----------------------------------------------->>
@@ -217,26 +217,28 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault policy write app-policy \
 	/bitnami/vault/config/app-policy.hcl > /dev/null
 
-echo -e "\n$BLUE[+] Uploaded policy:$WHITE_B app-policy"
-
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault policy write log-system-policy \
 	/bitnami/vault/config/log-system-policy.hcl > /dev/null
 
-echo -e "\n$BLUE[+] Uploaded policy:$WHITE_B log-system-policy"
+echo -e "\n$BLUE[+] Created policy:\n\
+    -$WHITE_B app-policy\n\
+    $BLUE-$WHITE_B log-system-policy"
 
 # Create tokens to access to secrets ----------------------------------------->>
 app_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault token create -policy="app-policy" -format=json \
 	| jq -r .auth.client_token)
 
-echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/app$BLUE:\n    $WHITE_B$app_token"
+echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/app$BLUE:\n\
+    $WHITE_B$app_token"
 
 logsystem_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault token create -policy="log-system-policy" -format=json \
 	| jq -r .auth.client_token)
 
-echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/log-system$BLUE:\n    $WHITE_B$logsystem_token${NC}"
+echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/log-system$BLUE:\n\
+    $WHITE_B$logsystem_token${NC}"
 
 # Put tokens to .env --------------------------------------------------------->>
 echo -e "APP_TOKEN=$app_token" >> .env
@@ -245,7 +247,6 @@ echo -e "LOG_SYSTEM_TOKEN=$logsystem_token" >> .env
 # Cleanup --------------------------------------------------------------------->
 docker container stop vault-setup > /dev/null 2>&1
 docker container rm vault-setup > /dev/null 2>&1
-docker image rm bitnami/vault:1.17.5 > /dev/null 2>&1
 docker network rm secrets > /dev/null 2>&1
 rm -rf setup/.tmp
 
@@ -254,13 +255,8 @@ echo -e "\n$BLUE[+] Compose$WHITE_B SECRETS$BLUE profile ..."
 docker compose -p "ft_transcendence" --profile secrets up -d >/dev/null 2>&1
 
 # Unseal Vault ---------------------------------------------------------------->
-docker exec -e VAULT_ADDR=https://10.0.0.1:8200 vault \
-	vault operator unseal $key1 > /dev/null
+docker exec vault vault operator unseal $key1 > /dev/null
+docker exec vault vault operator unseal $key2 > /dev/null
+docker exec vault vault operator unseal $key3 > /dev/null
 
-docker exec -e VAULT_ADDR=https://10.0.0.1:8200 vault \
-	vault operator unseal $key2 > /dev/null
-
-docker exec -e VAULT_ADDR=https://10.0.0.1:8200 vault \
-	vault operator unseal $key3 > /dev/null
-	
 echo -e "\n$BLUE[+] The vault has been unsealed"

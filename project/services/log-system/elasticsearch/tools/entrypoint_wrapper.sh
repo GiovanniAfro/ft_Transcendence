@@ -2,10 +2,8 @@
 
 set -e
 
-secrets=$(curl -H "X-Vault-Token: ${LOG_SYSTEM_TOKEN}" \
-		 -X GET http://10.0.4.1:8200/v1/secret/log-system)
-
-unset LOG_SYSTEM_TOKEN
+secrets=$(curl -k -H "X-Vault-Token: ${LOG_SYSTEM_TOKEN}" \
+		 -X GET https://10.0.0.1:8200/v1/secret/log-system)
 
 # Run EntryPoint -------------------------------------------------------------->
 # ELASTICSEARCH_ENABLE_SECURITY=$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_ENABLE_SECURITY') \

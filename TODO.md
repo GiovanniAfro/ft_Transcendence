@@ -45,27 +45,19 @@ DOUBTFUL
 
 # kichkiro
 
-[ ] Nginx
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da hashicorp-vault
+[ ] Vault 
+	[v] Usare immagine non-root
 	[ ] Configurare servizio
-		[ ] Settare HTTPS
-	[ ] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard
-	[ ] Configurare nginx in modalita solo TLS
-
-[ ] Hashicorp-Vault 
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da hashicorp-vault
-	[ ] Configurare servizio
-		[ ] Settare HTTPS
-		[ ] 
+		[v] Creare root CA e intermediate CA
+		[ ] Creare certificati per i container
+		[ ] Importare segreti
+		[v] Settare TLS mode
 	[ ] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard
 
 [ ] Django
 	[ ] Usare immagine non-root
-	[ ] Prendere segreti da hashicorp-vault
+	[ ] Prendere segreti da vault
 	[ ] Configurare servizio
 		[ ] Hashare password db
 		[ ] Settare HTTPS
@@ -76,7 +68,7 @@ DOUBTFUL
 
 [ ] Postgres
 	[v] Usare immagine non-root
-	[v] Prendere segreti da hashicorp-vault
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[ ] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
 	[ ] Collegare al log-system
@@ -84,27 +76,27 @@ DOUBTFUL
 
 [ ] Elasticsearch
 	[v] Usare immagine non-root
-	[v] Prendere segreti da hashicorp-vault
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Settare password login
 		[ ] Settare HTTPS e TLS
 
 [ ] Logstash
 	[v] Usare immagine non-root
-	[v] Prendere segreti da hashicorp-vault
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[ ] 
 
 [ ] Kibana
 	[v] Usare immagine non-root
-	[v] Prendere segreti da hashicorp-vault
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[ ] Settare HTTPS e TLS
 		[ ] Settare dataview di defualt per pattern log*
 
 [ ] Prometheus
 	[ ] Usare immagine non-root
-	[ ] Prendere segreti da hashicorp-vault
+	[ ] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Aggiungere target in prometheus.yml
 		[ ] Settare alertmanger
@@ -112,9 +104,19 @@ DOUBTFUL
 
 [ ] Grafana
 	[ ] Usare immagine non-root
-	[ ] Prendere segreti da hashicorp-vault
+	[ ] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Impostare password grafana
 		[v] Impostare data source grafana
 		[ ] Settare autenticazione grafana
 		[ ] Settare HTTPS
+	
+[ ] Nginx
+	[ ] Usare immagine non-root
+	[ ] Prendere segreti da vault
+	[ ] Configurare servizio
+		[ ] Settare HTTPS
+	[ ] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard
+	[ ] Configurare nginx in modalita solo TLS
+

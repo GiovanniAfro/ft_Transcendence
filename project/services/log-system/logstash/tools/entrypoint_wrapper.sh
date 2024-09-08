@@ -2,10 +2,8 @@
 
 set -ex
 
-secrets=$(curl -H "X-Vault-Token: ${LOG_SYSTEM_TOKEN}" \
-		 -X GET http://10.0.4.1:8200/v1/secret/log-system)
-
-unset LOG_SYSTEM_TOKEN
+secrets=$(curl -k -H "X-Vault-Token: ${LOG_SYSTEM_TOKEN}" \
+		 -X GET https://10.0.0.1:8200/v1/secret/log-system)
 
 # Run EntryPoint -------------------------------------------------------------->
 LOGSTASH_ENABLE_GELF_INPUT=$(echo "$secrets" | jq -r '.data.LOGSTASH_ENABLE_GELF_INPUT') \

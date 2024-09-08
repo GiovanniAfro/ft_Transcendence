@@ -15,13 +15,10 @@ iptables -I DOCKER-USER -s 10.0.2.0/24 -d 10.0.2.0/24 -j DROP
 iptables -I DOCKER-USER -s 10.0.3.0/24 -d 10.0.3.0/24 -j DROP
 iptables -I DOCKER-USER -s 10.0.4.0/24 -d 10.0.4.0/24 -j DROP
 
-# SECRETS SEGMENT --------------------------------------------------------------->
-# iptables -I DOCKER-USER -s 10.0.0.1 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
-
 # APP SEGMENT ----------------------------------------------------------------->
 iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.1.2 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.1.1 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.1.2 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
 
 # LOG-SYSTEM SEGMENT ---------------------------------------------------------->
 iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
@@ -29,9 +26,12 @@ iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.2.1 -p tcp --dport 9200 -j ACCEPT
 iptables -I DOCKER-USER -p udp --dport 5000 -j ACCEPT
 iptables -I DOCKER-USER -p udp --sport 5000 -j ACCEPT
 # iptables -I DOCKER-USER -s 10.0.1.0/24 -d 10.0.2.2 -p udp --dport 5000 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.2.1 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.4.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.1 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.1 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.2 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.2.3 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
 
 # MONITOR-SYSTEM SEGMENT ------------------------------------------------------>
 iptables -I DOCKER-USER -s 10.0.3.2 -d 10.0.3.1 -p tcp --dport 9090 -j ACCEPT
@@ -42,6 +42,7 @@ iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.4 -p tcp --dport 9187 -j ACCEPT
 
 # PROXY-WAF SEGMENT ----------------------------------------------------------->
 iptables -I DOCKER-USER -s 10.0.4.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.4.1 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
 
 # SET IPTABLES IN STATEFUL MODE ----------------------------------------------->
 iptables -I DOCKER-USER -m state --state ESTABLISHED,RELATED -j ACCEPT
