@@ -29,15 +29,13 @@ all: up
 
 up:
 	@./setup/setup_iptables.sh
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)VAULT $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile vault up -d >/dev/null 2>&1 
 	@./setup/setup_vault.sh
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile log-system up -d >/dev/null 2>&1 
+	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
+	# @docker compose -p "ft_transcendence" --profile log-system up -d >/dev/null 2>&1 
 	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
 	# @docker compose -p "ft_transcendence" --profile monitor-system up -d >/dev/null 2>&1 
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile app up -d >/dev/null 2>&1 
+	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
+	# @docker compose -p "ft_transcendence" --profile app up -d >/dev/null 2>&1 
 	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
 	# @docker compose -p "ft_transcendence" --profile proxy-waf up -d >/dev/null 2>&1 
 	@rm -rf .env
@@ -82,8 +80,6 @@ clean:
 		echo "    $(BLUE)Removing: $(WHITE_BOLD)$$id$(NC)"; \
 		docker volume rm $$id > /dev/null 2>&1; \
 	done
-
-fclean: clean
 	@echo "\n$(BLUE)[+] Removing all networks$(NC)"
 	@docker network ls -q | while read id; do \
 		name=$$(docker network inspect --format='{{.Name}}' $$id); \
@@ -92,6 +88,8 @@ fclean: clean
 			docker network rm $$id > /dev/null 2>&1; \
 		fi \
 	done
+
+fclean: clean
 	@echo "\n$(BLUE)[+] Removing all build cache$(NC)"
 	@-docker builder prune --all --force > /dev/null 2>&1
 	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"

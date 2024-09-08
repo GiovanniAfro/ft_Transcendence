@@ -1,27 +1,29 @@
 services:
-    # PROXY-WAF-SEGMENT ------------------------------------------------------->
-    nginx:
+    # SECRETS-SEGMENT ----------------------------------------------------------->
+    vault:
         profiles:
-            - proxy-waf
-        container_name: nginx
-        build:
-            context: ./requirements/proxy-waf/nginx
-            dockerfile: Dockerfile
+            - secrets
+        container_name: vault
+        image: bitnami/vault:1.17.5
         environment:
-            BACKEND: ${BACKEND}
-            NGINX_ALWAYS_TLS_REDIRECT: ${NGINX_ALWAYS_TLS_REDIRECT}
+            VAULT_ADDR: https://10.0.0.1:8200
+            VAULT_CACERT: /bitnami/vault/tls/intermediate.cert.pem
         ports:
-            - "80:8080"
-            - "443:8443"
+            - 8200:8200
+        volumes:
+            - vault:/bitnami/vault
         networks:
-            proxy-waf:
+            secrets:
                 ipv4_address: 10.0.0.1
+        cap_add:
+            - IPC_LOCK
         logging:
             driver: gelf
             options:
                 gelf-address: "udp://10.0.2.2:5000"
-                tag: "nginx"
+                tag: "vault"
         restart: always
+        entrypoint: vault server -config=/bitnami/vault/config/vault.hcl
 
     # APP-SEGMENT ------------------------------------------------------------->
     # django:
@@ -29,7 +31,7 @@ services:
     #         - app
     #     container_name: django
     #     build:
-    #         context: ./requirements/app/django
+    #         context: ./services/app/django
     #         dockerfile: Dockerfile
     #     environment:
     #         SECRET_KEY: ${SECRET_KEY} 
@@ -62,7 +64,7 @@ services:
             - app
         container_name: postgres
         build:
-            context: ./requirements/app/postgres
+            context: ./services/app/postgres
             dockerfile: Dockerfile
         environment:
             APP_TOKEN: ${APP_TOKEN}
@@ -85,7 +87,7 @@ services:
             - log-system
         container_name: elasticsearch
         build:
-            context: ./requirements/log-system/elasticsearch/
+            context: ./services/log-system/elasticsearch/
         # entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
         environment:
             LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
@@ -93,7 +95,7 @@ services:
             - 9200:9200
             - 9300:9300
         # volumes:
-        #     - ./requirements/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+        #     - ./services/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
         #     - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             log-system:
@@ -106,15 +108,15 @@ services:
             - log-system
         container_name: logstash
         build:
-            context: ./requirements/log-system/logstash
+            context: ./services/log-system/logstash
         environment:
             LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
         ports:
             - 5000:5000/udp
             - 9600:9600
         # volumes:
-        #     - ./requirements/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-        #     - ./requirements/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
+        #     - ./services/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+        #     - ./services/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.2
@@ -128,13 +130,13 @@ services:
             - log-system
         container_name: kibana
         build:
-            context: ./requirements/log-system/kibana
+            context: ./services/log-system/kibana
         environment:
             LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
         ports:
             - 5601:5601
         # volumes:
-        #     - ./requirements/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+        #     - ./services/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.3
@@ -149,7 +151,7 @@ services:
             - monitor-system
         container_name: prometheus
         build:
-            context: ./requirements/monitor-system/prometheus
+            context: ./services/monitor-system/prometheus
         volumes:
             - prometheus:/opt/bitnami/prometheus/
         ports:
@@ -164,7 +166,7 @@ services:
             - monitor-system
         container_name: grafana
         build:
-            context: ./requirements/monitor-system/grafana
+            context: ./services/monitor-system/grafana
         volumes:
             - grafana:/var/lib/grafana
         ports:
@@ -186,7 +188,7 @@ services:
             - monitor-system
         container_name: alertmanager
         build:
-            context: ./requirements/monitor-system/alertmanager
+            context: ./services/monitor-system/alertmanager
         ports:
             - 9093:9093
         networks:
@@ -201,7 +203,7 @@ services:
             - monitor-system
         container_name: postgres-exporter
         build:
-            context: ./requirements/monitor-system/postgres-exporter
+            context: ./services/monitor-system/postgres-exporter
         ports:
             - "9187:9187"
         environment:
@@ -220,7 +222,7 @@ services:
             - monitor-system
         container_name: nginx-exporter
         build:
-            context: ./requirements/monitor-system/nginx-exporter
+            context: ./services/monitor-system/nginx-exporter
         ports:
             - "9113:9113"
         # environment:
@@ -236,37 +238,33 @@ services:
         depends_on:
             - prometheus
 
-    # VAULT-SEGMENT ----------------------------------------------------------->
-    hashicorp-vault:
+    # PROXY-WAF-SEGMENT ------------------------------------------------------->
+    nginx:
         profiles:
-            - vault
-        container_name: hashicorp-vault
+            - proxy-waf
+        container_name: nginx
         build:
-            context: ./requirements/vault/hashicorp-vault
+            context: ./services/proxy-waf/nginx
             dockerfile: Dockerfile
         environment:
-            VAULT_ADDR: http://10.0.4.1:8200
-            # VAULT_CACERT: /tmp/intermediate.cert.pem
+            BACKEND: ${BACKEND}
+            NGINX_ALWAYS_TLS_REDIRECT: ${NGINX_ALWAYS_TLS_REDIRECT}
         ports:
-            - 8200:8200
-        volumes:
-            - vault:/bitnami/vault
+            - "80:8080"
+            - "443:8443"
         networks:
-            vault:
+            proxy-waf:
                 ipv4_address: 10.0.4.1
-        cap_add:
-            - IPC_LOCK
         logging:
             driver: gelf
             options:
                 gelf-address: "udp://10.0.2.2:5000"
-                tag: "hashicorp-vault"
+                tag: "nginx"
         restart: always
-        entrypoint: /bitnami/vault/entrypoint/entrypoint_wrapper.sh
-    
+
 volumes:
     postgres:
-            
+
     elasticsearch:
 
     prometheus:
@@ -274,10 +272,11 @@ volumes:
     grafana:
 
     vault:
+        external: true
 
 networks:
-    proxy-waf:
-        name: proxy-waf
+    secrets:
+        name: secrets
         driver: bridge
         ipam:
             driver: default
@@ -312,8 +311,8 @@ networks:
                 - subnet: 10.0.3.0/24
                   gateway: 10.0.3.254
 
-    vault:
-        name: vault
+    proxy-waf:
+        name: proxy-waf
         driver: bridge
         ipam:
             driver: default
