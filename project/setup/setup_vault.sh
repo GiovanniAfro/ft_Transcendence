@@ -170,8 +170,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 
 echo -e "\n$BLUE[+] Created a role for the intermediate CA"
 
-# Create Certificates for Containers ------------------------------------------>
-# Create Certificates for vault-setup ---------------------------------------->>
+# Create TLS Certificates for vault ------------------------------------------>>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write -format=json pki_int/issue/ft-transcendence-42 \
 	common_name="vault.ft-transcendence.42" ip_sans="10.0.0.1" ttl="24h"\
@@ -182,10 +181,13 @@ jq -r '.data.private_key' setup/.tmp/vault-cert.json > setup/.tmp/vault.key
 docker cp setup/.tmp/vault.crt vault-setup:/bitnami/vault/tls/vault.crt > /dev/null
 docker cp setup/.tmp/vault.key vault-setup:/bitnami/vault/tls/vault.key > /dev/null
 echo -e "\n$BLUE[+] Created certificates for vault-setup"
-
-# Copy TLS Configfile to Vault ----------------------------------------------->>
 docker cp services/secrets/vault/conf/vault.hcl \
 	vault-setup:/bitnami/vault/config/vault.hcl > /dev/null
+
+# # Create TLS Certificates for ELASTICSEARCH ---------------------------------->>
+# docker exec -e VAULT_TOKEN=$root_token vault-setup \
+# 	vault write pki_int/issue/ft-transcendence-42 \
+# 	common_name="ELASTICSEARCH.ft-transcendence.42" ip_sans="10.0.2.1" ttl="24h"
 
 # Import Secrets -------------------------------------------------------------->
 # Enable KV Secrets Engine --------------------------------------------------->>
@@ -194,55 +196,90 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 
 echo -e "\n$BLUE[+] Enabled the kv secrets engine at:$WHITE_B secret/"
 
-# Put secrets to Vault ------------------------------------------------------->>
+# Import Secrets to Vault ---------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/app - < secrets/env/app.json > /dev/null
-
-echo -e "\n$BLUE[+] Added app secrets to vault at $WHITE_B/secret/app"
+	vault kv put secret/django - <<< \
+	$(jq -r '.django' ./.env.json) > /dev/null
 
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/log-system - < secrets/env/log-system.json > /dev/null
+	vault kv put secret/postgresql - <<< \
+	$(jq -r '.postgresql' ./.env.json) > /dev/null
 
-echo -e "\n$BLUE[+] Added log-system secrets to vault at $WHITE_B/secret/log-system"
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/elasticsearch - <<< \
+	$(jq -r '.elasticsearch' ./.env.json) > /dev/null
 
-# Copy Policy Configfile to Container ---------------------------------------->>
-docker cp services/secrets/vault/conf/app-policy.hcl \
-	vault-setup:/bitnami/vault/config/app-policy.hcl > /dev/null
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/logstash - <<< \
+	$(jq -r '.logstash' ./.env.json) > /dev/null
 
-docker cp services/secrets/vault/conf/log-system-policy.hcl \
-	vault-setup:/bitnami/vault/config/log-system-policy.hcl > /dev/null
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/kibana - <<< \
+	$(jq -r '.kibana' ./.env.json) > /dev/null
 
-# Create policy -------------------------------------------------------------->>
+echo -e "\n$BLUE[+] Import secrets to vault:\n\
+    $BLUE- Add$WHITE_B django$BLUE secrets at $WHITE_B/secret/django\n\
+    $BLUE- Add$WHITE_B postgresql$BLUE secrets at $WHITE_B/secret/postgresql\n\
+    $BLUE- Add$WHITE_B elasticsearch$BLUE secrets at $WHITE_B/secret/elasticsearch\n\
+    $BLUE- Add$WHITE_B logstash$BLUE secrets at $WHITE_B/secret/logstash\n\
+    $BLUE- Add$WHITE_B kibana$BLUE secrets at $WHITE_B/secret/kibana"
+
+# Authentication from Containers ---------------------------------------------->
+# Create Roles --------------------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault policy write app-policy \
-	/bitnami/vault/config/app-policy.hcl > /dev/null
+	vault write pki_int/roles/elasticsearch \
+	allowed_domains="elasticsearch.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
 
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault policy write log-system-policy \
-	/bitnami/vault/config/log-system-policy.hcl > /dev/null
 
-echo -e "\n$BLUE[+] Created policy:\n\
-    -$WHITE_B app-policy\n\
-    $BLUE-$WHITE_B log-system-policy"
+# Create Policies ------------------------------------------------------------>>
+echo -e "\n$BLUE[+] Creating policies:"
 
-# Create tokens to access to secrets ----------------------------------------->>
-app_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="app-policy" -format=json \
+for policy_file in services/secrets/vault/conf/*-policy.hcl; do
+	file_name=$(basename "$policy_file")
+	docker cp "$policy_file" vault-setup:/bitnami/vault/config/"$file_name" \
+		> /dev/null
+	docker exec -e VAULT_TOKEN=$root_token vault-setup \
+		vault policy write ${file_name::-4} /bitnami/vault/config/$file_name \
+		> /dev/null
+	echo -e "$BLUE    -$WHITE_B ${file_name::-4}"   
+done
+
+# Create Tokens -------------------------------------------------------------->>
+django_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="django-policy" -format=json \
 	| jq -r .auth.client_token)
 
-echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/app$BLUE:\n\
-    $WHITE_B$app_token"
-
-logsystem_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="log-system-policy" -format=json \
+postgresql_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="postgresql-policy" -format=json \
 	| jq -r .auth.client_token)
 
-echo -e "\n$BLUE[+] Created token with access to $WHITE_B/secret/log-system$BLUE:\n\
-    $WHITE_B$logsystem_token${NC}"
+elasticsearch_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="elasticsearch-policy" -format=json \
+	| jq -r .auth.client_token)
+
+logstash_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="logstash-policy" -format=json \
+	| jq -r .auth.client_token)
+
+kibana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="kibana-policy" -format=json \
+	| jq -r .auth.client_token)
+
+echo -e "\n$BLUE[+] Creating tokens with access to:\n\
+    $WHITE_B/secret/django$BLUE: $WHITE_B$django_vault_token\n\
+    $WHITE_B/secret/postgresql$BLUE: $WHITE_B$postgresql_vault_token\n\
+    $WHITE_B/secret/elasticsearch$BLUE: $WHITE_B$elasticsearch_vault_token\n\
+    $WHITE_B/secret/logstash$BLUE: $WHITE_B$logstash_vault_token\n\
+    $WHITE_B/secret/kibana$BLUE: $WHITE_B$kibana_vault_token"
 
 # Put tokens to .env --------------------------------------------------------->>
-echo -e "APP_TOKEN=$app_token" >> .env
-echo -e "LOG_SYSTEM_TOKEN=$logsystem_token" >> .env
+echo -e "DJANGO_VAULT_TOKEN=$django_vault_token" >> .env
+echo -e "POSTGRESQL_VAULT_TOKEN=$postgresql_vault_token" >> .env
+echo -e "ELASTICSEARCH_VAULT_TOKEN=$elasticsearch_vault_token" >> .env
+echo -e "LOGSTASH_VAULT_TOKEN=$logstash_vault_token" >> .env
+echo -e "KIBANA_VAULT_TOKEN=$kibana_vault_token" >> .env
 
 # Cleanup --------------------------------------------------------------------->
 docker container stop vault-setup > /dev/null 2>&1
@@ -260,3 +297,9 @@ docker exec vault vault operator unseal $key2 > /dev/null
 docker exec vault vault operator unseal $key3 > /dev/null
 
 echo -e "\n$BLUE[+] The vault has been unsealed"
+
+
+
+# docker exec -e VAULT_TOKEN=hvs.qzgccwMYuBqLOAtMJ75zUipt vault \
+# 	vault write pki_int/issue/ft-transcendence-42 \
+# 	common_name="elasticsearch.ft-transcendence.42" ip_sans="10.0.2.1" ttl="24h"

@@ -1,3 +1,3 @@
-path "secret/app" {
+path "secret/logstash" {
   capabilities = ["read"]
 }

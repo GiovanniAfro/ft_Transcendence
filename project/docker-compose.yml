@@ -67,7 +67,7 @@ services:
             context: ./services/app/postgres
             dockerfile: Dockerfile
         environment:
-            APP_TOKEN: ${APP_TOKEN}
+            POSTGRESQL_VAULT_TOKEN: ${POSTGRESQL_VAULT_TOKEN}
         volumes:
             - postgres:/bitnami/postgresql
         networks:
@@ -90,7 +90,7 @@ services:
             context: ./services/log-system/elasticsearch/
         # entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
         environment:
-            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
+            ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
         ports:
             - 9200:9200
             - 9300:9300
@@ -110,7 +110,7 @@ services:
         build:
             context: ./services/log-system/logstash
         environment:
-            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
+            LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
         ports:
             - 5000:5000/udp
             - 9600:9600
@@ -132,7 +132,7 @@ services:
         build:
             context: ./services/log-system/kibana
         environment:
-            LOG_SYSTEM_TOKEN: ${LOG_SYSTEM_TOKEN}
+            KIBANA_VAULT_TOKEN: ${KIBANA_VAULT_TOKEN}
         ports:
             - 5601:5601
         # volumes:

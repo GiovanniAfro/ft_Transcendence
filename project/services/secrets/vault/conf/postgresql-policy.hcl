@@ -1,3 +1,3 @@
-path "secret/log-system" {
+path "secret/postgresql" {
   capabilities = ["read"]
 }
