@@ -3,8 +3,6 @@
 set -ex
 
 # Get Secrets from Vault ------------------------------------------------------>
-# mkdir -p /bitnami/elasticsearch/config/tls
-
 curl -k -H "X-Vault-Token: $ELASTICSEARCH_VAULT_TOKEN" -X POST -d '{
 		"common_name": "elasticsearch.ft-transcendence.42",
 		"ttl": "24h",
