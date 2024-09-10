@@ -232,6 +232,11 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	allow_subdomains=false allow_bare_domains=true \
 	max_ttl="24h" > /dev/null
 
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/kibana \
+	allowed_domains="kibana.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
 
 # Create Policies ------------------------------------------------------------>>
 echo -e "\n$BLUE[+] Creating policies:"
