@@ -34,6 +34,8 @@ while ! curl -k -o /dev/null -s -H --fail https://10.0.2.1:9200; do
 	sleep 1
 done
 
+sleep 5
+
 # Create ILM Policy ----------------------------------------------------------->
 curl -k -X PUT 'https://10.0.2.1:9200/_ilm/policy/ft-transcendence-policy' \
      -u elastic:$(echo "$secrets" | jq -r '.data.ELASTICSEARCH_PASSWORD') \

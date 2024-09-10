@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -e
+set -ex
 
 # Get Certs and Secrets from Vault -------------------------------------------->
 certs=$(curl -s -k -H "X-Vault-Token: $KIBANA_VAULT_TOKEN" -X POST -d '{
@@ -38,6 +38,8 @@ while ! curl -k -o /dev/null -s -H --fail https://10.0.2.3:5601; do
 	echo "waiting for kibana ..."
 	sleep 1
 done
+
+sleep 5
 
 # Create a DataView ----------------------------------------------------------->
 curl -k -X POST https://10.0.2.3:5601/api/data_views/data_view \

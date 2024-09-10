@@ -93,7 +93,6 @@ services:
             ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
         ports:
             - 9200:9200
-            - 9300:9300
         # volumes:
         #     - ./services/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
         #     - elasticsearch:/usr/share/elasticsearch/data:Z
@@ -111,9 +110,6 @@ services:
             context: ./services/log-system/logstash
         environment:
             LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
-        ports:
-            - 5000:5000/udp
-            - 9600:9600
         # volumes:
         #     - ./services/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
         #     - ./services/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
