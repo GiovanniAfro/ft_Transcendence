@@ -263,6 +263,9 @@ services:
         restart: always
 
 volumes:
+    vault:
+        external: true
+
     postgres:
 
     elasticsearch:
@@ -270,9 +273,6 @@ volumes:
     prometheus:
 
     grafana:
-
-    vault:
-        external: true
 
 networks:
     secrets:

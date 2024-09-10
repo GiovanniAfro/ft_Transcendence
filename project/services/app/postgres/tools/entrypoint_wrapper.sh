@@ -1,9 +1,10 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 set -e
 
+# Get Certs and Secrets from Vault -------------------------------------------->
 secrets=$(curl -k -H "X-Vault-Token: ${APP_TOKEN}" \
-		 -X GET https://10.0.0.1:8200/v1/secret/app)
+	-X GET https://10.0.0.1:8200/v1/secret/app)
 
 # Run EntryPoint -------------------------------------------------------------->
 POSTGRESQL_DATABASE=$(echo "$secrets" | jq -r '.data.POSTGRESQL_DATABASE') \

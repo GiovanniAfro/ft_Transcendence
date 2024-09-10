@@ -92,7 +92,7 @@ Below are the security measures that have been taken to protect the infrastructu
 - Log System
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
   - [Docker ELK](https://github.com/deviantony/docker-elk)
-  - [Kibana API - Get all data views](https://www.elastic.co/docs/api/doc/kibana/v8/operation/operation-getalldataviewsdefault)
+  - [Kibana API - Data Views](https://www.elastic.co/docs/api/doc/kibana/v8/operation/operation-getalldataviewsdefault)
   - [Configure SSL/TLS for the Logstash output](https://www.elastic.co/guide/en/fleet/current/secure-logstash-connections.html)
 - Monitor System
   - [Provision dashboards and data sources](https://grafana.com/tutorials/provision-dashboards-and-data-sources/)

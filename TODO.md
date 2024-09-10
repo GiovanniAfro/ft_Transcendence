@@ -47,52 +47,52 @@ DOUBTFUL
 
 [ ] Vault 
 	[v] Usare immagine non-root
-	[ ] Configurare servizio
+	[v] Configurare servizio
 		[v] Creare root CA e intermediate CA
-		[ ] Creare certificati per i container
-		[ ] Importare segreti
+		[v] Creare certificati per i container
+		[v] Importare segreti
 		[v] Settare TLS mode
-	[ ] Collegare al log-system
+	[v] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard
 
 [ ] Django
 	[ ] Usare immagine non-root
 	[ ] Prendere segreti da vault
 	[ ] Configurare servizio
-		[ ] Hashare password db
+		[ ] Hashare password postgresql
 		[ ] Settare HTTPS
 		[ ] 
 	[ ] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard
 	[ ] Utilizzare un server WSGI e disabilitare il webserver di sviluppo
 
-[ ] Postgres
+[ ] Postgresql
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[ ] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
-	[ ] Collegare al log-system
+	[v] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard
 
-[ ] Elasticsearch
+[v] Elasticsearch
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
-	[ ] Configurare servizio
+	[v] Configurare servizio
 		[v] Settare password login
-		[ ] Settare HTTPS e TLS
+		[v] Settare HTTPS e TLS
 
-[ ] Logstash
+[v] Logstash
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
-	[ ] Configurare servizio
-		[ ] 
+	[v] Configurare servizio
+		[v] ssl output elasticsearch
 
-[ ] Kibana
+[v] Kibana
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
-	[ ] Configurare servizio
-		[ ] Settare HTTPS e TLS
-		[ ] Settare dataview di defualt per pattern log*
+	[v] Configurare servizio
+		[v] Settare HTTPS e TLS
+		[v] Settare dataview di defualt per pattern log*
 
 [ ] Prometheus
 	[ ] Usare immagine non-root
