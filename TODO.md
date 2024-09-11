@@ -53,7 +53,7 @@ DOUBTFUL
 		[v] Importare segreti
 		[v] Settare TLS mode
 	[v] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard
+	[ ] Esportare metriche e creare dashboard
 
 [ ] Django
 	[ ] Usare immagine non-root
@@ -95,21 +95,21 @@ DOUBTFUL
 		[v] Settare dataview di defualt per pattern log*
 
 [ ] Prometheus
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da vault
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Aggiungere target in prometheus.yml
 		[ ] Settare alertmanger
-		[ ] Settare HTTPS
+		[v] Settare HTTPS
+		[ ] Hashare credenziali in web.yml e prometheus.yml
 
-[ ] Grafana
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da vault
-	[ ] Configurare servizio
-		[v] Impostare password grafana
+[v] Grafana
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
 		[v] Impostare data source grafana
-		[ ] Settare autenticazione grafana
-		[ ] Settare HTTPS
+		[v] Settare autenticazione grafana
+		[v] Settare HTTPS
 	
 [ ] Nginx
 	[ ] Usare immagine non-root

@@ -88,14 +88,10 @@ services:
         container_name: elasticsearch
         build:
             context: ./services/log-system/elasticsearch/
-        # entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
         environment:
             ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
         ports:
             - 9200:9200
-        # volumes:
-        #     - ./services/log-system/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
-        #     - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.1
@@ -110,9 +106,6 @@ services:
             context: ./services/log-system/logstash
         environment:
             LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
-        # volumes:
-        #     - ./services/log-system/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-        #     - ./services/log-system/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.2
@@ -131,8 +124,6 @@ services:
             KIBANA_VAULT_TOKEN: ${KIBANA_VAULT_TOKEN}
         ports:
             - 5601:5601
-        # volumes:
-        #     - ./services/log-system/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.3
@@ -148,14 +139,17 @@ services:
         container_name: prometheus
         build:
             context: ./services/monitor-system/prometheus
+        environment:
+            PROMETHEUS_VAULT_TOKEN: ${PROMETHEUS_VAULT_TOKEN}
         volumes:
-            - prometheus:/opt/bitnami/prometheus/
+            - prometheus:/bitnami/prometheus/
         ports:
             - 9090:9090
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.1
         restart: unless-stopped
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     grafana:
         profiles:
@@ -163,14 +157,12 @@ services:
         container_name: grafana
         build:
             context: ./services/monitor-system/grafana
+        environment:
+            GRAFANA_VAULT_TOKEN: ${GRAFANA_VAULT_TOKEN}
         volumes:
-            - grafana:/var/lib/grafana
+            - grafana:/bitnami/grafana
         ports:
             - 3000:3000
-        environment:
-            GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-}
-            GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-}
-            DS_PROMETHEUS: ${DS_PROMETHEUS:-}
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.2
@@ -179,20 +171,20 @@ services:
             - prometheus
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
-    alertmanager:
-        profiles:
-            - monitor-system
-        container_name: alertmanager
-        build:
-            context: ./services/monitor-system/alertmanager
-        ports:
-            - 9093:9093
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.3
-        restart: unless-stopped
-        depends_on:
-            - prometheus
+    # alertmanager:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: alertmanager
+    #     build:
+    #         context: ./services/monitor-system/alertmanager
+    #     ports:
+    #         - 9093:9093
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.3
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
 
     postgres-exporter:
         profiles:
@@ -213,26 +205,26 @@ services:
         depends_on:
             - prometheus
     
-    nginx-exporter:
-        profiles:
-            - monitor-system
-        container_name: nginx-exporter
-        build:
-            context: ./services/monitor-system/nginx-exporter
-        ports:
-            - "9113:9113"
-        # environment:
-        #     DATA_SOURCE_URI: ${DATA_SOURCE_URI:-}
-        #     DATA_SOURCE_USER: ${POSTGRES_USER:-}
-        #     DATA_SOURCE_PASS: ${POSTGRES_PASSWORD:-}
-        # volumes:
-        #     - vault-data:/vault/data
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.5
-        restart: unless-stopped
-        depends_on:
-            - prometheus
+    # nginx-exporter:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: nginx-exporter
+    #     build:
+    #         context: ./services/monitor-system/nginx-exporter
+    #     ports:
+    #         - "9113:9113"
+    #     # environment:
+    #     #     DATA_SOURCE_URI: ${DATA_SOURCE_URI:-}
+    #     #     DATA_SOURCE_USER: ${POSTGRES_USER:-}
+    #     #     DATA_SOURCE_PASS: ${POSTGRES_PASSWORD:-}
+    #     # volumes:
+    #     #     - vault-data:/vault/data
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.5
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
 
     # PROXY-WAF-SEGMENT ------------------------------------------------------->
     nginx:

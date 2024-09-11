@@ -1,4 +1,11 @@
-FROM grafana/grafana:main-ubuntu
+FROM bitnami/grafana:10.4.8
 
-COPY conf/ /var/lib/grafana/dashboards/
+USER root
+
+RUN apt-get update && apt-get install -y curl jq
+
+USER 1001
+
 COPY tools/ /entrypoint/
+COPY conf/grafana.ini /opt/bitnami/grafana/conf/
+COPY conf/postgres-dashboard.json /opt/bitnami/grafana/conf/provisioning/dashboards/

@@ -217,12 +217,22 @@ docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/kibana - <<< \
 	$(jq -r '.kibana' ./.env.json) > /dev/null
 
+# docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+# 	vault kv put secret/prometheus - <<< \
+# 	$(jq -r '.prometheus' ./.env.json) > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/grafana - <<< \
+	$(jq -r '.grafana' ./.env.json) > /dev/null
+
 echo -e "\n$BLUE[+] Import secrets to vault:\n\
     $BLUE- Add$WHITE_B django$BLUE secrets at $WHITE_B/secret/django\n\
     $BLUE- Add$WHITE_B postgresql$BLUE secrets at $WHITE_B/secret/postgresql\n\
     $BLUE- Add$WHITE_B elasticsearch$BLUE secrets at $WHITE_B/secret/elasticsearch\n\
     $BLUE- Add$WHITE_B logstash$BLUE secrets at $WHITE_B/secret/logstash\n\
-    $BLUE- Add$WHITE_B kibana$BLUE secrets at $WHITE_B/secret/kibana"
+    $BLUE- Add$WHITE_B kibana$BLUE secrets at $WHITE_B/secret/kibana\n\
+    $BLUE- Add$WHITE_B prometheus$BLUE secrets at $WHITE_B/secret/prometheus\n\
+    $BLUE- Add$WHITE_B grafana$BLUE secrets at $WHITE_B/secret/grafana"
 
 # Authentication from Containers ---------------------------------------------->
 # Create Roles --------------------------------------------------------------->>
@@ -235,6 +245,18 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/kibana \
 	allowed_domains="kibana.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/prometheus \
+	allowed_domains="prometheus.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/grafana \
+	allowed_domains="grafana.ft-transcendence.42" \
 	allow_subdomains=false allow_bare_domains=true \
 	max_ttl="24h" > /dev/null
 
@@ -272,12 +294,22 @@ kibana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault token create -policy="kibana-policy" -format=json \
 	| jq -r .auth.client_token)
 
+prometheus_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="prometheus-policy" -format=json \
+	| jq -r .auth.client_token)
+
+grafana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="grafana-policy" -format=json \
+	| jq -r .auth.client_token)
+
 echo -e "\n$BLUE[+] Creating tokens with access to:\n\
     $WHITE_B/secret/django$BLUE: $WHITE_B$django_vault_token\n\
     $WHITE_B/secret/postgresql$BLUE: $WHITE_B$postgresql_vault_token\n\
     $WHITE_B/secret/elasticsearch$BLUE: $WHITE_B$elasticsearch_vault_token\n\
     $WHITE_B/secret/logstash$BLUE: $WHITE_B$logstash_vault_token\n\
-    $WHITE_B/secret/kibana$BLUE: $WHITE_B$kibana_vault_token"
+    $WHITE_B/secret/kibana$BLUE: $WHITE_B$kibana_vault_token\n\
+    $WHITE_B/secret/prometheus$BLUE: $WHITE_B$prometheus_vault_token\n\
+    $WHITE_B/secret/grafana$BLUE: $WHITE_B$grafana_vault_token"
 
 # Put tokens to .env --------------------------------------------------------->>
 echo -e "DJANGO_VAULT_TOKEN=$django_vault_token" >> .env
@@ -285,6 +317,8 @@ echo -e "POSTGRESQL_VAULT_TOKEN=$postgresql_vault_token" >> .env
 echo -e "ELASTICSEARCH_VAULT_TOKEN=$elasticsearch_vault_token" >> .env
 echo -e "LOGSTASH_VAULT_TOKEN=$logstash_vault_token" >> .env
 echo -e "KIBANA_VAULT_TOKEN=$kibana_vault_token" >> .env
+echo -e "PROMETHEUS_VAULT_TOKEN=$prometheus_vault_token" >> .env
+echo -e "GRAFANA_VAULT_TOKEN=$grafana_vault_token" >> .env
 
 # Cleanup --------------------------------------------------------------------->
 docker container stop vault-setup > /dev/null 2>&1

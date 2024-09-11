@@ -1,7 +1,12 @@
-FROM bitnami/prometheus:2.53.1-debian-12-r0
+FROM bitnami/prometheus:2.54.1
 
-COPY conf/prometheus.yml /opt/bitnami/prometheus/conf/
-COPY conf/alert.rules.yml /opt/bitnami/prometheus/conf/
+USER root
 
-CMD ["--config.file=/opt/bitnami/prometheus/conf/prometheus.yml", \
-	"--storage.tsdb.retention.time=30d"]
+RUN apt-get update && apt-get install -y curl jq
+
+USER 1001
+
+COPY tools/ /entrypoint/
+COPY conf/ /opt/bitnami/prometheus/conf/
+
+# CMD ["--config.file=/opt/bitnami/prometheus/conf/prometheus.yml", "--web.config.file=/opt/bitnami/prometheus/conf/web.yml, --storage.tsdb.retention.time=30d"]
