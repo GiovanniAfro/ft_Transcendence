@@ -2,7 +2,7 @@ FROM bitnami/grafana:10.4.8
 
 USER root
 
-RUN apt-get update && apt-get install -y curl jq
+RUN apt-get update && apt-get install -y curl jq netcat-openbsd
 
 USER 1001
 

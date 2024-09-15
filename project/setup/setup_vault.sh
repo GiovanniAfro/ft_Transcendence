@@ -320,6 +320,36 @@ echo -e "KIBANA_VAULT_TOKEN=$kibana_vault_token" >> .env
 echo -e "PROMETHEUS_VAULT_TOKEN=$prometheus_vault_token" >> .env
 echo -e "GRAFANA_VAULT_TOKEN=$grafana_vault_token" >> .env
 
+# Create Client Certificate for host------------------------------------------->
+## Create role for host ------------------------------------------------------>>
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/host-client \
+	allow_any_name=true \
+	max_ttl="24h" > /dev/null
+
+## Create certificate for host ----------------------------------------------->>
+response=$(curl -k -X POST \
+	-H "X-Vault-Token: $root_token" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"common_name": "host-client",
+		"ttl": "24h"
+	}' http://10.0.0.1:8200/v1/pki_int/issue/host-client)> /dev/null 2>&1
+
+## Extract certificate, key and ca ------------------------------------------->>
+echo "$response" | jq -r '.data.certificate' > setup/.tmp/host-client.crt
+echo "$response" | jq -r '.data.private_key' > setup/.tmp/host-client.key
+echo "$response" | jq -r '.data.ca_chain[0]' > setup/.tmp/host-client-ca.crt
+
+## Create a keystore --------------------------------------------------------->>
+openssl pkcs12 -export \
+	-in setup/.tmp/host-client.crt \
+	-inkey setup/.tmp/host-client.key \
+	-out keystore.p12 \
+	-name ft-transcendence-host-client \
+	-CAfile setup/.tmp/host-client-ca.crt \
+	-caname root
+
 # Cleanup --------------------------------------------------------------------->
 docker container stop vault-setup > /dev/null 2>&1
 docker container rm vault-setup > /dev/null 2>&1

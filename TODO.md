@@ -45,7 +45,7 @@ DOUBTFUL
 
 # kichkiro
 
-[ ] Vault 
+[v] Vault 
 	[v] Usare immagine non-root
 	[v] Configurare servizio
 		[v] Creare root CA e intermediate CA
@@ -53,13 +53,13 @@ DOUBTFUL
 		[v] Importare segreti
 		[v] Settare TLS mode
 	[v] Collegare al log-system
-	[ ] Esportare metriche e creare dashboard
+	[v] Esportare metriche e creare dashboard
 
 [ ] Django
 	[ ] Usare immagine non-root
 	[ ] Prendere segreti da vault
 	[ ] Configurare servizio
-		[ ] Hashare password postgresql
+		[v] Hashare password postgresql
 		[ ] Settare HTTPS
 		[ ] 
 	[ ] Collegare al log-system
@@ -74,12 +74,12 @@ DOUBTFUL
 	[v] Collegare al log-system
 	[v] Impostare exporter e creare dashboard
 
-[v] Elasticsearch
+[ ] Elasticsearch
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare password login
-		[v] Settare HTTPS e TLS
+		[ ] Settare autorizazione TLS da webclient
 
 [v] Logstash
 	[v] Usare immagine non-root
@@ -87,21 +87,25 @@ DOUBTFUL
 	[v] Configurare servizio
 		[v] ssl output elasticsearch
 
-[v] Kibana
+[ ] Kibana
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare HTTPS e TLS
 		[v] Settare dataview di defualt per pattern log*
+		[ ] Settare autorizazione TLS da webclient
 
 [ ] Prometheus
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Aggiungere target in prometheus.yml
-		[ ] Settare alertmanger
+		[ ] Settare alert
+		[v] Settare autorizazione TLS da webclient
 		[v] Settare HTTPS
-		[ ] Hashare credenziali in web.yml e prometheus.yml
+		[ ] Hashare credenziali in web.yml
+		[ ] Settare alertmanager
+		[ ] Settare data retention
 
 [v] Grafana
 	[v] Usare immagine non-root

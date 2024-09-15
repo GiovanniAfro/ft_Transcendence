@@ -170,6 +170,23 @@ services:
         depends_on:
             - prometheus
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+    
+    # alertmanager:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: alertmanager
+    #     build:
+    #         context: ./services/monitor-system/alertmanager
+    #     volumes:
+    #         - alertmanager:/bitnami/alertmanager
+    #     ports:
+    #         - 9093:9093
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.3
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
 
     postgres-exporter:
         profiles:
@@ -246,6 +263,8 @@ volumes:
     prometheus:
 
     grafana:
+
+    # alertmanager:
 
 networks:
     secrets:

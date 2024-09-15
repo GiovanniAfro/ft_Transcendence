@@ -88,38 +88,48 @@ Below are the security measures that have been taken to protect the infrastructu
 
 - __TLS Certs__: 
 
-  - Create Role for Host:
+  - Create role for host webclient:
   ``` sh
-  docker exec -e VAULT_TOKEN=$root_token vault \
-  vault write pki_int/roles/host-client \
+  docker exec -e VAULT_TOKEN=<ROOT_TOKEN> vault \
+  vault write pki_int/roles/webclient \
   allow_any_name=true \
-  allow_ip_sans=true \
   max_ttl="24h"
   ```
-  - Create certificate for host:
+  - Create certificate for host webclient:
   ``` sh
   response=$(curl -k -X POST \
     -H "X-Vault-Token: <ROOT_TOKEN>" \
     -H "Content-Type: application/json" \
     -d '{
-      "common_name": "<IP_HOST>",
-      "ip_sans": "<IP_HOST>", 
+      "common_name": "webclient",
       "ttl": "24h"
-    }' https://10.0.0.1:8200/v1/pki_int/issue/host-client)
+    }' https://10.0.0.1:8200/v1/pki_int/issue/webclient)
   ```
 
-  - Create a KeyStore, set a password and remember it:
+  - Extract certificate, key and ca:
+  ``` sh
+  echo "$response" | jq -r '.data.certificate' > webclient.crt
+  echo "$response" | jq -r '.data.private_key' > webclient.key
+  echo "$response" | jq -r '.data.ca_chain[0]' > webclient-ca.crt
+  ```
+
+  - Create a keystore, set a password and remember it:
   ``` sh
   openssl pkcs12 -export \
-  -in $(echo "$response" | jq -r '.data.certificate') \
-  -inkey $(echo "$response" | jq -r '.data.private_key') \
+  -in webclient.crt \
+  -inkey webclient.key \
   -out keystore.p12 \
-  -name host-client-cert \
-  -CAfile $(echo "$response" | jq -r '.data.ca_chain[0]') \
+  -name ft-transcendence-webclient \
+  -CAfile webcalient-ca.crt \
   -caname root
   ```
 
   - Import KeyStore to your browser, now you can access to containers via web ui.
+
+  - Cleanup:
+  ``` sh
+  rm -f keystore.p12 && rm -f webclient.crt && rm -f webclient.key && rm -f webclient-ca.crt
+  ```
 
 
 ## 📚 - References
@@ -150,6 +160,7 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Kibana](https://github.com/bitnami/containers/tree/main/bitnami/kibana)
   - [Prometheus](https://github.com/bitnami/containers/tree/main/bitnami/prometheus)
   - [Grafana](https://github.com/bitnami/containers/tree/main/bitnami/grafana)
+  - [Alertmanager](https://github.com/bitnami/containers/tree/main/bitnami/alertmanager)
   - [Postgres-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/postgres-exporter)
   - [Nginx-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/nginx-exporter)
   - []

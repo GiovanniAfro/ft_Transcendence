@@ -32,6 +32,7 @@ iptables -I DOCKER-USER -p udp --sport 5000 -j ACCEPT
 
 # MONITOR-SYSTEM SEGMENT ------------------------------------------------------>
 iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
+# iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.3 -p tcp --dport 9093 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.2 -d 10.0.0.1 -p tcp --dport 8200 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.2 -d 10.0.3.1 -p tcp --dport 9090 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.3 -p tcp --dport 9093 -j ACCEPT
