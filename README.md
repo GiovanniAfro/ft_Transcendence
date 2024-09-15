@@ -86,7 +86,41 @@ Below are the security measures that have been taken to protect the infrastructu
 
 - __Hashicorp Vault__:
 
-- __SSL Certs__:
+- __TLS Certs__: 
+
+  - Create Role for Host:
+  ``` sh
+  docker exec -e VAULT_TOKEN=$root_token vault \
+  vault write pki_int/roles/host-client \
+  allow_any_name=true \
+  allow_ip_sans=true \
+  max_ttl="24h"
+  ```
+  - Create certificate for host:
+  ``` sh
+  response=$(curl -k -X POST \
+    -H "X-Vault-Token: <ROOT_TOKEN>" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "common_name": "<IP_HOST>",
+      "ip_sans": "<IP_HOST>", 
+      "ttl": "24h"
+    }' https://10.0.0.1:8200/v1/pki_int/issue/host-client)
+  ```
+
+  - Create a KeyStore, set a password and remember it:
+  ``` sh
+  openssl pkcs12 -export \
+  -in $(echo "$response" | jq -r '.data.certificate') \
+  -inkey $(echo "$response" | jq -r '.data.private_key') \
+  -out keystore.p12 \
+  -name host-client-cert \
+  -CAfile $(echo "$response" | jq -r '.data.ca_chain[0]') \
+  -caname root
+  ```
+
+  - Import KeyStore to your browser, now you can access to containers via web ui.
+
 
 ## 📚 - References
 - Log System
@@ -102,6 +136,7 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Securing Prometheus API and UI endpoints using TLS encryption](https://prometheus.io/docs/guides/tls-encryption/)
   - [Set up Grafana HTTPS for secure web traffic](https://grafana.com/docs/grafana/latest/setup-grafana/set-up-https/)
   - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
+  - [Provision Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 - Secrets
   - [Hashicorp Vault - Tutorials](https://developer.hashicorp.com/vault/tutorials)
   - [Hashicorp Vault - Documentation](https://developer.hashicorp.com/vault/docs)

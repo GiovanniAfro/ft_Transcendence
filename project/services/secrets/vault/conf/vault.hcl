@@ -15,3 +15,8 @@ listener "tcp" {
   tls_key_file       = "/bitnami/vault/tls/vault.key"
   tls_client_ca_file = "/bitnami/vault/tls/intermediate.cert.pem"
 }
+
+telemetry {
+  disable_hostname = true
+  prometheus_retention_time = "12h"
+}

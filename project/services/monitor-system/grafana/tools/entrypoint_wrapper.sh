@@ -30,9 +30,13 @@ done
 # Set Data Source ------------------------------------------------------------->
 auth="$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_USER'):$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')"
 
+tlsCACert=$(echo "$certs" | jq -r '.data.issuing_ca' | sed ':a;N;$!ba;s/\n/\\n/g')
+tlsClientCert=$(echo "$certs" | jq -r '.data.certificate' | sed ':a;N;$!ba;s/\n/\\n/g')
+tlsClientKey=$(echo "$certs" | jq -r '.data.private_key' | sed ':a;N;$!ba;s/\n/\\n/g')
+
 curl -k -X POST \
-	 -H "Content-Type: application/json" \
-	 -d '{
+	-H "Content-Type: application/json" \
+	-d '{
 		"name": "Prometheus",
 		"type": "prometheus",
 		"url": "https://10.0.3.1:9090",
@@ -40,29 +44,34 @@ curl -k -X POST \
 		"isDefault": true,
 		"basicAuth": true,
 		"basicAuthUser": "prometheus",
+		"JsonData": {
+			"tlsAuthWithCACert": true,
+			"tlsAuth": true,
+			"serverName": "prometheus.ft-transcendence.42"
+		},
 		"secureJsonData": {
 			"basicAuthPassword": "test",
-			"tlsCACert": "'"$(echo "$certs" | jq -r '.data.issuing_ca' | tr -d '\n')"'",
-			"tlsClientCert": "'"$(echo "$certs" | jq -r '.data.certificate' | tr -d '\n')"'",
-			"tlsClientKey": "'"$(echo "$certs" | jq -r '.data.private_key' | tr -d '\n')"'"
+			"tlsCACert": "'"${tlsCACert}"'",
+			"tlsClientCert": "'"${tlsClientCert}"'",
+			"tlsClientKey": "'"${tlsClientKey}"'"
 		}
-	 }' \
-	 https://$auth@10.0.3.2:3000/api/datasources
+	}' \
+	https://$auth@10.0.3.2:3000/api/datasources
 
 # Import Dashboards ----------------------------------------------------------->
-# dashboard_path="/opt/bitnami/grafana/conf/provisioning/dashboards/"
-# endpoint="https://10.0.3.2:3000/api/dashboards/db"
+dashboard_path="/opt/bitnami/grafana/conf/provisioning/dashboards/"
+endpoint="https://10.0.3.2:3000/api/dashboards/db"
 
-# for FILE in "$dashboard_path"/*.json; do
-#      dashboard_json=$(cat "$FILE")
-#     #  filename=$(basename "$FILE" .json)
+for FILE in "$dashboard_path"/*.json; do
+     dashboard_json=$(cat "$FILE")
+    #  filename=$(basename "$FILE" .json)
 
-#      curl -k -X POST "$endpoint" \
-#           -H "Content-Type: application/json" \
-#           -u "$auth" \
-#           -d "{\"dashboard\": $dashboard_json, \"overwrite\": true}"
-#      sleep 1
-# done
+     curl -k -X POST "$endpoint" \
+          -H "Content-Type: application/json" \
+          -u "$auth" \
+          -d "{\"dashboard\": $dashboard_json, \"overwrite\": true}"
+     sleep 1
+done
 
 # Wait for the Main Process --------------------------------------------------->
 wait

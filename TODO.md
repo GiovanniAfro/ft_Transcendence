@@ -72,7 +72,7 @@ DOUBTFUL
 	[ ] Configurare servizio
 		[ ] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
 	[v] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard
+	[v] Impostare exporter e creare dashboard
 
 [v] Elasticsearch
 	[v] Usare immagine non-root

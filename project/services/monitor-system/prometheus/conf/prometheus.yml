@@ -26,12 +26,17 @@ scrape_configs:
     static_configs:
       - targets: ["10.0.3.1:9090"]
   
-  - job_name: "vault"
+  - job_name: vault
+    metrics_path: /v1/sys/metrics
+    params:
+      format: ['prometheus']
     scheme: https
     tls_config:
       insecure_skip_verify: true
+    authorization:
+      credentials_file: /opt/bitnami/prometheus/conf/vault-token
     static_configs:
-      - targets: ["10.0.0.1:8200"]
+    - targets: ['10.0.0.1:8200']
 
   - job_name: "django"
     static_configs:

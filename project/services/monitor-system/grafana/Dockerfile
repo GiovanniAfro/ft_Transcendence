@@ -8,4 +8,4 @@ USER 1001
 
 COPY tools/ /entrypoint/
 COPY conf/grafana.ini /opt/bitnami/grafana/conf/
-COPY conf/postgres-dashboard.json /opt/bitnami/grafana/conf/provisioning/dashboards/
+COPY conf/dashboards/ /opt/bitnami/grafana/conf/provisioning/dashboards/

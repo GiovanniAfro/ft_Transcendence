@@ -16,6 +16,10 @@ echo "$certs" | jq -r '.data.issuing_ca' > /opt/bitnami/prometheus/conf/ca.crt
 # secrets=$(curl -s -k -H "X-Vault-Token: ${PROMETHEUS_VAULT_TOKEN}" \
 # 	-X GET https://10.0.0.1:8200/v1/secret/prometheus)
 
+# Write Token to file --------------------------------------------------------->
+
+echo $PROMETHEUS_VAULT_TOKEN > /opt/bitnami/prometheus/conf/vault-token
+
 # Run EntryPoint -------------------------------------------------------------->
 # GF_SECURITY_ADMIN_USER=$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_USER') \
 # GF_SECURITY_ADMIN_PASSWORD=$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD') \
