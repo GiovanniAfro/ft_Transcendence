@@ -25,13 +25,13 @@ scrape_configs:
     static_configs:
     - targets: ['10.0.0.1:8200']
 
-  - job_name: "django"
+  - job_name: 'postgres-exporter'
+    # scheme: https
+    # tls_config:
+    #   insecure_skip_verify: false
+    #   ca_file: /opt/bitnami/prometheus/conf/ca.crt
     static_configs:
-      - targets: ["10.0.1.1:8000"]
-
-  - job_name: "postgres-exporter"
-    static_configs:
-      - targets: ["10.0.3.4:9187"]
+      - targets: ['10.0.3.4:9187']
 
   - job_name: "nginx-exporter"
     static_configs:

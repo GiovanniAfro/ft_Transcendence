@@ -225,6 +225,18 @@ docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/grafana - <<< \
 	$(jq -r '.grafana' ./.env.json) > /dev/null
 
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/postgres-exporter - <<< \
+	$(jq -r '.postgres_exporter' ./.env.json) > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/nginx-exporter - <<< \
+	$(jq -r '.nginx_exporter' ./.env.json) > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+	vault kv put secret/nginx - <<< \
+	$(jq -r '.nginx' ./.env.json) > /dev/null
+
 echo -e "\n$BLUE[+] Import secrets to vault:\n\
     $BLUE- Add$WHITE_B django$BLUE secrets at $WHITE_B/secret/django\n\
     $BLUE- Add$WHITE_B postgresql$BLUE secrets at $WHITE_B/secret/postgresql\n\
@@ -232,10 +244,19 @@ echo -e "\n$BLUE[+] Import secrets to vault:\n\
     $BLUE- Add$WHITE_B logstash$BLUE secrets at $WHITE_B/secret/logstash\n\
     $BLUE- Add$WHITE_B kibana$BLUE secrets at $WHITE_B/secret/kibana\n\
     $BLUE- Add$WHITE_B prometheus$BLUE secrets at $WHITE_B/secret/prometheus\n\
-    $BLUE- Add$WHITE_B grafana$BLUE secrets at $WHITE_B/secret/grafana"
+    $BLUE- Add$WHITE_B grafana$BLUE secrets at $WHITE_B/secret/grafana\n\
+    $BLUE- Add$WHITE_B postgres-exporter$BLUE secrets at $WHITE_B/secret/postgres-exporter\n\
+    $BLUE- Add$WHITE_B nginx-exporter$BLUE secrets at $WHITE_B/secret/nginx-exporter\n\
+    $BLUE- Add$WHITE_B nginx$BLUE secrets at $WHITE_B/secret/nginx"
 
 # Authentication from Containers ---------------------------------------------->
 # Create Roles --------------------------------------------------------------->>
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/postgresql \
+	allowed_domains="postgresql.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/elasticsearch \
 	allowed_domains="elasticsearch.ft-transcendence.42" \
@@ -257,6 +278,24 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/grafana \
 	allowed_domains="grafana.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/postgres-exporter \
+	allowed_domains="postgres-exporter.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/nginx-exporter \
+	allowed_domains="nginx-exporter.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/nginx \
+	allowed_domains="nginx.ft-transcendence.42" \
 	allow_subdomains=false allow_bare_domains=true \
 	max_ttl="24h" > /dev/null
 
@@ -302,6 +341,18 @@ grafana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault token create -policy="grafana-policy" -format=json \
 	| jq -r .auth.client_token)
 
+postgres_exporter_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="postgres-exporter-policy" -format=json \
+	| jq -r .auth.client_token)
+
+nginx_exporter_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="nginx-exporter-policy" -format=json \
+	| jq -r .auth.client_token)
+
+nginx_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="nginx-policy" -format=json \
+	| jq -r .auth.client_token)
+
 echo -e "\n$BLUE[+] Creating tokens with access to:\n\
     $WHITE_B/secret/django$BLUE: $WHITE_B$django_vault_token\n\
     $WHITE_B/secret/postgresql$BLUE: $WHITE_B$postgresql_vault_token\n\
@@ -309,7 +360,10 @@ echo -e "\n$BLUE[+] Creating tokens with access to:\n\
     $WHITE_B/secret/logstash$BLUE: $WHITE_B$logstash_vault_token\n\
     $WHITE_B/secret/kibana$BLUE: $WHITE_B$kibana_vault_token\n\
     $WHITE_B/secret/prometheus$BLUE: $WHITE_B$prometheus_vault_token\n\
-    $WHITE_B/secret/grafana$BLUE: $WHITE_B$grafana_vault_token"
+    $WHITE_B/secret/grafana$BLUE: $WHITE_B$grafana_vault_token\n\
+    $WHITE_B/secret/postgres-exporter$BLUE: $WHITE_B$postgres_exporter_vault_token\n\
+    $WHITE_B/secret/nginx-exporter$BLUE: $WHITE_B$nginx_exporter_vault_token\n\
+    $WHITE_B/secret/nginx$BLUE: $WHITE_B$nginx_vault_token"
 
 # Put tokens to .env --------------------------------------------------------->>
 echo -e "DJANGO_VAULT_TOKEN=$django_vault_token" >> .env
@@ -319,41 +373,44 @@ echo -e "LOGSTASH_VAULT_TOKEN=$logstash_vault_token" >> .env
 echo -e "KIBANA_VAULT_TOKEN=$kibana_vault_token" >> .env
 echo -e "PROMETHEUS_VAULT_TOKEN=$prometheus_vault_token" >> .env
 echo -e "GRAFANA_VAULT_TOKEN=$grafana_vault_token" >> .env
+echo -e "POSTGRES_EXPORTER_VAULT_TOKEN=$postgres_exporter_vault_token" >> .env
+echo -e "NGINX_EXPORTER_VAULT_TOKEN=$nginx_exporter_vault_token" >> .env
+echo -e "NGINX_VAULT_TOKEN=$nginx_vault_token" >> .env
 
-# Create Client Certificate for host------------------------------------------->
-## Create role for host ------------------------------------------------------>>
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/host-client \
-	allow_any_name=true \
-	max_ttl="24h" > /dev/null
+# # Create Client Certificate for host------------------------------------------->
+# ## Create role for host ------------------------------------------------------>>
+# docker exec -e VAULT_TOKEN=$root_token vault-setup \
+# 	vault write pki_int/roles/host-client \
+# 	allow_any_name=true \
+# 	max_ttl="24h" > /dev/null
 
-## Create certificate for host ----------------------------------------------->>
-response=$(curl -k -X POST \
-	-H "X-Vault-Token: $root_token" \
-	-H "Content-Type: application/json" \
-	-d '{
-		"common_name": "host-client",
-		"ttl": "24h"
-	}' http://10.0.0.1:8200/v1/pki_int/issue/host-client)> /dev/null 2>&1
+# ## Create certificate for host ----------------------------------------------->>
+# response=$(curl -k -X POST \
+# 	-H "X-Vault-Token: $root_token" \
+# 	-H "Content-Type: application/json" \
+# 	-d '{
+# 		"common_name": "host-client",
+# 		"ttl": "24h"
+# 	}' http://10.0.0.1:8200/v1/pki_int/issue/host-client)> /dev/null 2>&1
 
-## Extract certificate, key and ca ------------------------------------------->>
-echo "$response" | jq -r '.data.certificate' > setup/.tmp/host-client.crt
-echo "$response" | jq -r '.data.private_key' > setup/.tmp/host-client.key
-echo "$response" | jq -r '.data.ca_chain[0]' > setup/.tmp/host-client-ca.crt
+# ## Extract certificate, key and ca ------------------------------------------->>
+# echo "$response" | jq -r '.data.certificate' > setup/.tmp/host-client.crt
+# echo "$response" | jq -r '.data.private_key' > setup/.tmp/host-client.key
+# echo "$response" | jq -r '.data.ca_chain[0]' > setup/.tmp/host-client-ca.crt
 
-## Create a keystore --------------------------------------------------------->>
-openssl pkcs12 -export \
-	-in setup/.tmp/host-client.crt \
-	-inkey setup/.tmp/host-client.key \
-	-out keystore.p12 \
-	-name ft-transcendence-host-client \
-	-CAfile setup/.tmp/host-client-ca.crt \
-	-caname root
+# ## Create a keystore --------------------------------------------------------->>
+# openssl pkcs12 -export \
+#     -in setup/.tmp/host-client.crt \
+#     -inkey setup/.tmp/host-client.key \
+#     -out keystore.p12 \
+#     -name ft-transcendence-host-client \
+#     -CAfile setup/.tmp/host-client-ca.crt \
+#     -caname root
 
 # Cleanup --------------------------------------------------------------------->
-docker container stop vault-setup > /dev/null 2>&1
-docker container rm vault-setup > /dev/null 2>&1
-docker network rm secrets > /dev/null 2>&1
+docker container stop vault-setup >/dev/null
+docker container rm vault-setup >/dev/null
+docker network rm secrets >/dev/null
 rm -rf setup/.tmp
 
 # Create Vault Container ------------------------------------------------------>
@@ -361,14 +418,8 @@ echo -e "\n$BLUE[+] Compose$WHITE_B SECRETS$BLUE profile ..."
 docker compose -p "ft_transcendence" --profile secrets up -d >/dev/null 2>&1
 
 # Unseal Vault ---------------------------------------------------------------->
-docker exec vault vault operator unseal $key1 > /dev/null
-docker exec vault vault operator unseal $key2 > /dev/null
-docker exec vault vault operator unseal $key3 > /dev/null
+docker exec vault vault operator unseal $key1 >/dev/null
+docker exec vault vault operator unseal $key2 >/dev/null
+docker exec vault vault operator unseal $key3 >/dev/null
 
 echo -e "\n$BLUE[+] The vault has been unsealed"
-
-
-
-# docker exec -e VAULT_TOKEN=hvs.qzgccwMYuBqLOAtMJ75zUipt vault \
-# 	vault write pki_int/issue/ft-transcendence-42 \
-# 	common_name="elasticsearch.ft-transcendence.42" ip_sans="10.0.2.1" ttl="24h"

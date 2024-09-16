@@ -13,12 +13,12 @@ echo "$certs" | jq -r '.data.certificate' > /opt/bitnami/grafana/conf/grafana.cr
 echo "$certs" | jq -r '.data.private_key' > /opt/bitnami/grafana/conf/grafana.key
 echo "$certs" | jq -r '.data.issuing_ca' > /opt/bitnami/grafana/conf/ca.crt
 
-secrets=$(curl -s -k -H "X-Vault-Token: ${GRAFANA_VAULT_TOKEN}" \
+env=$(curl -s -k -H "X-Vault-Token: ${GRAFANA_VAULT_TOKEN}" \
 	-X GET https://10.0.0.1:8200/v1/secret/grafana)
 
 # Run EntryPoint in Background ------------------------------------------------>
-GF_SECURITY_ADMIN_USER=$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_USER') \
-GF_SECURITY_ADMIN_PASSWORD=$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD') \
+GF_SECURITY_ADMIN_USER=$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_USER') \
+GF_SECURITY_ADMIN_PASSWORD=$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD') \
 /opt/bitnami/scripts/grafana/entrypoint.sh /opt/bitnami/scripts/grafana/run.sh &
 
 # Wait for Grafana ------------------------------------------------------------>
@@ -28,7 +28,7 @@ while ! curl -k -o /dev/null -s -H --fail https://10.0.3.2:3000; do
 done
 
 # Set Data Source ------------------------------------------------------------->
-auth="$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_USER'):$(echo "$secrets" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')"
+auth="$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_USER'):$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')"
 
 tlsCACert=$(echo "$certs" | jq -r '.data.issuing_ca' | sed ':a;N;$!ba;s/\n/\\n/g')
 tlsClientCert=$(echo "$certs" | jq -r '.data.certificate' | sed ':a;N;$!ba;s/\n/\\n/g')

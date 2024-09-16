@@ -28,6 +28,7 @@ NC=\033[0m
 all: up
 
 up:
+	@rm -rf .env
 	@./setup/setup_iptables.sh
 	@./setup/setup_vault.sh
 	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
@@ -36,8 +37,8 @@ up:
 	@docker compose -p "ft_transcendence" --profile monitor-system up -d >/dev/null 2>&1 
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
 	@docker compose -p "ft_transcendence" --profile app up -d >/dev/null 2>&1 
-	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
-	# @docker compose -p "ft_transcendence" --profile proxy-waf up -d >/dev/null 2>&1 
+	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
+	@docker compose -p "ft_transcendence" --profile proxy-waf up -d >/dev/null 2>&1 
 	@rm -rf .env
 	@echo
 

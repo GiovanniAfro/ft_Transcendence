@@ -164,7 +164,7 @@
                 <mxCell id="104" value="POSTGRES-EXPORTER&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;10.0.3.4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="102" vertex="1">
                     <mxGeometry x="40" y="60" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="105" value="NGINX-EXPORTER&lt;br&gt;10.0.3.5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="102" vertex="1">
+                <mxCell id="105" value="NGINX-EXPORTER&lt;br&gt;10.0.3.3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="102" vertex="1">
                     <mxGeometry x="40" y="180" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="52" value="GRAFANA&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;10.0.3.2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="102" vertex="1">

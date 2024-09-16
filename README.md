@@ -154,16 +154,16 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Hashicorp Vault - Monitor telemetry with Prometheus & Grafana](https://developer.hashicorp.com/vault/tutorials/archive/monitor-telemetry-grafana-prometheus)
 - Bitnami Images
   - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
+  - [Python](https://github.com/bitnami/containers/tree/main/bitnami/python)
   - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
   - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)
   - [Logstash](https://github.com/bitnami/containers/tree/main/bitnami/logstash)
   - [Kibana](https://github.com/bitnami/containers/tree/main/bitnami/kibana)
   - [Prometheus](https://github.com/bitnami/containers/tree/main/bitnami/prometheus)
   - [Grafana](https://github.com/bitnami/containers/tree/main/bitnami/grafana)
-  - [Alertmanager](https://github.com/bitnami/containers/tree/main/bitnami/alertmanager)
   - [Postgres-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/postgres-exporter)
   - [Nginx-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/nginx-exporter)
-  - []
+  - [Nginx](https://github.com/bitnami/containers/tree/main/bitnami/nginx)
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)
