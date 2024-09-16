@@ -5,8 +5,8 @@ set -e
 # Get Certs and Secrets from Vault -------------------------------------------->
 certs=$(curl -s -k -H "X-Vault-Token: $ELASTICSEARCH_VAULT_TOKEN" -X POST -d '{
 		"common_name": "elasticsearch.ft-transcendence.42",
-		"ttl": "24h",
-		"ip_sans": "10.0.2.1"
+		"ip_sans": "10.0.2.1",
+		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/elasticsearch)
 
 echo "$certs" | jq -r '.data.certificate' > /opt/bitnami/elasticsearch/config/elasticsearch.crt

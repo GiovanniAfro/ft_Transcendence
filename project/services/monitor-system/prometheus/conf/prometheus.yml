@@ -29,6 +29,8 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: false
+      cert_file: /opt/bitnami/prometheus/conf/prometheus.crt
+      key_file: /opt/bitnami/prometheus/conf/prometheus.key
       ca_file: /opt/bitnami/prometheus/conf/ca.crt
     static_configs:
       - targets: ['10.0.3.4:9187']

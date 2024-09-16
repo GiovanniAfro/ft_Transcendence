@@ -5,6 +5,7 @@ set -ex
 # Get Certs from Vault -------------------------------------------------------->
 certs=$(curl -s -k -H "X-Vault-Token: $PROMETHEUS_VAULT_TOKEN" -X POST -d '{
 		"common_name": "prometheus.ft-transcendence.42",
+		"ip_sans": "10.0.3.1",
 		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/prometheus)
 
