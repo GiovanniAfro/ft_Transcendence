@@ -1,71 +1,31 @@
 groups:
-- name: vault
-  rules:
-  - alert: VaultUp
-    expr: avg by(instance) (vault_up) != 1
-    for: <%= p('vault_alerts.up.evaluation_time') %>
-    labels:
-      service: vault
-      severity: critical
-    annotations:
-      summary: "Vault instance `{{$labels.instance}}` is down"
-      description: "The Vault instance at `{{$labels.instance}}` has been down for the last <%= p('vault_alerts.up.evaluation_time') %>"
+  - name: vault
+    rules:
+      - alert: VaultDownORSealed
+        expr: up{job="vault"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Vault is down or sealed"
+          description: "Vault has been unreachable for more than 5 seconds."
 
-  - alert: VaultUninitialized
-    expr: avg by(instance) (vault_initialized) != 1
-    for: <%= p('vault_alerts.initialized.evaluation_time') %>
-    labels:
-      service: vault
-      severity: critical
-    annotations:
-      summary: "Vault instance `{{$labels.instance}}` is uninitialized"
-      description: "The Vault instance at `{{$labels.instance}}` has been uninitialized for the last <%= p('vault_alerts.initialized.evaluation_time') %>"
-
-  - alert: VaultSealed
-    expr: avg by(instance) (vault_sealed) != 0
-    for: <%= p('vault_alerts.sealed.evaluation_time') %>
-    labels:
-      service: vault
-      severity: critical
-    annotations:
-      summary: "Vault instance `{{$labels.instance}}` is sealed"
-      description: "The Vault instance at `{{$labels.instance}}` has been sealed for the last <%= p('vault_alerts.sealed.evaluation_time') %>"
-
-  - alert: VaultStandby
-    expr: count(avg by(instance) (vault_standby) == 0) != 1
-    for: <%= p('vault_alerts.standby.evaluation_time') %>
-    labels:
-      service: vault
-      severity: critical
-    annotations:
-      summary: "There are {{ $value }} active Vault instance(s)"
-      description: "The Vault instance at `{{$labels.instance}}` has been Standby for the last <%= p('vault_alerts.standby.evaluation_time') %>"
-
-- name: postgresql
-  rules:
-  - alert: HighPostgresLoad
-    expr: pg_stat_activity_count{datname="your_database"} > 100
-    for: 5m
-    labels:
-      severity: critical
-    annotations:
-      summary: "High load on PostgreSQL database {{ $labels.datname }}"
-      description: "The number of active connections to the PostgreSQL database {{ $labels.datname }} has exceeded 100 for the past 5 minutes."
-
-  - alert: PostgresReplicationLag
-    expr: pg_stat_replication_delay{datname="your_database"} > 5m
-    for: 10m
-    labels:
-      severity: critical
-    annotations:
-      summary: "PostgreSQL replication lag detected"
-      description: "The replication lag for PostgreSQL database {{ $labels.datname }} has been greater than 5 minutes for the past 10 minutes."
-
-  - alert: HighPostgresDiskUsage
-    expr: pg_database_size{datname="your_database"} > 10000000000
-    for: 10m
-    labels:
-      severity: warning
-    annotations:
-      summary: "High disk usage for PostgreSQL database {{ $labels.datname }}"
-      description: "The disk usage for PostgreSQL database {{ $labels.datname }} has exceeded 10 GB for the past 10 minutes."
+  - name: postgresql
+    rules:
+      - alert: PostgresIsDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "Il PostgreSQL has been unreachable for more than 5 seconds."
+        
+      - alert: PostgresExporterDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Postgres Exporter is down"
+          description: "Il Postgres Exporter has been unreachable for more than 5 seconds."

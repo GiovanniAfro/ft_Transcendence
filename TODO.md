@@ -100,12 +100,11 @@ DOUBTFUL
 	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Aggiungere target in prometheus.yml
-		[ ] Settare alert
+		[v] Settare alert
 		[v] Settare autorizazione TLS da webclient
 		[v] Settare HTTPS
+		[v] Settare data retention
 		[ ] Hashare credenziali in web.yml
-		[ ] Settare alertmanager
-		[ ] Settare data retention
 
 [v] Grafana
 	[v] Usare immagine non-root
