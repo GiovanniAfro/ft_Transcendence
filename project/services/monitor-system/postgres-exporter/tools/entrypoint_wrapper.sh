@@ -25,7 +25,7 @@ env=$(curl -s -k -H "X-Vault-Token: ${POSTGRES_EXPORTER_VAULT_TOKEN}" \
 DATA_SOURCE_URI=$(echo "$env" | jq -r '.data.DATA_SOURCE_URI') \
 DATA_SOURCE_USER=$(echo "$env" | jq -r '.data.DATA_SOURCE_USER') \
 DATA_SOURCE_PASS=$(echo "$env" | jq -r '.data.DATA_SOURCE_PASS') \
-postgres_exporter &
+postgres_exporter --web.config.file=/opt/bitnami/postgres-exporter/web_config.yml &
 
 # Wait for the Main Process --------------------------------------------------->
 wait

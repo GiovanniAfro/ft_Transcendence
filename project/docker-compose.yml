@@ -187,8 +187,6 @@ services:
             - "9187:9187"
         environment:
             POSTGRES_EXPORTER_VAULT_TOKEN: ${POSTGRES_EXPORTER_VAULT_TOKEN}
-        volumes:
-            - postgres-exporter:/bitnami
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.4
@@ -197,25 +195,23 @@ services:
             - prometheus
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
-    nginx-exporter:
-        profiles:
-            - monitor-system
-        container_name: nginx-exporter
-        build:
-            context: ./services/monitor-system/nginx-exporter
-        ports:
-            - "9113:9113"
-        environment:
-            NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
-        volumes:
-            - nginx-exporter:/bitnami
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.3
-        restart: unless-stopped
-        depends_on:
-            - prometheus
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+    # nginx-exporter:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: nginx-exporter
+    #     build:
+    #         context: ./services/monitor-system/nginx-exporter
+    #     ports:
+    #         - "9113:9113"
+    #     environment:
+    #         NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.3
+    #     restart: unless-stopped
+    #     depends_on:
+    #         - prometheus
+    #     entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     # PROXY-WAF-SEGMENT ------------------------------------------------------->
     nginx:
@@ -257,10 +253,6 @@ volumes:
     prometheus:
 
     grafana:
-
-    postgres-exporter:
-
-    nginx-exporter:
 
     nginx:
 
