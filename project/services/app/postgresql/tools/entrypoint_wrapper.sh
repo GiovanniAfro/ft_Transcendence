@@ -9,8 +9,6 @@ certs=$(curl -k -H "X-Vault-Token: $POSTGRESQL_VAULT_TOKEN" -X POST -d '{
 		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/postgresql)
 
-echo $certs > /tmp/certs.json
-
 echo "$certs" | jq -r '.data.certificate' \
 	> /opt/bitnami/postgresql/conf/postgresql.crt
 echo "$certs" | jq -r '.data.private_key' \

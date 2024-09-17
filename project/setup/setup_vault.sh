@@ -198,8 +198,8 @@ echo -e "\n$BLUE[+] Enabled the kv secrets engine at:$WHITE_B secret/"
 
 # Import Secrets to Vault ---------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/django - <<< \
-	$(jq -r '.django' ./.env.json) > /dev/null
+	vault kv put secret/python - <<< \
+	$(jq -r '.python' ./.env.json) > /dev/null
 
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/postgresql - <<< \
@@ -238,7 +238,7 @@ docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	$(jq -r '.nginx' ./.env.json) > /dev/null
 
 echo -e "\n$BLUE[+] Import secrets to vault:\n\
-    $BLUE- Add$WHITE_B django$BLUE secrets at $WHITE_B/secret/django\n\
+    $BLUE- Add$WHITE_B python$BLUE secrets at $WHITE_B/secret/python\n\
     $BLUE- Add$WHITE_B postgresql$BLUE secrets at $WHITE_B/secret/postgresql\n\
     $BLUE- Add$WHITE_B elasticsearch$BLUE secrets at $WHITE_B/secret/elasticsearch\n\
     $BLUE- Add$WHITE_B logstash$BLUE secrets at $WHITE_B/secret/logstash\n\
@@ -313,8 +313,8 @@ for policy_file in services/secrets/vault/conf/*-policy.hcl; do
 done
 
 # Create Tokens -------------------------------------------------------------->>
-django_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="django-policy" -format=json \
+python_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault token create -policy="python-policy" -format=json \
 	| jq -r .auth.client_token)
 
 postgresql_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -354,7 +354,7 @@ nginx_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	| jq -r .auth.client_token)
 
 echo -e "\n$BLUE[+] Creating tokens with access to:\n\
-    $WHITE_B/secret/django$BLUE: $WHITE_B$django_vault_token\n\
+    $WHITE_B/secret/python$BLUE: $WHITE_B$python_vault_token\n\
     $WHITE_B/secret/postgresql$BLUE: $WHITE_B$postgresql_vault_token\n\
     $WHITE_B/secret/elasticsearch$BLUE: $WHITE_B$elasticsearch_vault_token\n\
     $WHITE_B/secret/logstash$BLUE: $WHITE_B$logstash_vault_token\n\
@@ -366,7 +366,7 @@ echo -e "\n$BLUE[+] Creating tokens with access to:\n\
     $WHITE_B/secret/nginx$BLUE: $WHITE_B$nginx_vault_token"
 
 # Put tokens to .env --------------------------------------------------------->>
-echo -e "DJANGO_VAULT_TOKEN=$django_vault_token" >> .env
+echo -e "PYTHON_VAULT_TOKEN=$python_vault_token" >> .env
 echo -e "POSTGRESQL_VAULT_TOKEN=$postgresql_vault_token" >> .env
 echo -e "ELASTICSEARCH_VAULT_TOKEN=$elasticsearch_vault_token" >> .env
 echo -e "LOGSTASH_VAULT_TOKEN=$logstash_vault_token" >> .env

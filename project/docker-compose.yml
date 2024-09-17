@@ -22,42 +22,34 @@ services:
             options:
                 gelf-address: "udp://10.0.2.2:5000"
                 tag: "vault"
-        restart: always
+        restart: no
         entrypoint: vault server -config=/bitnami/vault/config/vault.hcl
 
     # APP-SEGMENT ------------------------------------------------------------->
-    # django:
-    #     profiles:
-    #         - app
-    #     container_name: django
-    #     build:
-    #         context: ./services/app/django
-    #         dockerfile: Dockerfile
-    #     environment:
-    #         SECRET_KEY: ${SECRET_KEY} 
-    #         ALLOWED_HOSTS: ${ALLOWED_HOSTS} 
-    #         POSTGRES_DB: ${POSTGRES_DB}
-    #         POSTGRES_USER: ${POSTGRES_USER}
-    #         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    #         DB_HOST: ${DB_HOST} 
-    #         DB_PORT: ${DB_PORT} 
-    #         DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
-    #         DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
-    #     ports:
-    #         - "8000:8000"
-    #     # volumes:
-    #     #     -
-    #     networks:
-    #         app:
-    #             ipv4_address: 10.0.1.1
-    #     logging:
-    #         driver: gelf
-    #         options:
-    #             gelf-address: "udp://10.0.2.2:5000"
-    #             tag: "django"
-    #     restart: always
-    #     depends_on:
-    #         - postgres
+    python:
+        profiles:
+            - app
+        container_name: python
+        build:
+            context: ./services/app/python
+            dockerfile: Dockerfile
+        environment:
+            PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
+        ports:
+            - "8000:8000"
+        volumes:
+            - python:/bitnami
+        networks:
+            app:
+                ipv4_address: 10.0.1.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "python"
+        restart: no
+        depends_on:
+            - postgresql
 
     postgresql:
         profiles:
@@ -78,7 +70,7 @@ services:
             options:
                 gelf-address: "udp://10.0.2.2:5000"
                 tag: "postgresql"
-        restart: always
+        restart: no
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
@@ -234,13 +226,13 @@ services:
             options:
                 gelf-address: "udp://10.0.2.2:5000"
                 tag: "nginx"
-        restart: always
+        restart: no
 
 volumes:
     vault:
         external: true
 
-    django:
+    python:
 
     postgresql:
 

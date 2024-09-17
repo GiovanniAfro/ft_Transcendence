@@ -33,10 +33,10 @@ up:
 	@./setup/setup_vault.sh
 	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
 	# @docker compose -p "ft_transcendence" --profile log-system up -d >/dev/null 2>&1 
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile monitor-system up -d >/dev/null 2>&1 
+	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
+	# @docker compose -p "ft_transcendence" --profile monitor-system up -d >/dev/null 2>&1 
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile app up -d >/dev/null 2>&1 
+	@docker compose -p "ft_transcendence" --profile app up -d 
 	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
 	# @docker compose -p "ft_transcendence" --profile proxy-waf up -d >/dev/null 2>&1 
 	@rm -rf .env
