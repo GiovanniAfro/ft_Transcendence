@@ -6,7 +6,6 @@ set -ex
 certs=$(curl -k -H "X-Vault-Token: $POSTGRES_EXPORTER_VAULT_TOKEN" -X POST -d '{
 		"common_name": "postgres-exporter.ft-transcendence.42",
 		"ip_sans": "10.0.3.4",
-		"uri_sans": "postgres-exporter",
 		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/postgres-exporter)
 
