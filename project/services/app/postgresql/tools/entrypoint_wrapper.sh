@@ -21,20 +21,19 @@ echo "$certs" | jq -r '.data.ca_chain[]' \
 env=$(curl -k -H "X-Vault-Token: ${POSTGRESQL_VAULT_TOKEN}" \
 	-X GET https://10.0.0.1:8200/v1/secret/postgresql)
 
-# Run EntryPoint -------------------------------------------------------------->
-# POSTGRESQL_AUTOCTL_HOSTNAME=$(echo "$env" | jq -r '.data.POSTGRESQL_AUTOCTL_HOSTNAME') \
-POSTGRESQL_AUTOCTL_MONITOR_HOST=$(echo "$env" | jq -r '.data.POSTGRESQL_AUTOCTL_MONITOR_HOST') \
-POSTGRESQL_USERNAME=$(echo "$env" | jq -r '.data.POSTGRESQL_USERNAME') \
-POSTGRESQL_PASSWORD=$(echo "$env" | jq -r '.data.POSTGRESQL_PASSWORD') \
-POSTGRESQL_DATABASE=$(echo "$env" | jq -r '.data.POSTGRESQL_DATABASE') \
-POSTGRESQL_ENABLE_TLS=$(echo "$env" | jq -r '.data.POSTGRESQL_ENABLE_TLS') \
-POSTGRESQL_TLS_CERT_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_CERT_FILE') \
-POSTGRESQL_TLS_KEY_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_KEY_FILE') \
-POSTGRESQL_TLS_CA_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_CA_FILE') \
-POSTGRESQL_PGHBA_REMOVE_FILTERS=$(echo "$env" | jq -r '.data.POSTGRESQL_PGHBA_REMOVE_FILTERS') \
-/opt/bitnami/scripts/postgresql/entrypoint.sh /opt/bitnami/scripts/postgresql/run.sh
+export POSTGRESQL_USERNAME=$(echo "$env" | jq -r '.data.POSTGRESQL_USERNAME')
+export POSTGRESQL_PASSWORD=$(echo "$env" | jq -r '.data.POSTGRESQL_PASSWORD')
+export POSTGRESQL_DATABASE=$(echo "$env" | jq -r '.data.POSTGRESQL_DATABASE')
+export POSTGRESQL_ENABLE_TLS=$(echo "$env" | jq -r '.data.POSTGRESQL_ENABLE_TLS')
+export POSTGRESQL_TLS_CERT_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_CERT_FILE')
+export POSTGRESQL_TLS_KEY_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_KEY_FILE')
+export POSTGRESQL_TLS_CA_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_CA_FILE')
+export POSTGRESQL_PGHBA_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_PGHBA_FILE')
 
-# Wait for Postgresql --------------------------------------------------------->
+# Run EntryPoint -------------------------------------------------------------->
+exec /opt/bitnami/scripts/postgresql/entrypoint.sh "$@"
+
+# Waiting for the availability of Postgresql ---------------------------------->
 # while true; do
 #     if psql -h "127.0.0.1" -p "5432" -U "$POSTGRESQL_USERNAME" -d "$POSTGRESQL_DATABASE" -c '\q' > /dev/null 2>&1; then
 #         echo "PostgreSQL is reachable."

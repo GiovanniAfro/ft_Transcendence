@@ -56,15 +56,15 @@ DOUBTFUL
 	[v] Esportare metriche e creare dashboard
 
 [ ] Django
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da vault
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Hashare password postgresql
-		[ ] Settare HTTPS
-		[ ] 
+		[ ] Installare e configurare gunicorn
+		[ ] Abilitare TLS tra postgres e django
+		[ ] Esporre tramite Nginx
 	[ ] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard
-	[ ] Utilizzare un server WSGI e disabilitare il webserver di sviluppo
+	[ ] Impostare exporter e creare dashboard tramite TLS
 
 [ ] Postgresql
 	[v] Usare immagine non-root

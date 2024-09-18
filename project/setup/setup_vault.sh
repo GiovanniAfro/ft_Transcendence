@@ -252,6 +252,12 @@ echo -e "\n$BLUE[+] Import secrets to vault:\n\
 # Authentication from Containers ---------------------------------------------->
 # Create Roles --------------------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
+	vault write pki_int/roles/python \
+	allowed_domains="python.ft-transcendence.42" \
+	allow_subdomains=false allow_bare_domains=true \
+	max_ttl="24h" > /dev/null
+
+docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/postgresql \
 	allowed_domains="postgresql.ft-transcendence.42" \
 	allow_subdomains=false allow_bare_domains=true \

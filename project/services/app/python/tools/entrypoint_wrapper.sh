@@ -10,59 +10,45 @@ certs=$(curl -k -H "X-Vault-Token: $PYTHON_VAULT_TOKEN" -X POST -d '{
 	}' https://10.0.0.1:8200/v1/pki_int/issue/python)
 
 echo "$certs" | jq -r '.data.certificate' \
-	> /opt/bitnami/python/conf/python.crt
+	> /tmp/python.crt
 echo "$certs" | jq -r '.data.private_key' \
-	> /opt/bitnami/python/conf/python.key
+	> /tmp/python.key
 echo "$certs" | jq -r '.data.issuing_ca' \
-	> /opt/bitnami/python/conf/ca.crt
+	> /tmp/ca.crt
 echo "$certs" | jq -r '.data.ca_chain[]' \
-	> /opt/bitnami/python/conf/ca_chain.crt
+	> /tmp/ca_chain.crt
 
 env=$(curl -k -H "X-Vault-Token: ${PYTHON_VAULT_TOKEN}" \
 	-X GET https://10.0.0.1:8200/v1/secret/python)
 
-# Run EntryPoint in Background ------------------------------------------------>
-DB_HOST=$(echo "$env" | jq -r '.data.DB_HOST') \
-DB_PORT=$(echo "$env" | jq -r '.data.DB_PORT') \
-DB_NAME=$(echo "$env" | jq -r '.data.DB_NAME') \
-DB_USER=$(echo "$env" | jq -r '.data.DB_USER') \
-DB_PASSWORD=$(echo "$env" | jq -r '.data.DB_PASSWORD') \
-python
+db_host=$(echo "$env" | jq -r '.data.DB_HOST')
+db_port=$(echo "$env" | jq -r '.data.DB_PORT')
+db_name=$(echo "$env" | jq -r '.data.DB_NAME')
+db_user=$(echo "$env" | jq -r '.data.DB_USER')
+db_password=$(echo "$env" | jq -r '.data.DB_PASSWORD')
 
-# # Check Postgresql Server ----------------------------------------------------->
-# apt-get update -qq
-# apt-get install -y -qq netcat-openbsd
+export DB_HOST=$db_host
+export DB_PORT=$db_port
+export DB_NAME=$db_name
+export DB_USER=$db_user
+export DB_PASSWORD=$db_password
 
-# SUCCESS_MSG="Connection to ${DB_HOST} ${DB_PORT} port [tcp/postgresql] succeeded!"
+# Waiting for the availability of Postgresql ---------------------------------->
+success_msg="Connection to $db_host $db_port port [tcp/*] succeeded!"
 
-# while ! [[ "$OUTPUT" == *"$SUCCESS_MSG"* ]]; do
-#     OUTPUT=$(nc -zv ${DB_HOST} ${DB_PORT} 2>&1)
-#     if [[ "$OUTPUT" == *"$SUCCESS_MSG"* ]]; then
-#         echo "$SUCCESS_MSG"
-#     else
-#         echo "Connection to ${DB_HOST} ${DB_PORT} port [tcp/postgresql] failed. Retry ..."
-#     fi
-#     sleep 1
-# done
+while true; do
+    out=$(nc -zv $db_host $db_port 2>&1)
+    if [[ "$out" == *"$success_msg"* ]]; then
+        echo "$success_msg"
+		break
+    else
+        echo "Connection to $db_host $db_port port [tcp/*] failed. Retry ..."
+    fi
+    sleep 1
+done
 
-# apt-get remove --purge -y -qq netcat-openbsd
-# apt-get clean -qq
-# rm -rf var/lib/apt/lists/*
-
-# # Start Django server --------------------------------------------------------->
-
-# python ft_transcendence/manage.py makemigrations
-# python ft_transcendence/manage.py migrate
-# # python ft_transcendence/manage.py shell <<EOF
-# # from django.contrib.auth.models import User
-# # username = "${DJANGO_ADMIN_USER}"
-# # email = ""
-# # password = "${DJANGO_ADMIN_PASS}"
-# # if not User.objects.filter(username=username).exists():
-# #     User.objects.create_superuser(username=username, email=email, password=password)
-# # EOF
-# python ft_transcendence/manage.py collectstatic --noinput
-# python ft_transcendence/manage.py runserver 10.0.1.1:8000
-
-# # Wait for the Main Process --------------------------------------------------->
-# wait
+# Start Django server --------------------------------------------------------->
+python pong_project/manage.py makemigrations
+python pong_project/manage.py migrate
+python pong_project/manage.py collectstatic --noinput
+python pong_project/manage.py runserver 10.0.1.1:8000
