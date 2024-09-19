@@ -26,53 +26,30 @@ services:
         entrypoint: vault server -config=/bitnami/vault/config/vault.hcl
 
     # APP-SEGMENT ------------------------------------------------------------->
-    # python:
-    #     profiles:
-    #         - app
-    #     container_name: python
-    #     build:
-    #         context: ./services/app/python
-    #         dockerfile: Dockerfile
-    #     environment:
-    #         PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
-    #     ports:
-    #         - "8000:8000"
-    #     volumes:
-    #         - python:/bitnami
-    #     networks:
-    #         app:
-    #             ipv4_address: 10.0.1.1
-    #     logging:
-    #         driver: gelf
-    #         options:
-    #             gelf-address: "udp://10.0.2.2:5000"
-    #             tag: "python"
-    #     restart: no
-    #     depends_on:
-    #         - postgresql
-    #     entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
-
-    # postgresql:
-    #     profiles:
-    #         - app
-    #     container_name: postgresql
-    #     image: bitnami/postgresql:16
-    #     environment:
-    #         # POSTGRESQL_VAULT_TOKEN: ${POSTGRESQL_VAULT_TOKEN}
-    #         POSTGRESQL_POSTGRES_PASSWORD: "adminpwd"
-    #         POSTGRESQL_USERNAME: "python"
-    #         POSTGRESQL_PASSWORD: "psqlpwd"
-    #         POSTGRESQL_DATABASE: "django_db"
-    #         POSTGRESQL_ENABLE_TLS: "no"
-    #         POSTGRESQL_TLS_CERT_FILE: ""
-    #         POSTGRESQL_TLS_KEY_FILE: ""
-    #         POSTGRESQL_TLS_CA_FILE: ""
-    #     volumes:
-    #         - postgresql:/bitnami
-    #     networks:
-    #         app:
-    #             ipv4_address: 10.0.1.2
-    #     restart: no
+    python:
+        profiles:
+            - app
+        container_name: python
+        build:
+            context: ./services/app/python
+            dockerfile: Dockerfile
+        environment:
+            PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
+        ports:
+            - "8000:8000"
+        volumes:
+            - python:/bitnami
+        networks:
+            app:
+                ipv4_address: 10.0.1.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "python"
+        restart: no
+        depends_on:
+            - postgresql
 
     postgresql:
         profiles:
@@ -83,13 +60,6 @@ services:
             dockerfile: Dockerfile
         environment:
             POSTGRESQL_VAULT_TOKEN: ${POSTGRESQL_VAULT_TOKEN}
-            # POSTGRESQL_POSTGRES_PASSWORD: "psqlpwd"
-            # POSTGRESQL_PASSWORD: "psqlpwd"
-            # POSTGRESQL_DATABASE: "django_db"
-            # POSTGRESQL_ENABLE_TLS: "no"
-            # POSTGRESQL_TLS_CERT_FILE: ""
-            # POSTGRESQL_TLS_KEY_FILE: ""
-            # POSTGRESQL_TLS_CA_FILE: ""
         volumes:
             - postgresql:/bitnami/postgresql
         networks:
@@ -101,7 +71,6 @@ services:
                 gelf-address: "udp://10.0.2.2:5000"
                 tag: "postgresql"
         restart: no
-        # entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
     elasticsearch:

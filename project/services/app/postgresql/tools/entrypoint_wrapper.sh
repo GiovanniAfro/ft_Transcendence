@@ -31,28 +31,28 @@ export POSTGRESQL_TLS_CA_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_TLS_CA_FIL
 export POSTGRESQL_PGHBA_FILE=$(echo "$env" | jq -r '.data.POSTGRESQL_PGHBA_FILE')
 
 # Run EntryPoint -------------------------------------------------------------->
-exec /opt/bitnami/scripts/postgresql/entrypoint.sh "$@"
+exec /opt/bitnami/scripts/postgresql/entrypoint.sh "$@" &
 
 # Waiting for the availability of Postgresql ---------------------------------->
-# while true; do
-#     if psql -h "127.0.0.1" -p "5432" -U "$POSTGRESQL_USERNAME" -d "$POSTGRESQL_DATABASE" -c '\q' > /dev/null 2>&1; then
-#         echo "PostgreSQL is reachable."
-#         break
-#     else
-#         echo "PostgreSQL is unreachable."
-#         sleep 1
-#     fi
-# done
+while true; do
+    if PGPASSWORD="$POSTGRESQL_PASSWORD" psql -h "127.0.0.1" -p "5432" -U "$POSTGRESQL_USERNAME" -d "$POSTGRESQL_DATABASE" -c '\q'; then
+        echo "PostgreSQL is reachable."
+        break
+    else
+        echo "PostgreSQL is unreachable, retry ..."
+        sleep 1
+    fi
+done
 
-# # Create Roles ---------------------------------------------------------------->
-# psql_user=$(echo "$env" | jq -r '.data.POSTGRESQL_USERNAME')
-# psql_pass=$(echo "$env" | jq -r '.data.POSTGRESQL_PASSWORD')
-# psql_db=$(echo "$env" | jq -r '.data.POSTGRESQL_DATABASE')
-
-# psql -U "$psql_user" -d "$psql_db" -c \
-# 	"CREATE ROLE \"postgresql.ft-transcendence.42\" WITH LOGIN PASSWORD 'exporterpwd';"
-# psql -U "$psql_user" -d "$psql_db" -c \
-# 	"GRANT CONNECT ON DATABASE \"$psql_db\" TO \"postgresql.ft-transcendence.42\";"
+# Edit pg_hba.conf ------------------------------------------------------------>
+echo "local   all all                                                 md5 " \
+	> /opt/bitnami/postgresql/conf/pg_hba.conf
+echo "hostssl all postgres-exporter.ft-transcendence.42 10.0.1.254/32 cert" \
+	>> /opt/bitnami/postgresql/conf/pg_hba.conf
+echo "hostssl all python.ft-transcendence.42            10.0.1.1/32   cert" \
+	>> /opt/bitnami/postgresql/conf/pg_hba.conf
+echo "host    all python                                10.0.1.1/32   md5 " \
+	>> /opt/bitnami/postgresql/conf/pg_hba.conf
 
 # Wait for the Main Process --------------------------------------------------->
-# wait
+wait

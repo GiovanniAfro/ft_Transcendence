@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -ex
+set -x
 
 # Get Certs and Secrets from Vault -------------------------------------------->
 certs=$(curl -k -H "X-Vault-Token: $PYTHON_VAULT_TOKEN" -X POST -d '{
@@ -9,40 +9,38 @@ certs=$(curl -k -H "X-Vault-Token: $PYTHON_VAULT_TOKEN" -X POST -d '{
 		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/python)
 
-echo "$certs" | jq -r '.data.certificate' \
-	> /tmp/python.crt
-echo "$certs" | jq -r '.data.private_key' \
-	> /tmp/python.key
-echo "$certs" | jq -r '.data.issuing_ca' \
-	> /tmp/ca.crt
-echo "$certs" | jq -r '.data.ca_chain[]' \
-	> /tmp/ca_chain.crt
+mkdir -p /app/tls
+
+echo "$certs" | jq -r '.data.certificate' > /app/tls/python.crt
+echo "$certs" | jq -r '.data.private_key' > /app/tls/python.key
+echo "$certs" | jq -r '.data.issuing_ca' > /app/tls/ca.crt
+echo "$certs" | jq -r '.data.ca_chain[]' > /app/tls/ca_chain.crt
+
+chmod 600 /app/tls/python.key
 
 env=$(curl -k -H "X-Vault-Token: ${PYTHON_VAULT_TOKEN}" \
 	-X GET https://10.0.0.1:8200/v1/secret/python)
 
-db_host=$(echo "$env" | jq -r '.data.DB_HOST')
-db_port=$(echo "$env" | jq -r '.data.DB_PORT')
-db_name=$(echo "$env" | jq -r '.data.DB_NAME')
-db_user=$(echo "$env" | jq -r '.data.DB_USER')
-db_password=$(echo "$env" | jq -r '.data.DB_PASSWORD')
-
-export DB_HOST=$db_host
-export DB_PORT=$db_port
-export DB_NAME=$db_name
-export DB_USER=$db_user
-export DB_PASSWORD=$db_password
+export DB_HOST=$(echo "$env" | jq -r '.data.DB_HOST')
+export DB_PORT=$(echo "$env" | jq -r '.data.DB_PORT')
+export DB_NAME=$(echo "$env" | jq -r '.data.DB_NAME')
+export DB_USER=$(echo "$env" | jq -r '.data.DB_USER')
+export DB_PASSWORD=$(echo "$env" | jq -r '.data.DB_PASSWORD')
+export DB_TLS=$(echo "$env" | jq -r '.data.DB_TLS')
+export TLS_CERT_FILE=$(echo "$env" | jq -r '.data.TLS_CERT_FILE')
+export TLS_KEY_FILE=$(echo "$env" | jq -r '.data.TLS_KEY_FILE')
+export TLS_CA_FILE=$(echo "$env" | jq -r '.data.TLS_CA_FILE')
 
 # Waiting for the availability of Postgresql ---------------------------------->
-success_msg="Connection to $db_host $db_port port [tcp/*] succeeded!"
+success_msg="Connection to $DB_HOST $DB_PORT port [tcp/*] succeeded!"
 
 while true; do
-    out=$(nc -zv $db_host $db_port 2>&1)
+    out=$(nc -zv $DB_HOST $DB_PORT 2>&1)
     if [[ "$out" == *"$success_msg"* ]]; then
         echo "$success_msg"
 		break
     else
-        echo "Connection to $db_host $db_port port [tcp/*] failed. Retry ..."
+        echo "Connection to $DB_HOST $DB_PORT port [tcp/*] failed. Retry ..."
     fi
     sleep 1
 done
