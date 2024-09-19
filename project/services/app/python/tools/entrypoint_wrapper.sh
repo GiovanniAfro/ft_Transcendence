@@ -21,6 +21,7 @@ chmod 600 /app/tls/python.key
 env=$(curl -k -H "X-Vault-Token: ${PYTHON_VAULT_TOKEN}" \
 	-X GET https://10.0.0.1:8200/v1/secret/python)
 
+export PYTHONPATH=$(echo "$env" | jq -r '.data.PYTHONPATH')
 export DB_HOST=$(echo "$env" | jq -r '.data.DB_HOST')
 export DB_PORT=$(echo "$env" | jq -r '.data.DB_PORT')
 export DB_NAME=$(echo "$env" | jq -r '.data.DB_NAME')
@@ -49,7 +50,7 @@ done
 python pong_project/manage.py makemigrations
 python pong_project/manage.py migrate
 python pong_project/manage.py collectstatic --noinput
-
-export PYTHONPATH=$(echo "$env" | jq -r '.data.PYTHONPATH')
-
-gunicorn --workers 3 --bind 0.0.0.0:8000 pong_project.wsgi:application
+gunicorn --workers 3 --bind 0.0.0.0:8000 \
+	--certfile=${TLS_CERT_FILE} \
+	--ca-certs=${TLS_CA_FILE} \
+	pong_project.wsgi:application
