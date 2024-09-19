@@ -45,8 +45,11 @@ while true; do
     sleep 1
 done
 
-# Start Django server --------------------------------------------------------->
+# Start Gunicorn server ------------------------------------------------------->
 python pong_project/manage.py makemigrations
 python pong_project/manage.py migrate
 python pong_project/manage.py collectstatic --noinput
-python pong_project/manage.py runserver 10.0.1.1:8000
+
+export PYTHONPATH=$(echo "$env" | jq -r '.data.PYTHONPATH')
+
+gunicorn --workers 3 --bind 0.0.0.0:8000 pong_project.wsgi:application

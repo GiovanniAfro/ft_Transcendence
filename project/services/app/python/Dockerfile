@@ -4,6 +4,7 @@ COPY conf/ ./
 COPY tools/ /entrypoint/
 
 RUN apt-get update && apt-get install -y curl jq netcat-openbsd && \
+	pip install --no-cache-dir --upgrade pip && \
 	pip install --no-cache-dir -r requirements.txt
 
 ENTRYPOINT ["bash", "-c", "source /entrypoint/entrypoint_wrapper.sh"]

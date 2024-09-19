@@ -38,7 +38,8 @@ services:
         ports:
             - "8000:8000"
         volumes:
-            - python:/bitnami
+            - django_static_files:/app/pong_project/static
+            - django_media_files:/app/pong_project/static
         networks:
             app:
                 ipv4_address: 10.0.1.1
@@ -217,6 +218,9 @@ services:
         ports:
             - "80:8080"
             - "443:8443"
+        volumes:
+            - django_static_files:/app/pong_project/static
+            - django_media_files:/app/pong_project/static
         networks:
             proxy-waf:
                 ipv4_address: 10.0.4.1
@@ -245,7 +249,9 @@ volumes:
 
     grafana:
 
-    nginx:
+    django_static_files:
+
+    django_media_files:
 
 networks:
     secrets:

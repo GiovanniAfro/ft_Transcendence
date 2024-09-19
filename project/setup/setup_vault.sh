@@ -165,7 +165,7 @@ echo -e "\n$BLUE[+] Import signed intermediate CA certificate"
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/ft-transcendence-42 \
 	allowed_domains="ft-transcendence.42" \
-	allow_subdomains=true \
+	allow_subdomains=true\
 	max_ttl="720h" > /dev/null
 
 echo -e "\n$BLUE[+] Created a role for the intermediate CA"
@@ -301,7 +301,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/nginx \
-	allowed_domains="nginx.ft-transcendence.42" \
+	allowed_domains="ft-transcendence.42" \
 	allow_subdomains=false allow_bare_domains=true \
 	max_ttl="24h" > /dev/null
 
