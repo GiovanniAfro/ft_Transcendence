@@ -152,9 +152,9 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Hashicorp Vault - Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
   - [Hashicorp Vault - Monitor telemetry with Prometheus & Grafana](https://developer.hashicorp.com/vault/tutorials/archive/monitor-telemetry-grafana-prometheus)
   - [Hashicorp Vault - PKI Secret Engine](https://developer.hashicorp.com/vault/api-docs/secret/pki#sign-certificate)
-- Bitnami Images
+- Docker Images
   - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
-  - [Nginx](https://github.com/bitnami/containers/tree/main/bitnami/nginx)
+  - [Nginx](https://github.com/coreruleset/modsecurity-crs-docker)
   - [Python](https://github.com/bitnami/containers/tree/main/bitnami/python)
   - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
   - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)

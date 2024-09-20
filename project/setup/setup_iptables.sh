@@ -40,7 +40,7 @@ iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.3 -p tcp --dport 9093 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.1.1 -p tcp --dport 8000 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.4 -d 10.0.1.2 -p tcp --dport 5432 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.4 -p tcp --dport 9187 -j ACCEPT
-iptables -I DOCKER-USER -s 10.0.3.3 -d 10.0.4.1 -p tcp --dport 8080 -j ACCEPT
+iptables -I DOCKER-USER -s 10.0.3.3 -d 10.0.4.1 -p tcp --dport 8443 -j ACCEPT
 iptables -I DOCKER-USER -s 10.0.3.1 -d 10.0.3.3 -p tcp --dport 9113 -j ACCEPT
 
 # PROXY-WAF SEGMENT ----------------------------------------------------------->

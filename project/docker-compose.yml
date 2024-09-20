@@ -184,23 +184,22 @@ services:
             - prometheus
         entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
-    # nginx-exporter:
-    #     profiles:
-    #         - monitor-system
-    #     container_name: nginx-exporter
-    #     build:
-    #         context: ./services/monitor-system/nginx-exporter
-    #     ports:
-    #         - "9113:9113"
-    #     environment:
-    #         NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
-    #     networks:
-    #         monitor-system:
-    #             ipv4_address: 10.0.3.3
-    #     restart: no
-    #     depends_on:
-    #         - prometheus
-    #     entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+    nginx-exporter:
+        profiles:
+            - monitor-system
+        container_name: nginx-exporter
+        build:
+            context: ./services/monitor-system/nginx-exporter
+        ports:
+            - "9113:9113"
+        environment:
+            NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.3
+        restart: no
+        depends_on:
+            - prometheus
 
     # PROXY-WAF-SEGMENT ------------------------------------------------------->
     nginx:

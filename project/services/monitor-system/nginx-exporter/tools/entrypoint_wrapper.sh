@@ -9,19 +9,13 @@ certs=$(curl -s -k -H "X-Vault-Token: $NGINX_EXPORTER_VAULT_TOKEN" -X POST -d '{
 		"ttl": "24h"
 	}' https://10.0.0.1:8200/v1/pki_int/issue/nginx-exporter)
 
-# mkdir -p /opt/bitnami/nginx-exporter/tls
-# chown -R 
+echo "$certs" | jq -r '.data.certificate' > /tmp/nginx-exporter.crt
+echo "$certs" | jq -r '.data.private_key' > /tmp/nginx-exporter.key
+echo "$certs" | jq -r '.data.issuing_ca' > /tmp/ca.crt
+echo "$certs" | jq -r '.data.ca_chain[]' > /tmp/ca_chain.crt
 
-# echo "$certs" | jq -r '.data.certificate' > /opt/bitnami/nginx-exporter/tls/nginx-exporter.crt
-# echo "$certs" | jq -r '.data.private_key' > /opt/bitnami/nginx-exporter/tls/nginx-exporter.key
-# echo "$certs" | jq -r '.data.issuing_ca' > /opt/bitnami/nginx-exporter/tls/ca.crt
+# env=$(curl -s -k -H "X-Vault-Token: ${NGINX_EXPORTER_VAULT_TOKEN}" \
+# 	-X GET https://10.0.0.1:8200/v1/secret/nginx-exporter)
 
-env=$(curl -s -k -H "X-Vault-Token: ${NGINX_EXPORTER_VAULT_TOKEN}" \
-	-X GET https://10.0.0.1:8200/v1/secret/nginx-exporter)
-
-# Run EntryPoint in Background ------------------------------------------------>
-DATA_SOURCE_URI=$(echo "$env" | jq -r '.data.DATA_SOURCE_URI') \
-nginx-prometheus-exporter &
-
-# Wait for the Main Process --------------------------------------------------->
-wait
+# Run EntryPoint -------------------------------------------------------------->
+exec nginx-prometheus-exporter "$@" 

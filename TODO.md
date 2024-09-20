@@ -52,6 +52,7 @@ DOUBTFUL
 		[v] Creare certificati per i container
 		[v] Importare segreti
 		[v] Settare TLS mode
+		[v] Settare mutua autenticazione tls con client
 	[v] Collegare al log-system
 	[v] Esportare metriche e creare dashboard
 
@@ -63,7 +64,7 @@ DOUBTFUL
 		[v] Installare e configurare gunicorn
 		[v] Abilitare TLS tra postgres e django
 		[v] Esporre tramite Nginx
-	[ ] Collegare al log-system
+	[v] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard tramite TLS
 
 [ ] Postgresql
@@ -79,7 +80,7 @@ DOUBTFUL
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare password login
-		[ ] Settare autorizazione TLS da webclient
+		[ ] Settare mutua autenticazione tls con client
 
 [v] Logstash
 	[v] Usare immagine non-root
@@ -93,7 +94,7 @@ DOUBTFUL
 	[v] Configurare servizio
 		[v] Settare HTTPS e TLS
 		[v] Settare dataview di defualt per pattern log*
-		[ ] Settare autorizazione TLS da webclient
+		[ ] Settare mutua autenticazione tls con client
 
 [ ] Prometheus
 	[v] Usare immagine non-root
@@ -104,6 +105,7 @@ DOUBTFUL
 		[v] Settare autorizazione TLS da webclient
 		[v] Settare HTTPS
 		[v] Settare data retention
+		[v] Settare mutua autenticazione tls con client
 		[ ] Hashare credenziali in web.yml
 
 [v] Grafana
@@ -119,7 +121,7 @@ DOUBTFUL
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare HTTPS
-		[ ] Settare modsecurity
-	[ ] Collegare al log-system
+		[v] Settare modsecurity
+		[v] Settare mutua autenticazione tls con client
+	[v] Collegare al log-system
 	[ ] Impostare exporter in TLS mode e creare dashboard
-
