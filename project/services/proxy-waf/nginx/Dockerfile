@@ -1,17 +1,12 @@
-# FROM owasp/modsecurity-crs:nginx
-
-FROM bitnami/nginx:1.27.1
+FROM owasp/modsecurity-crs:nginx
 
 USER root
 
-RUN apt-get update && apt-get install -y curl jq
+RUN apt-get update && apt-get install -y curl jq 
 
-USER 1001
+USER nginx
 
-COPY conf/ /opt/bitnami/nginx/conf/server_blocks/
+COPY conf/ /etc/nginx/conf.d/
 COPY tools/ /entrypoint/
 
 ENTRYPOINT ["bash", "-c", "source /entrypoint/entrypoint_wrapper.sh"]
-
-CMD [ "/opt/bitnami/scripts/nginx/entrypoint.sh", \
-	"/opt/bitnami/scripts/nginx/run.sh" ]

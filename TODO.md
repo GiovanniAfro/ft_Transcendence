@@ -60,19 +60,19 @@ DOUBTFUL
 	[v] Prendere segreti da vault
 	[ ] Configurare servizio
 		[v] Hashare password postgresql
-		[ ] Installare e configurare gunicorn
-		[ ] Abilitare TLS tra postgres e django
-		[ ] Esporre tramite Nginx
+		[v] Installare e configurare gunicorn
+		[v] Abilitare TLS tra postgres e django
+		[v] Esporre tramite Nginx
 	[ ] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard tramite TLS
 
 [ ] Postgresql
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
-	[ ] Configurare servizio
-		[ ] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
+	[v] Configurare servizio
+		[v] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
 	[v] Collegare al log-system
-	[v] Impostare exporter e creare dashboard
+	[ ] Impostare exporter in TLS mode e creare dashboard
 
 [ ] Elasticsearch
 	[v] Usare immagine non-root
@@ -115,11 +115,11 @@ DOUBTFUL
 		[v] Settare HTTPS
 	
 [ ] Nginx
-	[ ] Usare immagine non-root
-	[ ] Prendere segreti da vault
-	[ ] Configurare servizio
-		[ ] Settare HTTPS
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Settare HTTPS
+		[ ] Settare modsecurity
 	[ ] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard
-	[ ] Configurare nginx in modalita solo TLS
+	[ ] Impostare exporter in TLS mode e creare dashboard
 

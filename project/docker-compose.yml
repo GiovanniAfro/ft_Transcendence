@@ -35,11 +35,8 @@ services:
             dockerfile: Dockerfile
         environment:
             PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
-        ports:
-            - "8000:8000"
         volumes:
             - django_static_files:/app/pong_project/static
-            - django_media_files:/app/pong_project/static
         networks:
             app:
                 ipv4_address: 10.0.1.1
@@ -220,7 +217,6 @@ services:
             - "443:8443"
         volumes:
             - django_static_files:/app/pong_project/static
-            - django_media_files:/app/pong_project/static
         networks:
             proxy-waf:
                 ipv4_address: 10.0.4.1
@@ -235,8 +231,6 @@ volumes:
     vault:
         external: true
 
-    python:
-
     postgresql:
 
     elasticsearch:
@@ -250,8 +244,6 @@ volumes:
     grafana:
 
     django_static_files:
-
-    django_media_files:
 
 networks:
     secrets:

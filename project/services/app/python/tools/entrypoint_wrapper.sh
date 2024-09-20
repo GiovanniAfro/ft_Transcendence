@@ -51,6 +51,7 @@ python pong_project/manage.py makemigrations
 python pong_project/manage.py migrate
 python pong_project/manage.py collectstatic --noinput
 gunicorn --workers 3 --bind 0.0.0.0:8000 \
-	--certfile=${TLS_CERT_FILE} \
-	--ca-certs=${TLS_CA_FILE} \
-	pong_project.wsgi:application
+    --certfile=${TLS_CERT_FILE} \
+    --keyfile=${TLS_KEY_FILE} \
+    --ca-certs=${TLS_CA_FILE} \
+    pong_project.wsgi:application

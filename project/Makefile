@@ -38,7 +38,7 @@ up:
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
 	@docker compose -p "ft_transcendence" --profile app up -d 
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile proxy-waf up -d >/dev/null 2>&1 
+	@docker compose -p "ft_transcendence" --profile proxy-waf up -d
 	@rm -rf .env
 	@echo
 

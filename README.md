@@ -131,7 +131,6 @@ Below are the security measures that have been taken to protect the infrastructu
   rm -f keystore.p12 && rm -f webclient.crt && rm -f webclient.key && rm -f webclient-ca.crt
   ```
 
-
 ## 📚 - References
 - Log System
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
@@ -155,6 +154,7 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Hashicorp Vault - PKI Secret Engine](https://developer.hashicorp.com/vault/api-docs/secret/pki#sign-certificate)
 - Bitnami Images
   - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
+  - [Nginx](https://github.com/bitnami/containers/tree/main/bitnami/nginx)
   - [Python](https://github.com/bitnami/containers/tree/main/bitnami/python)
   - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
   - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)
@@ -164,7 +164,6 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Grafana](https://github.com/bitnami/containers/tree/main/bitnami/grafana)
   - [Postgres-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/postgres-exporter)
   - [Nginx-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/nginx-exporter)
-  - [Nginx](https://github.com/bitnami/containers/tree/main/bitnami/nginx)
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/kichkiro/webserv/blob/main/LICENSE)

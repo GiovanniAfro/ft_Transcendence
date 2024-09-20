@@ -184,11 +184,6 @@ echo -e "\n$BLUE[+] Created certificates for vault-setup"
 docker cp services/secrets/vault/conf/vault.hcl \
 	vault-setup:/bitnami/vault/config/vault.hcl > /dev/null
 
-# # Create TLS Certificates for ELASTICSEARCH ---------------------------------->>
-# docker exec -e VAULT_TOKEN=$root_token vault-setup \
-# 	vault write pki_int/issue/ft-transcendence-42 \
-# 	common_name="ELASTICSEARCH.ft-transcendence.42" ip_sans="10.0.2.1" ttl="24h"
-
 # Import Secrets -------------------------------------------------------------->
 # Enable KV Secrets Engine --------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -217,10 +212,6 @@ docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/kibana - <<< \
 	$(jq -r '.kibana' ./.env.json) > /dev/null
 
-# docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-# 	vault kv put secret/prometheus - <<< \
-# 	$(jq -r '.prometheus' ./.env.json) > /dev/null
-
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/grafana - <<< \
 	$(jq -r '.grafana' ./.env.json) > /dev/null
@@ -232,10 +223,6 @@ docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
 	vault kv put secret/nginx-exporter - <<< \
 	$(jq -r '.nginx_exporter' ./.env.json) > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/nginx - <<< \
-	$(jq -r '.nginx' ./.env.json) > /dev/null
 
 echo -e "\n$BLUE[+] Import secrets to vault:\n\
     $BLUE- Add$WHITE_B python$BLUE secrets at $WHITE_B/secret/python\n\
@@ -408,7 +395,7 @@ echo -e "NGINX_VAULT_TOKEN=$nginx_vault_token" >> .env
 # openssl pkcs12 -export \
 #     -in setup/.tmp/host-client.crt \
 #     -inkey setup/.tmp/host-client.key \
-#     -out keystore.p12 \
+#     -out client_host.p12 \
 #     -name ft-transcendence-host-client \
 #     -CAfile setup/.tmp/host-client-ca.crt \
 #     -caname root
