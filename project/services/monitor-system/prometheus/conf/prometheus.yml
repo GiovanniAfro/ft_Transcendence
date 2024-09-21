@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - '10.0.3.2:3000'
+
+rule_files:
+  - "/opt/bitnami/prometheus/conf/alert.rules.yml"
+
+scrape_configs:  
+  - job_name: vault
+    metrics_path: /v1/sys/metrics
+    params:
+      format: ['prometheus']
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    authorization:
+      credentials_file: /opt/bitnami/prometheus/conf/vault-token
+    static_configs:
+    - targets: ['10.0.0.1:8200']
+
+  - job_name: 'postgres-exporter'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: false
+      cert_file: /opt/bitnami/prometheus/conf/prometheus.crt
+      key_file: /opt/bitnami/prometheus/conf/prometheus.key
+      ca_file: /opt/bitnami/prometheus/conf/ca.crt
+    static_configs:
+      - targets: ['10.0.3.4:9187']
+
+  - job_name: "nginx-exporter"
+    static_configs:
+      - targets: ["10.0.3.5:9113"]

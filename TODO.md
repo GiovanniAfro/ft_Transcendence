@@ -41,19 +41,87 @@ DOUBTFUL
 	[] Major module: Replacing Basic Pong with Server-Side Pong and Implementing an API.
 	[] Major module: Enabling Pong Gameplay via CLI against Web Users with API Integration.
 
+--------------------------------------------------------------------------------
 
+# kichkiro
 
+[v] Vault 
+	[v] Usare immagine non-root
+	[v] Configurare servizio
+		[v] Creare root CA e intermediate CA
+		[v] Creare certificati per i container
+		[v] Importare segreti
+		[v] Settare TLS mode
+		[v] Settare mutua autenticazione tls con client
+	[v] Collegare al log-system
+	[v] Esportare metriche e creare dashboard
 
+[ ] Django
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[ ] Configurare servizio
+		[v] Hashare password postgresql
+		[v] Installare e configurare gunicorn
+		[v] Abilitare TLS tra postgres e django
+		[v] Esporre tramite Nginx
+	[v] Collegare al log-system
+	[ ] Impostare exporter e creare dashboard tramite TLS
 
+[ ] Postgresql
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
+	[v] Collegare al log-system
+	[ ] Impostare exporter in TLS mode e creare dashboard
 
+[ ] Elasticsearch
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Settare password login
+		[ ] Settare mutua autenticazione tls con client
 
-# kichkiro todo
+[v] Logstash
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] ssl output elasticsearch
 
-## Monitor System
+[ ] Kibana
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Settare HTTPS e TLS
+		[v] Settare dataview di defualt per pattern log*
+		[ ] Settare mutua autenticazione tls con client
 
-	[ ] Creare un container per ogni exporter (ad eccezione di django che ha django-prometheus un modulo pip)
-	[ ] Settare le regole di iptables
-	[ ] Aggiungere target in prometheus.yml
-	[ ] Impostare password grafana
-	[ ] Impostare data source grafana
-	[ ] ...
+[ ] Prometheus
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[ ] Configurare servizio
+		[v] Aggiungere target in prometheus.yml
+		[v] Settare alert
+		[v] Settare autorizazione TLS da webclient
+		[v] Settare HTTPS
+		[v] Settare data retention
+		[v] Settare mutua autenticazione tls con client
+		[ ] Hashare credenziali in web.yml
+
+[v] Grafana
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Impostare data source grafana
+		[v] Settare autenticazione grafana
+		[v] Settare HTTPS
+	
+[ ] Nginx
+	[v] Usare immagine non-root
+	[v] Prendere segreti da vault
+	[v] Configurare servizio
+		[v] Settare HTTPS
+		[v] Settare modsecurity
+		[v] Settare mutua autenticazione tls con client
+	[v] Collegare al log-system
+	[ ] Impostare exporter in TLS mode e creare dashboard

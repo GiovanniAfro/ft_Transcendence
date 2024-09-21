@@ -1,242 +1,252 @@
 services:
-    # nginx:
-    #     profiles:
-    #         - proxy-waf
-    #     container_name: nginx
-    #     build:
-    #         context: ./requirements/nginx
-    #         dockerfile: Dockerfile
-    #     ports:
-    #         - "8080:8080"
-    #         - "8443:8443"
-    #     # volumes:
-    #         # - ./nginx.conf:/etc/nginx/nginx.conf
-    #         # - ./modsecurity.conf:/etc/modsecurity/modsecurity.conf
-    #     networks:
-    #         proxy-waf:
-    #             ipv4_address: 10.0.0.1
-    #     logging:
-    #         driver: gelf
-    #         options:
-    #             gelf-address: "udp://10.0.2.2:50000"
-    #             tag: "nginx"
-    #     restart: always
-    #     depends_on:
-    #         - django
+    # SECRETS-SEGMENT ----------------------------------------------------------->
+    vault:
+        profiles:
+            - secrets
+        container_name: vault
+        image: bitnami/vault:1.17.5
+        environment:
+            VAULT_ADDR: https://10.0.0.1:8200
+            VAULT_CACERT: /bitnami/vault/tls/intermediate.cert.pem
+        ports:
+            - 8200:8200
+        volumes:
+            - vault:/bitnami/vault
+        networks:
+            secrets:
+                ipv4_address: 10.0.0.1
+        cap_add:
+            - IPC_LOCK
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "vault"
+        restart: no
+        entrypoint: vault server -config=/bitnami/vault/config/vault.hcl
 
-    django:
+    # APP-SEGMENT ------------------------------------------------------------->
+    python:
         profiles:
             - app
-        container_name: django
+        container_name: python
         build:
-            context: ./requirements/django
+            context: ./services/app/python
             dockerfile: Dockerfile
         environment:
-            SECRET_KEY: ${SECRET_KEY} 
-            ALLOWED_HOSTS: ${ALLOWED_HOSTS} 
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            DB_HOST: ${DB_HOST} 
-            DB_PORT: ${DB_PORT} 
-            DJANGO_ADMIN_USER: ${DJANGO_ADMIN_USER} 
-            DJANGO_ADMIN_PASS: ${DJANGO_ADMIN_PASS} 
-        ports:
-            - "8000:8000"
-        # volumes:
-        #     -
+            PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
+        volumes:
+            - django_static_files:/app/pong_project/static
         networks:
             app:
                 ipv4_address: 10.0.1.1
         logging:
             driver: gelf
             options:
-                gelf-address: "udp://10.0.2.2:50000"
-                tag: "django"
-        restart: always
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "python"
+        restart: no
         depends_on:
-            - postgres
+            - postgresql
 
-    postgres:
+    postgresql:
         profiles:
             - app
-        container_name: postgres
+        container_name: postgresql
         build:
-            context: ./requirements/postgres
+            context: ./services/app/postgresql
             dockerfile: Dockerfile
         environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready"]
-            interval: 1s
-            timeout: 5s
-            retries: 10
+            POSTGRESQL_VAULT_TOKEN: ${POSTGRESQL_VAULT_TOKEN}
         volumes:
-            - postgres:/var/lib/postgresql/data
+            - postgresql:/bitnami/postgresql
         networks:
             app:
                 ipv4_address: 10.0.1.2
         logging:
             driver: gelf
             options:
-                gelf-address: "udp://10.0.2.2:50000"
-                tag: "postgres"
-        restart: always
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "postgresql"
+        restart: no
 
+    # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
     elasticsearch:
         profiles:
             - log-system
         container_name: elasticsearch
         build:
-            context: ./requirements/elasticsearch/
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
-        entrypoint: /bin/sh -c "/tmp/setup.sh & exec /bin/tini -- /usr/local/bin/docker-entrypoint.sh"
+            context: ./services/log-system/elasticsearch/
         environment:
-            ELASTIC_VERSION: ${ELASTIC_VERSION:-}
-            node.name: elasticsearch
-            ES_JAVA_OPTS: -Xms512m -Xmx512m
-            # Bootstrap password.
-            # Used to initialize the keystore during the initial startup of
-            # Elasticsearch. Ignored on subsequent runs.
-            ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
-            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
-            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
-            METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
-            FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
-            HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
-            MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
-            BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
-            # Use single node discovery in order to disable production mode and avoid bootstrap checks.
-            # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
-            discovery.type: single-node
+            ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
+        volumes:
+            - elasticsearch:/bitnami
         ports:
             - 9200:9200
-            # - 9300:9300
-        volumes:
-            - ./requirements/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
-            - elasticsearch:/usr/share/elasticsearch/data:Z
         networks:
             log-system:
                 ipv4_address: 10.0.2.1
-        restart: unless-stopped
+        restart: no
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     logstash:
         profiles:
             - log-system
         container_name: logstash
         build:
-            context: ./requirements/logstash
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
-        ports:
-            - 50000:50000/udp
-            - 9600:9600
-        volumes:
-            - ./requirements/logstash/conf/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-            - ./requirements/logstash/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
+            context: ./services/log-system/logstash
         environment:
-            LS_JAVA_OPTS: -Xms256m -Xmx256m
-            LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+            LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
+        volumes:
+            - logstash:/bitnami
         networks:
             log-system:
                 ipv4_address: 10.0.2.2
-        restart: unless-stopped
+        restart: no
         depends_on:
             - elasticsearch
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     kibana:
         profiles:
             - log-system
         container_name: kibana
         build:
-            context: ./requirements/kibana
-            args:
-                ELASTIC_VERSION: ${ELASTIC_VERSION}
+            context: ./services/log-system/kibana
+        environment:
+            KIBANA_VAULT_TOKEN: ${KIBANA_VAULT_TOKEN}
         volumes:
-            - ./requirements/kibana/conf/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+            - kibana:/bitnami
         ports:
             - 5601:5601
-        environment:
-            KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
         networks:
             log-system:
                 ipv4_address: 10.0.2.3
-        restart: unless-stopped
+        restart: no
         depends_on:
             - logstash
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
+    # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
     prometheus:
         profiles:
             - monitor-system
         container_name: prometheus
         build:
-            context: ./requirements/prometheus
+            context: ./services/monitor-system/prometheus
+        environment:
+            PROMETHEUS_VAULT_TOKEN: ${PROMETHEUS_VAULT_TOKEN}
         volumes:
-            - prometheus:/opt/bitnami/prometheus/
+            - prometheus:/bitnami
         ports:
             - 9090:9090
-        # environment:
-        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.1
-        restart: unless-stopped
+        restart: no
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     grafana:
         profiles:
             - monitor-system
         container_name: grafana
         build:
-            context: ./requirements/grafana
+            context: ./services/monitor-system/grafana
+        environment:
+            GRAFANA_VAULT_TOKEN: ${GRAFANA_VAULT_TOKEN}
         volumes:
-            - grafana:/var/lib/grafana
+            - grafana:/bitnami
         ports:
             - 3000:3000
-        # environment:
-        #     KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
         networks:
             monitor-system:
                 ipv4_address: 10.0.3.2
-        restart: unless-stopped
+        restart: no
+        depends_on:
+            - prometheus
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+
+    postgres-exporter:
+        profiles:
+            - monitor-system
+        container_name: postgres-exporter
+        build:
+            context: ./services/monitor-system/postgres-exporter
+        ports:
+            - "9187:9187"
+        environment:
+            POSTGRES_EXPORTER_VAULT_TOKEN: ${POSTGRES_EXPORTER_VAULT_TOKEN}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.4
+        restart: no
+        depends_on:
+            - prometheus
+        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
+    
+    nginx-exporter:
+        profiles:
+            - monitor-system
+        container_name: nginx-exporter
+        build:
+            context: ./services/monitor-system/nginx-exporter
+        ports:
+            - "9113:9113"
+        environment:
+            NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
+        networks:
+            monitor-system:
+                ipv4_address: 10.0.3.3
+        restart: no
         depends_on:
             - prometheus
 
-    # hashicorp-vault:
-    #     profiles:
-    #         - secrets
-    #     container_name: hashicorp-vault
-    #     build:
-    #         context: ./requirements/hashicorp-vault
-    #         dockerfile: Dockerfile
-    #     # environment:
-    #     # 
-    #     # volumes:
-    #     #     - postgres:/var/lib/postgresql/data
-    #     networks:
-    #         app:
-    #             ipv4_address: 10.0.0.3
-    #     logging:
-    #         driver: gelf
-    #         options:
-    #             gelf-address: "udp://10.0.4.1:50000"
-    #             tag: "postgres"
-    #     restart: always
-    
+    # PROXY-WAF-SEGMENT ------------------------------------------------------->
+    nginx:
+        profiles:
+            - proxy-waf
+        container_name: nginx
+        build:
+            context: ./services/proxy-waf/nginx
+            dockerfile: Dockerfile
+        environment:
+            NGINX_VAULT_TOKEN: ${NGINX_VAULT_TOKEN}
+        ports:
+            - "80:8080"
+            - "443:8443"
+        volumes:
+            - django_static_files:/app/pong_project/static
+        networks:
+            proxy-waf:
+                ipv4_address: 10.0.4.1
+        logging:
+            driver: gelf
+            options:
+                gelf-address: "udp://10.0.2.2:5000"
+                tag: "nginx"
+        restart: no
+
 volumes:
-    postgres:
-            
+    vault:
+        external: true
+
+    postgresql:
+
     elasticsearch:
+
+    logstash:
+
+    kibana:
 
     prometheus:
 
     grafana:
 
+    django_static_files:
+
 networks:
-    proxy-waf:
-        name: proxy-waf
+    secrets:
+        name: secrets
         driver: bridge
         ipam:
             driver: default
@@ -271,8 +281,8 @@ networks:
                 - subnet: 10.0.3.0/24
                   gateway: 10.0.3.254
 
-    secrets:
-        name: secrets
+    proxy-waf:
+        name: proxy-waf
         driver: bridge
         ipam:
             driver: default

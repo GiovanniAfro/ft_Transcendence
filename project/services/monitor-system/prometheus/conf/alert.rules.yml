@@ -1,0 +1,31 @@
+groups:
+  - name: vault
+    rules:
+      - alert: VaultDownORSealed
+        expr: up{job="vault"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Vault is down or sealed"
+          description: "Vault has been unreachable for more than 5 seconds."
+
+  - name: postgresql
+    rules:
+      - alert: PostgresIsDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "Il PostgreSQL has been unreachable for more than 5 seconds."
+        
+      - alert: PostgresExporterDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Postgres Exporter is down"
+          description: "Il Postgres Exporter has been unreachable for more than 5 seconds."

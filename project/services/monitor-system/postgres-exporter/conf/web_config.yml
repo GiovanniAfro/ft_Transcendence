@@ -1,0 +1,6 @@
+tls_server_config:
+  cert_file: "/opt/bitnami/postgres-exporter/tls/postgres-exporter.crt"
+  key_file: "/opt/bitnami/postgres-exporter/tls/postgres-exporter.key"
+  client_auth_type: "RequireAndVerifyClientCert"
+  client_ca_file: "/opt/bitnami/postgres-exporter/tls/ca.crt"
+  client_allowed_sans: ["10.0.1.2","10.0.3.1"]
