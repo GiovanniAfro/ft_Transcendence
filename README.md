@@ -133,6 +133,20 @@ Below are the security measures that have been taken to protect the infrastructu
   ```
 
 ## 📚 - References
+- Docker Images
+  - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
+  - [Nginx](https://github.com/coreruleset/modsecurity-crs-docker)
+  - [Python](https://github.com/bitnami/containers/tree/main/bitnami/python)
+  - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
+  - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)
+  - [Logstash](https://github.com/bitnami/containers/tree/main/bitnami/logstash)
+  - [Kibana](https://github.com/bitnami/containers/tree/main/bitnami/kibana)
+  - [Prometheus](https://github.com/bitnami/containers/tree/main/bitnami/prometheus)
+  - [Grafana](https://github.com/bitnami/containers/tree/main/bitnami/grafana)
+  - [Postgres-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/postgres-exporter)
+  - [Nginx-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/nginx-exporter)
+- Docker Images Bugs and Workarounds
+  - [[bitnami/postgresql] container crashes if you use a custom pg_hba.conf](https://github.com/bitnami/containers/issues/41431)
 - Log System
   - [The Complete Guide to the ELK Stack](https://logz.io/learn/complete-guide-elk-stack/#what-elk-stack)
   - [Docker ELK](https://github.com/deviantony/docker-elk)
@@ -153,18 +167,6 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Hashicorp Vault - Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
   - [Hashicorp Vault - Monitor telemetry with Prometheus & Grafana](https://developer.hashicorp.com/vault/tutorials/archive/monitor-telemetry-grafana-prometheus)
   - [Hashicorp Vault - PKI Secret Engine](https://developer.hashicorp.com/vault/api-docs/secret/pki#sign-certificate)
-- Docker Images
-  - [Vault](https://github.com/bitnami/containers/tree/main/bitnami/vault)
-  - [Nginx](https://github.com/coreruleset/modsecurity-crs-docker)
-  - [Python](https://github.com/bitnami/containers/tree/main/bitnami/python)
-  - [Postgresql](https://github.com/bitnami/containers/tree/main/bitnami/postgresql)
-  - [Elasticsearch](https://github.com/bitnami/containers/tree/main/bitnami/elasticsearch)
-  - [Logstash](https://github.com/bitnami/containers/tree/main/bitnami/logstash)
-  - [Kibana](https://github.com/bitnami/containers/tree/main/bitnami/kibana)
-  - [Prometheus](https://github.com/bitnami/containers/tree/main/bitnami/prometheus)
-  - [Grafana](https://github.com/bitnami/containers/tree/main/bitnami/grafana)
-  - [Postgres-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/postgres-exporter)
-  - [Nginx-Exporter](https://github.com/bitnami/containers/tree/main/bitnami/nginx-exporter)
 
 ## ⚖️ - License
 See [LICENSE](https://github.com/GiovanniAfro/ft_transcendence-/blob/master/LICENSE)

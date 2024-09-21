@@ -67,13 +67,13 @@ DOUBTFUL
 	[v] Collegare al log-system
 	[ ] Impostare exporter e creare dashboard tramite TLS
 
-[ ] Postgresql
+[v] Postgresql
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Aggiungere 10.0.1.1 come client (add_remote_host.sh)
 	[v] Collegare al log-system
-	[ ] Impostare exporter in TLS mode e creare dashboard
+	[v] Impostare exporter in TLS mode e creare dashboard
 
 [ ] Elasticsearch
 	[v] Usare immagine non-root

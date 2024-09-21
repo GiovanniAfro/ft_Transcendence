@@ -6,3 +6,5 @@ db.sqlite3
 *.swp
 .mypy_cache
 .venv
+project/client_host.p12
+project/setup/.tmp
