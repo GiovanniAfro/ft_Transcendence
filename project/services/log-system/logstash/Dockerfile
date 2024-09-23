@@ -7,3 +7,5 @@ RUN apt-get update && apt-get install -y curl jq
 USER 1001
 
 COPY tools/ /entrypoint/
+
+ENTRYPOINT ["bash", "-c", "source /entrypoint/entrypoint_wrapper.sh"]

@@ -16,19 +16,19 @@ if [ ! "$(ls -A /tls/certs/)" ]; then
 	echo "$certs" | jq -r '.data.ca_chain[]' > /tls/certs/ca_chain.crt
 
 	chmod 400 /tls/private/postgresql.key
-
-	envs=$(curl -k -H "X-Vault-Token: ${POSTGRESQL_VAULT_TOKEN}" \
-		-X GET https://10.0.0.1:8200/v1/secret/postgresql)
-
-	export POSTGRESQL_USERNAME=$(echo "$envs" | jq -r '.data.POSTGRESQL_USERNAME')
-	export POSTGRESQL_PASSWORD=$(echo "$envs" | jq -r '.data.POSTGRESQL_PASSWORD')
-	export POSTGRESQL_DATABASE=$(echo "$envs" | jq -r '.data.POSTGRESQL_DATABASE')
-	export POSTGRESQL_ENABLE_TLS=$(echo "$envs" | jq -r '.data.POSTGRESQL_ENABLE_TLS')
-	export POSTGRESQL_TLS_CERT_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_CERT_FILE')
-	export POSTGRESQL_TLS_KEY_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_KEY_FILE')
-	export POSTGRESQL_TLS_CA_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_CA_FILE')
-	export POSTGRESQL_EXTRA_FLAGS=$(echo "$envs" | jq -r '.data.POSTGRESQL_EXTRA_FLAGS')
 fi
+
+envs=$(curl -k -H "X-Vault-Token: ${POSTGRESQL_VAULT_TOKEN}" \
+	-X GET https://10.0.0.1:8200/v1/secret/postgresql)
+
+export POSTGRESQL_USERNAME=$(echo "$envs" | jq -r '.data.POSTGRESQL_USERNAME')
+export POSTGRESQL_PASSWORD=$(echo "$envs" | jq -r '.data.POSTGRESQL_PASSWORD')
+export POSTGRESQL_DATABASE=$(echo "$envs" | jq -r '.data.POSTGRESQL_DATABASE')
+export POSTGRESQL_ENABLE_TLS=$(echo "$envs" | jq -r '.data.POSTGRESQL_ENABLE_TLS')
+export POSTGRESQL_TLS_CERT_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_CERT_FILE')
+export POSTGRESQL_TLS_KEY_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_KEY_FILE')
+export POSTGRESQL_TLS_CA_FILE=$(echo "$envs" | jq -r '.data.POSTGRESQL_TLS_CA_FILE')
+export POSTGRESQL_EXTRA_FLAGS=$(echo "$envs" | jq -r '.data.POSTGRESQL_EXTRA_FLAGS')
 
 # Run EntryPoint -------------------------------------------------------------->
 exec $0 $@

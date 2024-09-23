@@ -87,7 +87,6 @@ services:
             log-system:
                 ipv4_address: 10.0.2.1
         restart: no
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     logstash:
         profiles:
@@ -105,7 +104,6 @@ services:
         restart: no
         depends_on:
             - elasticsearch
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     kibana:
         profiles:
@@ -125,7 +123,6 @@ services:
         restart: no
         depends_on:
             - logstash
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
     # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
     prometheus:
