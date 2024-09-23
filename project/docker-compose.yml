@@ -144,7 +144,6 @@ services:
             monitor-system:
                 ipv4_address: 10.0.3.1
         restart: no
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
 
     grafana:
         profiles:
@@ -182,7 +181,6 @@ services:
         restart: no
         depends_on:
             - prometheus
-        entrypoint: bash -c "source /entrypoint/entrypoint_wrapper.sh"
     
     nginx-exporter:
         profiles:

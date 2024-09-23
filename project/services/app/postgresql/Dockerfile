@@ -2,7 +2,10 @@ FROM bitnami/postgresql:15.8.0
 
 USER root
 
-RUN apt-get update && apt-get install -y curl jq
+RUN apt-get update && apt-get install -y curl jq && \
+	mkdir -p /tls/certs && \
+	mkdir -p /tls/private && \
+	chown -R 1001:1001 /tls
 
 USER 1001
 

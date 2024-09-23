@@ -19,7 +19,10 @@ scrape_configs:
       format: ['prometheus']
     scheme: https
     tls_config:
-      insecure_skip_verify: true
+      insecure_skip_verify: false
+      cert_file: /tls/certs/prometheus.crt
+      key_file: /tls/private/prometheus.key
+      ca_file: /tls/certs/ca.crt
     authorization:
       credentials_file: /opt/bitnami/prometheus/conf/vault-token
     static_configs:
@@ -29,12 +32,18 @@ scrape_configs:
     scheme: https
     tls_config:
       insecure_skip_verify: false
-      cert_file: /opt/bitnami/prometheus/conf/prometheus.crt
-      key_file: /opt/bitnami/prometheus/conf/prometheus.key
-      ca_file: /opt/bitnami/prometheus/conf/ca.crt
+      cert_file: /tls/certs/prometheus.crt
+      key_file: /tls/private/prometheus.key
+      ca_file: /tls/certs/ca.crt
     static_configs:
       - targets: ['10.0.3.4:9187']
-
-  - job_name: "nginx-exporter"
+  
+  - job_name: 'nginx-exporter'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: false
+      cert_file: /tls/certs/prometheus.crt
+      key_file: /tls/private/prometheus.key
+      ca_file: /tls/certs/ca.crt
     static_configs:
-      - targets: ["10.0.3.5:9113"]
+      - targets: ['10.0.3.3:9113']
