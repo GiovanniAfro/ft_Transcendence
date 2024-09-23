@@ -3,23 +3,29 @@
 set -ex
 
 # Get Certs and Secrets from Vault -------------------------------------------->
-certs=$(curl -s -k -H "X-Vault-Token: $GRAFANA_VAULT_TOKEN" -X POST -d '{
-		"common_name": "grafana.ft-transcendence.42",
-		"ttl": "24h",
-		"ip_sans": "10.0.3.2"
-	}' https://10.0.0.1:8200/v1/pki_int/issue/grafana)
+if [ ! "$(ls -A /tls/certs/)" ]; then
+	certs=$(curl -s -k -H "X-Vault-Token: $GRAFANA_VAULT_TOKEN" -X POST -d '{
+			"common_name": "grafana.ft-transcendence.42",
+			"ttl": "24h",
+			"ip_sans": "10.0.3.2"
+		}' https://10.0.0.1:8200/v1/pki_int/issue/grafana)
 
-echo "$certs" | jq -r '.data.certificate' > /opt/bitnami/grafana/conf/grafana.crt
-echo "$certs" | jq -r '.data.private_key' > /opt/bitnami/grafana/conf/grafana.key
-echo "$certs" | jq -r '.data.issuing_ca' > /opt/bitnami/grafana/conf/ca.crt
+	echo "$certs" | jq -r '.data.certificate' > /tls/certs/grafana.crt
+	echo "$certs" | jq -r '.data.private_key' > /tls/private/grafana.key
+	echo "$certs" | jq -r '.data.issuing_ca' > /tls/certs/ca.crt
 
-env=$(curl -s -k -H "X-Vault-Token: ${GRAFANA_VAULT_TOKEN}" \
-	-X GET https://10.0.0.1:8200/v1/secret/grafana)
+	chmod 400 /tls/private/grafana.key
+
+	envs=$(curl -s -k -H "X-Vault-Token: ${GRAFANA_VAULT_TOKEN}" \
+		-X GET https://10.0.0.1:8200/v1/secret/grafana)
+
+	export GF_SECURITY_ADMIN_USER=$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_USER')
+	export GF_SECURITY_ADMIN_PASSWORD=$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')
+	export DS_PROMETHEUS=$(echo "$envs" | jq -r '.data.DS_PROMETHEUS')
+fi
 
 # Run EntryPoint in Background ------------------------------------------------>
-GF_SECURITY_ADMIN_USER=$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_USER') \
-GF_SECURITY_ADMIN_PASSWORD=$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD') \
-/opt/bitnami/scripts/grafana/entrypoint.sh /opt/bitnami/scripts/grafana/run.sh &
+exec $0 $@ &
 
 # Wait for Grafana ------------------------------------------------------------>
 while ! curl -k -o /dev/null -s -H --fail https://10.0.3.2:3000; do
@@ -28,8 +34,7 @@ while ! curl -k -o /dev/null -s -H --fail https://10.0.3.2:3000; do
 done
 
 # Set Data Source ------------------------------------------------------------->
-auth="$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_USER'):$(echo "$env" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')"
-
+auth="$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_USER'):$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')"
 tlsCACert=$(echo "$certs" | jq -r '.data.issuing_ca' | sed ':a;N;$!ba;s/\n/\\n/g')
 tlsClientCert=$(echo "$certs" | jq -r '.data.certificate' | sed ':a;N;$!ba;s/\n/\\n/g')
 tlsClientKey=$(echo "$certs" | jq -r '.data.private_key' | sed ':a;N;$!ba;s/\n/\\n/g')
@@ -64,8 +69,6 @@ endpoint="https://10.0.3.2:3000/api/dashboards/db"
 
 for FILE in "$dashboard_path"/*.json; do
      dashboard_json=$(cat "$FILE")
-    #  filename=$(basename "$FILE" .json)
-
      curl -k -X POST "$endpoint" \
           -H "Content-Type: application/json" \
           -u "$auth" \

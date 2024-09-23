@@ -52,7 +52,7 @@ DOUBTFUL
 		[v] Creare certificati per i container
 		[v] Importare segreti
 		[v] Settare TLS mode
-		[v] Settare mutua autenticazione tls con client
+		[v] Settare mtls con client
 	[v] Collegare al log-system
 	[v] Esportare metriche e creare dashboard
 
@@ -80,7 +80,7 @@ DOUBTFUL
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare password login
-		[ ] Settare mutua autenticazione tls con client
+		[ ] Settare mtls con client
 
 [v] Logstash
 	[v] Usare immagine non-root
@@ -88,13 +88,12 @@ DOUBTFUL
 	[v] Configurare servizio
 		[v] ssl output elasticsearch
 
-[ ] Kibana
+[v] Kibana
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare HTTPS e TLS
 		[v] Settare dataview di defualt per pattern log*
-		[ ] Settare mutua autenticazione tls con client
 
 [ ] Prometheus
 	[v] Usare immagine non-root
@@ -105,7 +104,7 @@ DOUBTFUL
 		[v] Settare autorizazione TLS da webclient
 		[v] Settare HTTPS
 		[v] Settare data retention
-		[v] Settare mutua autenticazione tls con client
+		[v] Settare mtls con client
 		[ ] Hashare credenziali in web.yml
 
 [v] Grafana
@@ -116,12 +115,12 @@ DOUBTFUL
 		[v] Settare autenticazione grafana
 		[v] Settare HTTPS
 	
-[ ] Nginx
+[v] Nginx
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[v] Configurare servizio
 		[v] Settare HTTPS
 		[v] Settare modsecurity
-		[v] Settare mutua autenticazione tls con client
+		[v] Settare mtls con client
 	[v] Collegare al log-system
-	[ ] Impostare exporter in TLS mode e creare dashboard
+	[v] Impostare exporter in TLS mode e creare dashboard
