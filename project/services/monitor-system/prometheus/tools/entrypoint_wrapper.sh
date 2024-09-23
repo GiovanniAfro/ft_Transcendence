@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -ex
+set -e
 
 # Get Certs from Vault -------------------------------------------------------->
 if [ ! "$(ls -A /tls/certs/)" ]; then

@@ -3,34 +3,34 @@
 set -x
 
 # Get Certs and Secrets from Vault -------------------------------------------->
-certs=$(curl -k -H "X-Vault-Token: $PYTHON_VAULT_TOKEN" -X POST -d '{
-		"common_name": "python.ft-transcendence.42",
-		"ip_sans": "10.0.1.1",
-		"ttl": "24h"
-	}' https://10.0.0.1:8200/v1/pki_int/issue/python)
+if [ ! "$(ls -A /tls/certs)"]; then
+    certs=$(curl -k -H "X-Vault-Token: $PYTHON_VAULT_TOKEN" -X POST -d '{
+            "common_name": "python.ft-transcendence.42",
+            "ip_sans": "10.0.1.1",
+            "ttl": "24h"
+        }' https://10.0.0.1:8200/v1/pki_int/issue/python)
 
-mkdir -p /app/tls
+    echo "$certs" | jq -r '.data.certificate' > /tls/certs/python.crt
+    echo "$certs" | jq -r '.data.private_key' > /tls/private/python.key
+    echo "$certs" | jq -r '.data.issuing_ca' > /tls/certs/ca.crt
+    echo "$certs" | jq -r '.data.ca_chain[]' > /tls/certs/ca_chain.crt
 
-echo "$certs" | jq -r '.data.certificate' > /app/tls/python.crt
-echo "$certs" | jq -r '.data.private_key' > /app/tls/python.key
-echo "$certs" | jq -r '.data.issuing_ca' > /app/tls/ca.crt
-echo "$certs" | jq -r '.data.ca_chain[]' > /app/tls/ca_chain.crt
+    chmod 400 /tls/private/python.key
 
-chmod 600 /app/tls/python.key
+    envs=$(curl -k -H "X-Vault-Token: ${PYTHON_VAULT_TOKEN}" \
+        -X GET https://10.0.0.1:8200/v1/secret/python)
 
-env=$(curl -k -H "X-Vault-Token: ${PYTHON_VAULT_TOKEN}" \
-	-X GET https://10.0.0.1:8200/v1/secret/python)
-
-export PYTHONPATH=$(echo "$env" | jq -r '.data.PYTHONPATH')
-export DB_HOST=$(echo "$env" | jq -r '.data.DB_HOST')
-export DB_PORT=$(echo "$env" | jq -r '.data.DB_PORT')
-export DB_NAME=$(echo "$env" | jq -r '.data.DB_NAME')
-export DB_USER=$(echo "$env" | jq -r '.data.DB_USER')
-export DB_PASSWORD=$(echo "$env" | jq -r '.data.DB_PASSWORD')
-export DB_TLS=$(echo "$env" | jq -r '.data.DB_TLS')
-export TLS_CERT_FILE=$(echo "$env" | jq -r '.data.TLS_CERT_FILE')
-export TLS_KEY_FILE=$(echo "$env" | jq -r '.data.TLS_KEY_FILE')
-export TLS_CA_FILE=$(echo "$env" | jq -r '.data.TLS_CA_FILE')
+    export PYTHONPATH=$(echo "$envs" | jq -r '.data.PYTHONPATH')
+    export DB_HOST=$(echo "$envs" | jq -r '.data.DB_HOST')
+    export DB_PORT=$(echo "$envs" | jq -r '.data.DB_PORT')
+    export DB_NAME=$(echo "$envs" | jq -r '.data.DB_NAME')
+    export DB_USER=$(echo "$envs" | jq -r '.data.DB_USER')
+    export DB_PASSWORD=$(echo "$envs" | jq -r '.data.DB_PASSWORD')
+    export DB_TLS=$(echo "$envs" | jq -r '.data.DB_TLS')
+    export TLS_CERT_FILE=$(echo "$envs" | jq -r '.data.TLS_CERT_FILE')
+    export TLS_KEY_FILE=$(echo "$envs" | jq -r '.data.TLS_KEY_FILE')
+    export TLS_CA_FILE=$(echo "$envs" | jq -r '.data.TLS_CA_FILE')
+fi
 
 # Waiting for the availability of Postgresql ---------------------------------->
 success_msg="Connection to $DB_HOST $DB_PORT port [tcp/*] succeeded!"

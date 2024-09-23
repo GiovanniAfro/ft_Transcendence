@@ -5,6 +5,8 @@ COPY tools/ /entrypoint/
 
 RUN apt-get update && apt-get install -y curl jq netcat-openbsd && \
 	pip install --no-cache-dir --upgrade pip && \
-	pip install --no-cache-dir -r requirements.txt
+	pip install --no-cache-dir -r requirements.txt && \
+	mkdir -p /tls/certs && \
+	mkdir -p /tls/private
 
 ENTRYPOINT ["bash", "-c", "source /entrypoint/entrypoint_wrapper.sh"]

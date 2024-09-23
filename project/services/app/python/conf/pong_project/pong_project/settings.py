@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',
     'two_factor',
+    'django_prometheus',
 ]
 
 ASGI_APPLICATION = 'pong_project.asgi.application'
@@ -141,6 +142,8 @@ MIDDLEWARE = [
     'accounts.middleware.UpdateLastActivityMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 LOGIN_URL = 'two_factor:login'

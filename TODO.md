@@ -56,7 +56,7 @@ DOUBTFUL
 	[v] Collegare al log-system
 	[v] Esportare metriche e creare dashboard
 
-[ ] Django
+[v] Django
 	[v] Usare immagine non-root
 	[v] Prendere segreti da vault
 	[ ] Configurare servizio
@@ -65,7 +65,7 @@ DOUBTFUL
 		[v] Abilitare TLS tra postgres e django
 		[v] Esporre tramite Nginx
 	[v] Collegare al log-system
-	[ ] Impostare exporter e creare dashboard tramite TLS
+	[v] Impostare exporter e creare dashboard tramite TLS
 
 [v] Postgresql
 	[v] Usare immagine non-root

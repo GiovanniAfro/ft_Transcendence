@@ -9,6 +9,17 @@ groups:
         annotations:
           summary: "Vault is down or sealed"
           description: "Vault has been unreachable for more than 5 seconds."
+  
+  - name: django
+    rules:
+      - alert: DjangoIsDown
+        expr: up{job="python"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Django is down"
+          description: "Django has not processed any HTTP requests in the last 5 seconds."
 
   - name: postgresql
     rules:

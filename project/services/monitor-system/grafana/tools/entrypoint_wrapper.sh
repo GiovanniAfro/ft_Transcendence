@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -ex
+set -e
 
 # Get Certs and Secrets from Vault -------------------------------------------->
 if [ ! "$(ls -A /tls/certs/)" ]; then
@@ -21,7 +21,6 @@ if [ ! "$(ls -A /tls/certs/)" ]; then
 
 	export GF_SECURITY_ADMIN_USER=$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_USER')
 	export GF_SECURITY_ADMIN_PASSWORD=$(echo "$envs" | jq -r '.data.GF_SECURITY_ADMIN_PASSWORD')
-	export DS_PROMETHEUS=$(echo "$envs" | jq -r '.data.DS_PROMETHEUS')
 fi
 
 # Run EntryPoint in Background ------------------------------------------------>

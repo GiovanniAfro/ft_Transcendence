@@ -161,11 +161,12 @@ Below are the security measures that have been taken to protect the infrastructu
   - [Set up Grafana HTTPS for secure web traffic](https://grafana.com/docs/grafana/latest/setup-grafana/set-up-https/)
   - [How to secure Grafana?](https://www.squadcast.com/questions/how-to-secure-grafana)
   - [Provision Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/)
+  - [Monitor Vault telemetry with Prometheus & Grafana](https://developer.hashicorp.com/vault/tutorials/archive/monitor-telemetry-grafana-prometheus)
+  - [Monitoring Your Django Project with Prometheus and Grafana](https://medium.com/@tommyraspati/monitoring-your-django-project-with-prometheus-and-grafana-b06a5ca78744)
 - Secrets
   - [Hashicorp Vault - Tutorials](https://developer.hashicorp.com/vault/tutorials)
   - [Hashicorp Vault - Documentation](https://developer.hashicorp.com/vault/docs)
   - [Hashicorp Vault - Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
-  - [Hashicorp Vault - Monitor telemetry with Prometheus & Grafana](https://developer.hashicorp.com/vault/tutorials/archive/monitor-telemetry-grafana-prometheus)
   - [Hashicorp Vault - PKI Secret Engine](https://developer.hashicorp.com/vault/api-docs/secret/pki#sign-certificate)
 
 ## ⚖️ - License
