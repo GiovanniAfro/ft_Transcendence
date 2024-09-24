@@ -8,8 +8,10 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Create Setup Container ------------------------------------------------------>
+echo -e "\n$BLUE[+] Creating a container for vault setup"
 # Create TMP Directory ------------------------------------------------------->>
 mkdir -p setup/.tmp
+echo -e "$BLUE    - Created$WHITE_B .tmp$BLUE directoy"
 
 # Create Network ------------------------------------------------------------->>
 docker network inspect secrets >/dev/null 2>&1 || docker network create \
@@ -18,8 +20,11 @@ docker network inspect secrets >/dev/null 2>&1 || docker network create \
 	--gateway 10.0.0.254 \
 	secrets > /dev/null
 
+echo -e "$BLUE    - Created$WHITE_B secrets$BLUE network"
+
 # Create Volume -------------------------------------------------------------->>
 docker volume create vault > /dev/null
+echo -e "$BLUE    - Created$WHITE_B vault$BLUE volume"
 
 # Create Container ----------------------------------------------------------->>
 docker create \
@@ -33,21 +38,30 @@ docker create \
 	--entrypoint "vault" \
 	bitnami/vault:1.17.5 server -config=/tmp/setup_vault.json > /dev/null 2>&1
 
+echo -e "$BLUE    - Created$WHITE_B vault-setup$BLUE container"
+
 # Copy Configfile ------------------------------------------------------------>>
 docker cp setup/setup_vault.json vault-setup:/tmp/setup_vault.json > /dev/null
+echo -e "$BLUE    - Copy$WHITE_B setup/setup_vault.json$BLUE to$WHITE_B vault-setup:/tmp/setup_vault.json"
 
 # Start Container ------------------------------------------------------------>>
 docker start vault-setup > /dev/null
+echo -e "$BLUE    - Started$WHITE_B vault-setup$BLUE container"
 
 # Change Ownership of Volume ------------------------------------------------->>
 docker exec --user=root vault-setup chown -R vault:root /bitnami/vault \
 	> /dev/null
 
+echo -e "$BLUE    - Changed ownership of$WHITE_B vault-setup$BLUE container to$WHITE_B vault:root"
+
 # Install Utilities ---------------------------------------------------------->>
 docker exec --user=root vault-setup apt-get update > /dev/null 2>&1 \
 	&& apt-get install -y jq > /dev/null 2>&1
 
+echo -e "$BLUE    - Installed utilities to$WHITE_B vault-setup$BLUE container"
+
 # Initialize Vault ------------------------------------------------------------>
+echo -e "\n$BLUE[+] Vault initialization"
 # Get Unseal Keys and Root Token --------------------------------------------->>
 keys=$(docker exec vault-setup vault operator init)
 key1=$(echo "$keys" | grep 'Unseal Key 1:' | awk '{print $4}')
@@ -57,21 +71,22 @@ key4=$(echo "$keys" | grep 'Unseal Key 4:' | awk '{print $4}')
 key5=$(echo "$keys" | grep 'Unseal Key 5:' | awk '{print $4}')
 root_token=$(echo "$keys" | grep 'Initial Root Token:' | awk '{print $4}')
 
-echo -e "\n$BLUE[+] Vault initialized. Here are the keys and the root token:"
-echo -e "$BLUE    - UNSEAL KEY 1: $WHITE_B$key1"
-echo -e "$BLUE    - UNSEAL KEY 2: $WHITE_B$key2"
-echo -e "$BLUE    - UNSEAL KEY 3: $WHITE_B$key3"
-echo -e "$BLUE    - UNSEAL KEY 4: $WHITE_B$key4"
-echo -e "$BLUE    - UNSEAL KEY 5: $WHITE_B$key5"
-echo -e "$BLUE    - ROOT TOKEN:   $WHITE_B$root_token"
+echo -e "$BLUE    - Vault initialized. Here are the keys and the root token:"
+echo -e "$BLUE        - UNSEAL KEY 1: $WHITE_B$key1"
+echo -e "$BLUE        - UNSEAL KEY 2: $WHITE_B$key2"
+echo -e "$BLUE        - UNSEAL KEY 3: $WHITE_B$key3"
+echo -e "$BLUE        - UNSEAL KEY 4: $WHITE_B$key4"
+echo -e "$BLUE        - UNSEAL KEY 5: $WHITE_B$key5"
+echo -e "$BLUE        - ROOT TOKEN:   $WHITE_B$root_token"
 
 # Unseal Vault --------------------------------------------------------------->>
 docker exec vault-setup vault operator unseal $key1 > /dev/null 2>&1
 docker exec vault-setup vault operator unseal $key2 > /dev/null 2>&1
 docker exec vault-setup vault operator unseal $key3 > /dev/null 2>&1
-echo -e "\n$BLUE[+] The vault has been unsealed"
+echo -e "$BLUE    - The vault has been unsealed"
 
 # Generate Root CA ------------------------------------------------------------>
+echo -e "\n$BLUE[+] Creating Root CA"
 # Enable PKI Engine for Root CA Certificate ---------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault secrets enable -path=pki pki > /dev/null
@@ -79,7 +94,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault secrets tune -max-lease-ttl=87600h pki > /dev/null
 
-echo -e "\n$BLUE[+] Enabled the pki secrets engine for root CA at:$WHITE_B pki/"
+echo -e "$BLUE    - Enabled the pki secrets engine for root CA at:$WHITE_B pki/"
 
 # Generate Root CA Certificate ----------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -87,13 +102,13 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	common_name="ft-transcendence.42" issuer_name="root-2024" ttl=87600h \
 	> /dev/null
 
-echo -e "\n$BLUE[+] Generated root CA certificate"
+echo -e "$BLUE    - Generated root CA certificate"
 
 # Create a Role for the Root CA ---------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki/roles/2024-servers allow_any_name=true > /dev/null
 
-echo -e "\n$BLUE[+] Created a role for the root CA"
+echo -e "$BLUE    - Created a role for the root CA"
 
 # Set Endpoint for CA and CRL ------------------------------------------------>>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -101,11 +116,12 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	issuing_certificates="https://10.0.0.1:8200/v1/pki/ca" \
 	crl_distribution_points="https://10.0.0.1:8200/v1/pki/crl" > /dev/null
 
-echo -e "\n$BLUE[+] Configured endpoints for CA certificates:\n \
-   - crl_distribution_points:$WHITE_B https://10.0.0.1:8200/v1/pki/crl$BLUE\n \
-   - issuing_certificates:$WHITE_B    https://10.0.0.1:8200/v1/pki/ca"
+echo -e "$BLUE    - Configured endpoints for CA certificates:\n \
+       - crl_distribution_points:$WHITE_B https://10.0.0.1:8200/v1/pki/crl$BLUE\n \
+       - issuing_certificates:$WHITE_B    https://10.0.0.1:8200/v1/pki/ca"
 
 # Generate Intermediate CA ---------------------------------------------------->
+echo -e "\n$BLUE[+] Creating Intermediate CA"
 # Create TLS and Config Directories ------------------------------------------>>
 docker exec vault-setup mkdir -p /bitnami/vault/tls
 docker exec vault-setup mkdir -p /bitnami/vault/config
@@ -117,7 +133,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault secrets tune -max-lease-ttl=43800h pki_int > /dev/null
 
-echo -e "\n$BLUE[+] Enabled the pki secrets engine for intermediate CA at:$WHITE_B pki_int/"
+echo -e "$BLUE    - Enabled the pki secrets engine for intermediate CA at:$WHITE_B pki_int/"
 
 # Generate CSR for Intermediate CA Certificate ------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -129,7 +145,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker cp setup/.tmp/pki_intermediate.csr \
 	vault-setup:/tmp/pki_intermediate.csr > /dev/null
 
-echo -e "\n$BLUE[+] Generated CSR for intermediate CA certificate"
+echo -e "$BLUE    - Generated CSR for intermediate CA certificate"
 
 # Sign the Intermediate Certificate with the Root CA ------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -142,7 +158,7 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 docker cp setup/.tmp/intermediate.cert.pem \
 	vault-setup:/bitnami/vault/tls/intermediate.cert.pem > /dev/null
 
-echo -e "\n$BLUE[+] Signed intermediate CA with root CA private key"
+echo -e "$BLUE    - Signed intermediate CA with root CA private key"
 
 # Set Endpoint for CA and CRL ------------------------------------------------>>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -150,16 +166,16 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	issuing_certificates="https://10.0.0.1:8200/v1/pki_int/ca" \
 	crl_distribution_points="https://10.0.0.1:8200/v1/pki_int/crl" > /dev/null
 
-echo -e "\n$BLUE[+] Configured endpoints for CA certificates:\n \
-   - crl_distribution_points:$WHITE_B https://10.0.0.1:8200/v1/pki_int/crl$BLUE\n \
-   - issuing_certificates:$WHITE_B    https://10.0.0.1:8200/v1/pki_int/ca"
+echo -e "$BLUE    - Configured endpoints for CA certificates:\n \
+       - crl_distribution_points:$WHITE_B https://10.0.0.1:8200/v1/pki_int/crl$BLUE\n \
+       - issuing_certificates:$WHITE_B    https://10.0.0.1:8200/v1/pki_int/ca"
 
 # Import signed Intermediate CA Certificate into vault ----------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/intermediate/set-signed \
 	certificate=@/bitnami/vault/tls/intermediate.cert.pem > /dev/null
 
-echo -e "\n$BLUE[+] Import signed intermediate CA certificate"
+echo -e "$BLUE    - Import signed intermediate CA certificate"
 
 # Create a Role for the Intermediate CA -------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
@@ -168,9 +184,9 @@ docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	allow_subdomains=true\
 	max_ttl="720h" > /dev/null
 
-echo -e "\n$BLUE[+] Created a role for the intermediate CA"
+echo -e "$BLUE    - Created a role for the intermediate CA"
 
-# Create TLS Certificates for vault ------------------------------------------>>
+# Create TLS Certificates for vault ------------------------------------------->
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write -format=json pki_int/issue/ft-transcendence-42 \
 	common_name="vault.ft-transcendence.42" ip_sans="10.0.0.1" ttl="24h"\
@@ -181,118 +197,58 @@ jq -r '.data.private_key' setup/.tmp/vault-cert.json > setup/.tmp/vault.key
 docker cp setup/.tmp/vault.crt vault-setup:/bitnami/vault/tls/vault.crt > /dev/null
 docker cp setup/.tmp/vault.key vault-setup:/bitnami/vault/tls/vault.key > /dev/null
 echo -e "\n$BLUE[+] Created certificates for vault-setup"
+
 docker cp services/secrets/vault/conf/vault.hcl \
 	vault-setup:/bitnami/vault/config/vault.hcl > /dev/null
 
 # Import Secrets -------------------------------------------------------------->
+echo -e "\n$BLUE[+] Import secrets" 
 # Enable KV Secrets Engine --------------------------------------------------->>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault secrets enable -path=secret kv >/dev/null 2>&1
 
-echo -e "\n$BLUE[+] Enabled the kv secrets engine at:$WHITE_B secret/"
+echo -e "$BLUE    - Enabled the kv secrets engine at:$WHITE_B secret/"
 
 # Import Secrets to Vault ---------------------------------------------------->>
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/python - <<< \
-	$(jq -r '.python' ./.env.json) > /dev/null
+containers=("python" "postgresql" "elasticsearch" "logstash" "kibana" "grafana" 
+	"postgres-exporter" "nginx-exporter")
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/postgresql - <<< \
-	$(jq -r '.postgresql' ./.env.json) > /dev/null
+echo -e "$BLUE - Import secrets to vault:"
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/elasticsearch - <<< \
-	$(jq -r '.elasticsearch' ./.env.json) > /dev/null
+for container in "${containers[@]}"; do
+	docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
+		vault kv put secret/$container - \
+		<<< "$(jq -r ".${container//-/_}" ./.env.json)" > /dev/null
+    echo -e "$BLUE    - Add$WHITE_B ${container//-/_}$BLUE secrets at $WHITE_B/secret/$container"
+done
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/logstash - <<< \
-	$(jq -r '.logstash' ./.env.json) > /dev/null
+# Create Roles ---------------------------------------------------------------->
+declare -A roles
+roles=(
+    ["python"]="python.ft-transcendence.42"
+    ["postgresql"]="postgresql.ft-transcendence.42"
+    ["elasticsearch"]="elasticsearch.ft-transcendence.42"
+    ["kibana"]="kibana.ft-transcendence.42"
+    ["prometheus"]="prometheus.ft-transcendence.42"
+    ["grafana"]="grafana.ft-transcendence.42"
+    ["postgres-exporter"]="postgres-exporter.ft-transcendence.42"
+    ["nginx-exporter"]="nginx-exporter.ft-transcendence.42"
+    ["nginx"]="ft-transcendence.42"
+)
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/kibana - <<< \
-	$(jq -r '.kibana' ./.env.json) > /dev/null
+echo -e "\n$BLUE[+] Creating roles:"
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/grafana - <<< \
-	$(jq -r '.grafana' ./.env.json) > /dev/null
+for role in "${!roles[@]}"; do
+    allowed_domain="${roles[$role]}"
+    docker exec -e VAULT_TOKEN=$root_token vault-setup \
+        vault write pki_int/roles/$role \
+        allowed_domains="$allowed_domain" \
+        allow_subdomains=false allow_bare_domains=true \
+        max_ttl="24h" > /dev/null
+	echo -e "$BLUE    - Created role for$WHITE_B $role$BLUE with domain$WHITE_B $allowed_domain"
+done
 
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/postgres-exporter - <<< \
-	$(jq -r '.postgres_exporter' ./.env.json) > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token -i vault-setup \
-	vault kv put secret/nginx-exporter - <<< \
-	$(jq -r '.nginx_exporter' ./.env.json) > /dev/null
-
-echo -e "\n$BLUE[+] Import secrets to vault:\n\
-    $BLUE- Add$WHITE_B python$BLUE secrets at $WHITE_B/secret/python\n\
-    $BLUE- Add$WHITE_B postgresql$BLUE secrets at $WHITE_B/secret/postgresql\n\
-    $BLUE- Add$WHITE_B elasticsearch$BLUE secrets at $WHITE_B/secret/elasticsearch\n\
-    $BLUE- Add$WHITE_B logstash$BLUE secrets at $WHITE_B/secret/logstash\n\
-    $BLUE- Add$WHITE_B kibana$BLUE secrets at $WHITE_B/secret/kibana\n\
-    $BLUE- Add$WHITE_B prometheus$BLUE secrets at $WHITE_B/secret/prometheus\n\
-    $BLUE- Add$WHITE_B grafana$BLUE secrets at $WHITE_B/secret/grafana\n\
-    $BLUE- Add$WHITE_B postgres-exporter$BLUE secrets at $WHITE_B/secret/postgres-exporter\n\
-    $BLUE- Add$WHITE_B nginx-exporter$BLUE secrets at $WHITE_B/secret/nginx-exporter\n\
-    $BLUE- Add$WHITE_B nginx$BLUE secrets at $WHITE_B/secret/nginx"
-
-# Authentication from Containers ---------------------------------------------->
-# Create Roles --------------------------------------------------------------->>
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/python \
-	allowed_domains="python.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/postgresql \
-	allowed_domains="postgresql.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/elasticsearch \
-	allowed_domains="elasticsearch.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/kibana \
-	allowed_domains="kibana.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/prometheus \
-	allowed_domains="prometheus.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/grafana \
-	allowed_domains="grafana.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/postgres-exporter \
-	allowed_domains="postgres-exporter.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/nginx-exporter \
-	allowed_domains="nginx-exporter.ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault write pki_int/roles/nginx \
-	allowed_domains="ft-transcendence.42" \
-	allow_subdomains=false allow_bare_domains=true \
-	max_ttl="24h" > /dev/null
-
-# Create Policies ------------------------------------------------------------>>
+# Create Policies ------------------------------------------------------------->
 echo -e "\n$BLUE[+] Creating policies:"
 
 for policy_file in services/secrets/vault/conf/*-policy.hcl; do
@@ -302,97 +258,65 @@ for policy_file in services/secrets/vault/conf/*-policy.hcl; do
 	docker exec -e VAULT_TOKEN=$root_token vault-setup \
 		vault policy write ${file_name::-4} /bitnami/vault/config/$file_name \
 		> /dev/null
-	echo -e "$BLUE    -$WHITE_B ${file_name::-4}"   
+	echo -e "$BLUE    - add$WHITE_B ${file_name::-4}"   
 done
 
-# Create Tokens -------------------------------------------------------------->>
-python_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="python-policy" -format=json \
-	| jq -r .auth.client_token)
+# Create Tokens --------------------------------------------------------------->
+declare -A policies=(
+    ["python"]="python-policy"
+    ["postgresql"]="postgresql-policy"
+    ["elasticsearch"]="elasticsearch-policy"
+    ["logstash"]="logstash-policy"
+    ["kibana"]="kibana-policy"
+    ["prometheus"]="prometheus-policy"
+    ["grafana"]="grafana-policy"
+    ["postgres-exporter"]="postgres-exporter-policy"
+    ["nginx-exporter"]="nginx-exporter-policy"
+    ["nginx"]="nginx-policy"
+)
 
-postgresql_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="postgresql-policy" -format=json \
-	| jq -r .auth.client_token)
+declare -A tokens
 
-elasticsearch_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="elasticsearch-policy" -format=json \
-	| jq -r .auth.client_token)
+echo -e "\n$BLUE[+] Creating tokens with access to:"
 
-logstash_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="logstash-policy" -format=json \
-	| jq -r .auth.client_token)
-
-kibana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="kibana-policy" -format=json \
-	| jq -r .auth.client_token)
-
-prometheus_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="prometheus-policy" -format=json \
-	| jq -r .auth.client_token)
-
-grafana_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="grafana-policy" -format=json \
-	| jq -r .auth.client_token)
-
-postgres_exporter_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="postgres-exporter-policy" -format=json \
-	| jq -r .auth.client_token)
-
-nginx_exporter_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="nginx-exporter-policy" -format=json \
-	| jq -r .auth.client_token)
-
-nginx_vault_token=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
-	vault token create -policy="nginx-policy" -format=json \
-	| jq -r .auth.client_token)
-
-echo -e "\n$BLUE[+] Creating tokens with access to:\n\
-    $WHITE_B/secret/python$BLUE: $WHITE_B$python_vault_token\n\
-    $WHITE_B/secret/postgresql$BLUE: $WHITE_B$postgresql_vault_token\n\
-    $WHITE_B/secret/elasticsearch$BLUE: $WHITE_B$elasticsearch_vault_token\n\
-    $WHITE_B/secret/logstash$BLUE: $WHITE_B$logstash_vault_token\n\
-    $WHITE_B/secret/kibana$BLUE: $WHITE_B$kibana_vault_token\n\
-    $WHITE_B/secret/prometheus$BLUE: $WHITE_B$prometheus_vault_token\n\
-    $WHITE_B/secret/grafana$BLUE: $WHITE_B$grafana_vault_token\n\
-    $WHITE_B/secret/postgres-exporter$BLUE: $WHITE_B$postgres_exporter_vault_token\n\
-    $WHITE_B/secret/nginx-exporter$BLUE: $WHITE_B$nginx_exporter_vault_token\n\
-    $WHITE_B/secret/nginx$BLUE: $WHITE_B$nginx_vault_token"
-
-# Put tokens to .env --------------------------------------------------------->>
-echo -e "PYTHON_VAULT_TOKEN=$python_vault_token" >> .env
-echo -e "POSTGRESQL_VAULT_TOKEN=$postgresql_vault_token" >> .env
-echo -e "ELASTICSEARCH_VAULT_TOKEN=$elasticsearch_vault_token" >> .env
-echo -e "LOGSTASH_VAULT_TOKEN=$logstash_vault_token" >> .env
-echo -e "KIBANA_VAULT_TOKEN=$kibana_vault_token" >> .env
-echo -e "PROMETHEUS_VAULT_TOKEN=$prometheus_vault_token" >> .env
-echo -e "GRAFANA_VAULT_TOKEN=$grafana_vault_token" >> .env
-echo -e "POSTGRES_EXPORTER_VAULT_TOKEN=$postgres_exporter_vault_token" >> .env
-echo -e "NGINX_EXPORTER_VAULT_TOKEN=$nginx_exporter_vault_token" >> .env
-echo -e "NGINX_VAULT_TOKEN=$nginx_vault_token" >> .env
+for service in "${!policies[@]}"; do
+    policy="${policies[$service]}"
+    tokens[$service]=$(docker exec -e VAULT_TOKEN=$root_token vault-setup \
+        vault token create -policy="$policy" -format=json | jq -r .auth.client_token)
+    echo -e "    $WHITE_B/secret/$service$BLUE: $WHITE_B${tokens[$service]}"
+	service_format="${service//-/_}"
+	service_format="${service_format^^}"
+    echo -e "${service_format}_VAULT_TOKEN=${tokens[$service]}" >> .env
+done
 
 # Create Client Certificate for host------------------------------------------->
+echo -e "\n$BLUE[+] Creating certificate for host"
 ## Create role for host ------------------------------------------------------>>
 docker exec -e VAULT_TOKEN=$root_token vault-setup \
 	vault write pki_int/roles/host-client \
 	allow_any_name=true \
 	max_ttl="24h" > /dev/null
 
+echo -e "$BLUE    - Created role for$WHITE_B host-client $NC"
+
 ## Create certificate for host ----------------------------------------------->>
-response=$(curl -k -X POST \
+response=$(curl -k -s -o -X POST \
 	-H "X-Vault-Token: $root_token" \
 	-H "Content-Type: application/json" \
 	-d '{
 		"common_name": "host-client",
 		"ttl": "24h"
-	}' http://10.0.0.1:8200/v1/pki_int/issue/host-client)> /dev/null 2>&1
+	}' http://10.0.0.1:8200/v1/pki_int/issue/host-client)
 
-## Extract certificate, key and ca ------------------------------------------->>
+echo -e "$BLUE    - Created certifcate for$WHITE_B host-client$NC"
+
+## Create a keystore --------------------------------------------------------->>
 echo "$response" | jq -r '.data.certificate' > setup/.tmp/host-client.crt
 echo "$response" | jq -r '.data.private_key' > setup/.tmp/host-client.key
 echo "$response" | jq -r '.data.ca_chain[0]' > setup/.tmp/host-client-ca.crt
 
-## Create a keystore --------------------------------------------------------->>
-openssl pkcs12 -export \
+openssl pkcs12 \
+	-export \
     -in setup/.tmp/host-client.crt \
     -inkey setup/.tmp/host-client.key \
     -out client_host.p12 \
@@ -400,7 +324,11 @@ openssl pkcs12 -export \
     -CAfile setup/.tmp/host-client-ca.crt \
     -caname root
 
+echo -e "$BLUE    - Created keystore at$WHITE_B project/client_host.p12"
+
 # Cleanup --------------------------------------------------------------------->
+echo -e "\n$BLUE[+] Clenaup"
+
 docker container stop vault-setup >/dev/null
 docker container rm vault-setup >/dev/null
 docker network rm secrets >/dev/null
