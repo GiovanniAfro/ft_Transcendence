@@ -29,6 +29,9 @@ export DB_TLS=$(echo "$envs" | jq -r '.data.DB_TLS')
 export TLS_CERT_FILE=$(echo "$envs" | jq -r '.data.TLS_CERT_FILE')
 export TLS_KEY_FILE=$(echo "$envs" | jq -r '.data.TLS_KEY_FILE')
 export TLS_CA_FILE=$(echo "$envs" | jq -r '.data.TLS_CA_FILE')
+export DJANGO_SUPERUSER_PASSWORD=$(echo "$envs" | jq -r '.data.DJANGO_SUPERUSER_PASSWORD')
+export DJANGO_SUPERUSER_USERNAME=$(echo "$envs" | jq -r '.data.DJANGO_SUPERUSER_USERNAME')
+export DJANGO_SUPERUSER_EMAIL=$(echo "$envs" | jq -r '.data.DJANGO_SUPERUSER_EMAIL')
 
 # Waiting for the availability of Postgresql ---------------------------------->
 success_msg="Connection to $DB_HOST $DB_PORT port [tcp/*] succeeded!"
@@ -48,6 +51,7 @@ done
 python pong_project/manage.py makemigrations
 python pong_project/manage.py migrate
 python pong_project/manage.py collectstatic --noinput
+python pong_project/manage.py createsuperuser --noinput
 
 # Start Gunicorn server ------------------------------------------------------->
 eval exec $0 $@
