@@ -32,37 +32,116 @@ const ProfileView = {
                 const friendsData = await friendsResponse.json();
                 
                 app.innerHTML = `
-                    <div class="container mt-5">
-                        <h2>User Profile</h2>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img src="${profileData.avatar || '/static/img/default_avatar.png'}" alt="Avatar" class="img-fluid rounded-circle mb-3" id="avatar-preview">
-                                <input type="file" id="avatar-input" style="display: none;" accept="image/*">
-                                <button class="btn btn-primary" id="change-avatar-btn">Change Avatar</button>
-                            </div>
-                            <div class="col-md-8">
-                                <form id="profile-form">
-                                    <div class="mb-3">
-                                        <label for="username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="username" value="${profileData.username}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" value="${profileData.email}">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                                </form>
-                            </div>
+				  <div class="container">
+    <div class="main-body">
+          <!-- Breadcrumb -->
+
+          <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center text-center">
+                  <form id="profile-form">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <img src="${profileData.avatar || "/static/img/default_avatar.png"}" alt="Admin" class="rounded-circle" width="150" height="150">
+                    <div class="mt-3">
+                      <div class="mb-3">
+                        <label for="username" class="form-label">Username:</label>
+                        <input type="text" class="form-control" id="username" value="${profileData.username}">
+                        <input type="file" id="avatar-input" style="display: none;" accept="image/*">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" value="${profileData.email}">
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <h3>Stats</h3>
-                                <p>Games Played: ${statsData.games_played}</p>
-                                <p>Games Won: ${statsData.games_won_count}</p>
-                                <p>Total Score: ${statsData.total_score}</p>
-                                <p>Win Rate: ${statsData.win_rate}%</p>
-                            </div>
-                            <div class="col-md-6">
+                        <p></p>
+                        <button class="btn btn-primary" id="change-avatar-btn">Change Avatar</button>
+                        <button type="submit" class="btn btn-outline-primary">Update Profile</button>
+                      </div>
+                    </div>
+                  </div>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              <div class="card mt-3">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                    <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe mr-2 icon-inline"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>boh</h6>
+                    <span class="text-secondary">Roba da aggiungere volendo, i match o lista amici</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">qua match/editable/lista amici</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      username
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Email</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      email editable
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">altra roba</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                     boh
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <a class="btn btn-info " target="__blank" href="">btn edit o pagine successive o boh lista di amici etc...</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row gutters-sm">
+                <div class="col-sm-6 mb-3">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      	<h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Stats</i></h6>
+                      	<div class="card p-3">
+                        	<h5 class="card-title">Games Played:</h5>
+                        	<h5 class="card-text">${statsData.games_played}</h5>
+                      	</div>
+                      	<div class="card p-3" style="text-align:right;">
+						  	<h5 class="card-title">Games Won:</h5>
+                        	<h5 class="card-text">${statsData.games_won_count}</h5>
+                      	</div>
+                      	<div class="card p-3">
+                      	  <h5 class="card-title">Total Score:</h5>
+                      	  <h5 class="card-text">${statsData.total_score}</h5>
+                      	</div>
+					    <div class="card p-3" style="text-align:right;">
+                      	  <h5 class="card-title">Win Rate:</h5>
+                      	  <h5 class="card-text">${statsData.win_rate}%</h5>
+                      	</div>
+                      	<small>Win Rate:</small>
+                      	<div class="progress" style="height: 20px">
+                       		<div class="progress-bar bg-primary" role="progressbar" style="width:${statsData.win_rate}" " aria-valuemin="0" aria-valuemax="100">${statsData.win_rate}%</div>
+					  	</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <div class="card h-100">
+                    <div class="card-body">
+                    <div class="col-md-6">
                                 <h3>Friends</h3>
                                 <ul id="friends-list">
                                     ${friendsData.map(friend => `
@@ -79,14 +158,24 @@ const ProfileView = {
                                     <button id="add-friend-btn" class="btn btn-secondary">Add Friend</button>
                                 </div>
                             </div>
-                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+
+        </div>
+    </div>
                         <div class="row mt-4">
                             <div class="col">
                                 <h3>Match History</h3>
                                 <div id="match-history"></div>
                             </div>
-                        </div>
-                    </div>
+                        </div>	
                 `;
                 this.attachEventListeners();
                 this.loadMatchHistory();

@@ -2,15 +2,40 @@ const RegisterView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-		<h2>Register</h2>
-            <form id="register-form">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <input type="password" id="confirm-password" placeholder="Confirm Password" required>
-                <button type="submit">Register</button>
-            </form>
-            <p id="register-message"></p>
+		<card>	
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card">
+            		    <div class="card-body">
+        					<form id="register-form">
+        			    	<h1 class="h3 mb-3 font-weight-normal" style="text-align:center;">Please Register Yourself</h1>
+							<h1 class="h3 mb-3 font-weight-normal" style="text-align:center;">NO FAKE DATA OR GTFO</h1>
+							<div class="row">
+								<div class="col-sm">
+									<input type="text" id="username" class="form-control" placeholder="Username" required style="text-align:center;">
+									<p></p>
+									<input type="email" id="email" class="form-control" placeholder="Email" required style="text-align:center;">
+								</div>
+								<div class="col-sm">
+        			    			<input type="password" id="password" class="form-control" placeholder="Password" required style="text-align:center;">
+									<p></p>
+									<input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" required style="text-align:center;">
+								</div>
+							</div>
+							<div class="text-center">
+        			    		<p></p>
+        			    		<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+								<p></p>
+								<img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200" >
+							</div>
+        					</form>
+						</div>
+					</div>
+				</div>
+        	</div>
+		</card>
+        <p id="register-message"></p>
         `;
         this.attachEventListeners();
     },
