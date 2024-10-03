@@ -8,3 +8,5 @@ db.sqlite3
 .venv
 project/client_host.p12
 project/setup/.tmp
+.env
+pyenv
