@@ -2,7 +2,7 @@ const RegisterView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-            <h2>Register</h2>
+		<h2>Register</h2>
             <form id="register-form">
                 <input type="text" id="username" placeholder="Username" required>
                 <input type="email" id="email" placeholder="Email" required>

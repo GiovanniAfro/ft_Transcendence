@@ -148,6 +148,7 @@ MIDDLEWARE = [
 
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = 'two_factor:profile'
+TWO_FACTOR_PATCH_ADMIN = False
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

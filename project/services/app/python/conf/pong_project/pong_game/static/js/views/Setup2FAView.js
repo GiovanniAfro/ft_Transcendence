@@ -26,37 +26,41 @@ const Setup2FAView = {
         await this.loadQRCode();
         this.attachEventListeners();
     },
-
     loadQRCode: async function() {
         try {
             const response = await fetch('/api/accounts/2fa/setup/', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                    'Content-Type': 'application/json'
                 }
             });
-            const data = await response.json();
+    
             if (response.ok) {
+                const data = await response.json();
                 document.getElementById('qr-code').innerHTML = `<img src="data:image/svg+xml;base64,${data.qr_code}" alt="2FA QR Code">`;
             } else {
-                document.getElementById('setup-message').textContent = 'Failed to load QR code.';
+                if (response.status === 401 || response.status === 403) {
+                    // Non autenticato, reindirizza al login
+                    window.location.hash = '#login';
+                } else {
+                    document.getElementById('setup-message').textContent = 'Failed to load QR code.';
+                }
             }
         } catch (error) {
             console.error('Error:', error);
             document.getElementById('setup-message').textContent = 'An error occurred while loading the QR code.';
         }
     },
-
     attachEventListeners: function() {
         const form = document.getElementById('setup-2fa-form');
         form.addEventListener('submit', this.handleSetup2FA);
     },
-
     handleSetup2FA: async function(e) {
         e.preventDefault();
         const code = document.getElementById('2fa-setup-code').value;
         const messageElement = document.getElementById('setup-message');
-
+    
         try {
             const response = await fetch('/api/accounts/2fa/setup/', {
                 method: 'POST',
@@ -69,6 +73,11 @@ const Setup2FAView = {
             const data = await response.json();
             if (response.ok) {
                 messageElement.textContent = '2FA setup successful!';
+                // Aggiorna lo stato di is_2fa_verified a 'true'
+                localStorage.setItem('is_2fa_verified', 'true');
+                // Aggiorna la navbar
+                auth.updateNavbar();
+                // Reindirizza alla home dopo un breve ritardo
                 setTimeout(() => {
                     window.location.hash = '#home';
                 }, 1000);
