@@ -26,6 +26,7 @@ const Setup2FAView = {
         await this.loadQRCode();
         this.attachEventListeners();
     },
+
     loadQRCode: async function() {
         try {
             const response = await fetch('/api/accounts/2fa/setup/', {
@@ -52,10 +53,12 @@ const Setup2FAView = {
             document.getElementById('setup-message').textContent = 'An error occurred while loading the QR code.';
         }
     },
+
     attachEventListeners: function() {
         const form = document.getElementById('setup-2fa-form');
         form.addEventListener('submit', this.handleSetup2FA);
     },
+
     handleSetup2FA: async function(e) {
         e.preventDefault();
         const code = document.getElementById('2fa-setup-code').value;
