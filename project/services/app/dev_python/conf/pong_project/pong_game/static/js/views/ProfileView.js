@@ -288,7 +288,8 @@ const ProfileView = {
                 }
     
                 matchHistoryDiv.innerHTML = `
-                    <table class="table">
+				
+                    <table class="table table-dark">
                         <thead>
                             <tr>
                                 <th>Date</th>
