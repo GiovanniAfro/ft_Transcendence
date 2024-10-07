@@ -48,7 +48,8 @@ while true; do
 done
 
 # Collect static files -------------------------------------------------------->
-python pong_project/manage.py makemigrations
+python pong_project/manage.py makemigrations pong_game
+python pong_project/manage.py makemigrations accounts
 python pong_project/manage.py migrate
 python pong_project/manage.py collectstatic --noinput
 python pong_project/manage.py createsuperuser --noinput

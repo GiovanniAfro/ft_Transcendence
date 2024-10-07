@@ -47,11 +47,31 @@ while true; do
     sleep 1
 done
 
-# Collect static files -------------------------------------------------------->
-python pong_project/manage.py makemigrations
+# Init Django ----------------------------------------------------------------->
+
+source venv/bin/activate
+
+python pong_project/manage.py makemigrations pong_game
+python pong_project/manage.py makemigrations accounts
 python pong_project/manage.py migrate
 # python pong_project/manage.py collectstatic --noinput
 python pong_project/manage.py createsuperuser --noinput
 
-# Start Gunicorn server ------------------------------------------------------->
+python pong_project/manage.py shell -c "
+from accounts.models import CustomUser;
+
+user = CustomUser(
+    username='test',
+    email='test@test.it',
+    first_name='Test',
+    last_name='',
+    is_active=True,
+    is_superuser=False,
+    is_staff=False
+);
+user.set_password('test');  # Cripta la password
+user.save();  # Salva l'utente nel database
+"
+
+# Start Dev server ------------------------------------------------------------>
 eval exec $0 $@
