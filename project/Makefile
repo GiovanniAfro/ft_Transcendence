@@ -42,15 +42,6 @@ up:
 	@rm -rf .env
 	@echo
 
-down:
-	docker compose down
-
-start:
-	docker compose start
-
-stop:
-	docker compose stop
-
 clean:
 	@echo "\n$(BLUE)[+] Removing all containers$(NC)"
 	@docker ps -qa | while read id; do \
@@ -96,3 +87,9 @@ fclean: clean
 	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"
 
 re: clean up
+
+dev: clean
+	@./setup/setup_iptables.sh
+	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)DEV $(BLUE)profile ..." 
+	@docker compose -p "ft_transcendence" --profile dev up -d 
+	@echo

@@ -1,6 +1,6 @@
-# ft-transcendence
-
 ![ft-transcendence](https://github.com/kichkiro/42_cursus/blob/assets/banner_ft-transcendence.jpg?raw=true)
+
+# ft-transcendence
 
 <i>
   <p>
@@ -47,14 +47,6 @@ cd ft_transcendence/project
   - create images
   - create volumes
   - create networks 
-  - start containers
-- make down: 
-  - stop containers
-  - remove containers
-  - remove networks
-- make stop: 
-  - stop containers
-- make start: 
   - start containers
 - make clean:
   - remove all containers
