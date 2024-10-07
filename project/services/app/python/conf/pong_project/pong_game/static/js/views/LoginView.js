@@ -26,7 +26,7 @@ const LoginView = {
     
         const result = await auth.login(username, password);
     
-        if (result.success) {
+        if (result.success || result.requires_2fa_setup || result.requires_2fa) {
             messageElement.textContent = 'Login successful!';
             setTimeout(() => {
                 window.location.hash = '#home';
