@@ -7,10 +7,10 @@
 
 body {
     margin-top: 20px;
-    color: #90b1f1;
+    color: #10a8d6;
     text-align: left;
     background-color: #e2e8f0;
-	
+	background-image: url('/static/img/background.jpeg');
 	background-repeat: no-repeat;
 	background-attachment: fixed;  
 	background-size: cover;

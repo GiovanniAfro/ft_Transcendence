@@ -2,6 +2,12 @@ const Setup2FAView = {
     render: async function() {
         const app = document.getElementById('app');
         app.innerHTML = `
+        <card>	
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card">
+            		    <div class="card-body" text-start>
             <h2>Setup Two-Factor Authentication (2FA)</h2>
             <ol>
                 <li>Install Google Authenticator on your mobile device:
@@ -21,10 +27,16 @@ const Setup2FAView = {
             </form>
             <p id="setup-message"></p>
             <p><strong>Important:</strong> Keep the Google Authenticator app installed. You'll need it to generate a new 6-digit code every time you log in.</p>
-        `;
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </card>
+            `;
         
-        await this.loadQRCode();
-        this.attachEventListeners();
+       await this.loadQRCode();
+       this.attachEventListeners();
     },
 
     loadQRCode: async function() {

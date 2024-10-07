@@ -31,7 +31,8 @@ const LoginView = {
             setTimeout(() => {
                 window.location.hash = '#home';
             }, 1000);
-        } else if (result.requires_2fa) {
+        }
+		 else if (result.requires_2fa) {
             // Salva l'username per l'uso successivo nella verifica 2FA
             this.username = username;
             this.show2FAForm();
@@ -40,7 +41,8 @@ const LoginView = {
             setTimeout(() => {
                 window.location.hash = '#setup2fa';
             }, 1000);
-        } else {
+        } 
+		else {
             messageElement.textContent = result.error;
         }
     },
