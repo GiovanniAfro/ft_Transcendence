@@ -2,6 +2,8 @@ import logging
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -43,8 +45,10 @@ class RegisterView(APIView):
         return Response({"message": "Errore di registrazione", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(login_required, name='dispatch')
 class TwoFactorSetupView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         user = request.user
         device, created = TOTPDevice.objects.get_or_create(user=user, name="default")
