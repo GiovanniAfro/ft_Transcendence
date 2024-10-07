@@ -2,13 +2,28 @@ const LoginView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p id="login-message"></p>
+		<card>	
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card">
+            		    <div class="card-body text-center">
+        					<form id="login-form" class="form-signin">
+        					    <img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200" >
+        					    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        					    <label class="sr-only">Username</label>
+        					    <input type="text" id="username" class="form-control" placeholder="Username" required style="text-align:center;">
+        					    <label for="inputPassword" class="sr-only">Password</label>
+        					    <input type="password" id="password" class="form-control" placeholder="Password" required style="text-align:center;">
+        					    <p></p>
+        					    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+        					</form>
+						</div>
+					</div>
+				</div>
+        	</div>
+		</card>
+        <p id="login-message"></p>
         `;
         this.attachEventListeners();
     },
