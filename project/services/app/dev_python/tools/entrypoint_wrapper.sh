@@ -71,6 +71,18 @@ user = CustomUser(
 );
 user.set_password('test');  # Cripta la password
 user.save();  # Salva l'utente nel database
+
+gianni = CustomUser(
+    username='test1',
+    email='test1@test.it',
+    first_name='Test1',
+    last_name='',
+    is_active=True,
+    is_superuser=False,
+    is_staff=False
+);
+gianni.set_password('test1');  # Cripta la password
+gianni.save();  # Salva l'utente nel database
 "
 
 # Start Dev server ------------------------------------------------------------>
