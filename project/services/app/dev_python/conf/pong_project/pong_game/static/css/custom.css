@@ -116,3 +116,23 @@ body {
     background-color: #e2e8f0;
     text-align: center !important;
 }
+
+#friends-list {
+    display: flex;                   /* Use Flexbox */
+    flex-wrap: wrap;                /* Allow items to wrap onto the next line */
+    justify-content: space-between;  /* Space between columns */
+    list-style-type: none;          /* Remove default list styles */
+    padding: 0;                     /* Remove default padding */
+    margin: 0;                      /* Remove default margin */
+}
+
+#friends-list li {
+    width: calc(50% - 5px);        /* Set item width to 50% minus the gap */
+    box-sizing: border-box;         /* Include padding and border in element's total width */
+    padding: 5px;                  /* Padding for list items */
+    border: 1px solid #ddd;         /* Optional border for visibility */
+    border-radius: 30px;             /* Rounded corners */
+    background-color: #f9f9f9;      /* Background color */
+    margin-bottom: 5px;            /* Space between rows */
+	text-align: center;
+}

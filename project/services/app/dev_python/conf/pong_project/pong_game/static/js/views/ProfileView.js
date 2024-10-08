@@ -139,10 +139,16 @@ const ProfileView = {
         	                    </li>
         	                `).join('')}
         	            </ul>
-        	            <div class="mt-3">
-        	                <input type="text" id="friend-username" placeholder="Friend's username">
-        	                <button id="add-friend-btn" class="btn btn-secondary">Add Friend</button>
-        	            </div>
+						<div class="row w-100">
+							<h3 class="mb-0">Friend's Username:</h3>
+							<p></p>
+        	            	<div class="col-6 w-50">
+        	            	    <input type="text" id="friend-username" class="form-control w-100" placeholder="Friend">
+							</div>
+							<div class="col-6 w-50">
+        	            	    <button id="add-friend-btn" class="btn btn-danger">Add Friend</button>
+        	            	</div>
+						</div>
         	    </div>
         	</div>
       	</div>
