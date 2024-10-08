@@ -91,5 +91,5 @@ re: clean up
 dev:
 	@./setup/setup_iptables.sh
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)DEV $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile dev up -d 
+	@docker compose -p "ft_transcendence" --profile dev up -d --build
 	@echo
