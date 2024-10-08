@@ -19,17 +19,11 @@ const ProfileView = {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            const friendsResponse = await fetch('/api/friends/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
 
-            if (profileResponse.ok && statsResponse.ok && friendsResponse.ok) {
+            if (profileResponse.ok && statsResponse.ok) {
                 const profileData = await profileResponse.json();
                 this.profileData = profileData; // Assegna profileData come proprietà
                 const statsData = await statsResponse.json();
-                const friendsData = await friendsResponse.json();
                 
                 app.innerHTML = `
 				  <div class="container">
@@ -130,14 +124,6 @@ const ProfileView = {
         		<div class="col-md-6">
         	            <h3>Friends</h3>
         	            <ul id="friends-list">
-        	                ${friendsData.map(friend => `
-        	                    <li>
-        	                        ${friend.username} 
-        	                        <span class="${friend.is_online ? 'online' : 'offline'}">
-        	                            (${friend.is_online ? 'Online' : 'Offline'})
-        	                        </span>
-        	                    </li>
-        	                `).join('')}
         	            </ul>
 						<div class="row w-100">
 							<h3 class="mb-0">Friend's Username:</h3>
@@ -160,6 +146,7 @@ const ProfileView = {
     </div>	
 </div>
 						`;
+				this.friendsResponse(1);
                 this.attachEventListeners();
                 this.loadMatchHistory();
             } else {
@@ -170,6 +157,44 @@ const ProfileView = {
             app.innerHTML = '<h2>Error loading profile</h2>';
         }
     },
+	friendsResponse: async function (page) {
+		const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.hash = '#login';
+            return;
+        }
+
+		const result = await fetch(`/api/friends/?page=${page}`, {headers: {'Authorization': `Bearer ${token}`}});
+		const json = await result.json();
+		const friendsContainer = document.getElementById('friends-list');
+		const list = json.data.map(friend => `
+			<li>
+				${friend.username} 
+				<span class="${friend.is_online ? 'online' : 'offline'}">
+					(${friend.is_online ? 'Online' : 'Offline'})
+				</span>
+			</li>
+		`).join('');
+
+		friendsContainer.innerHTML = `
+			${list}
+			<div class="d-flex gap-2">
+				<button id="friends-prev-page" class="btn btn-primary" ${json.previous_page !== null ? '' : 'disabled'}>Previous</button>
+				<div>Page ${json.actual_page}</div>
+				<button id="friends-next-page" class="btn btn-primary" ${json.next_page !== null  ? '' : 'disabled'}>Next</button>
+			</div>
+		`;
+		document.querySelector('#friends-prev-page').addEventListener('click', () =>{
+			if (json.previous_page !== null) {
+				this.friendsResponse(json.previous_page);
+			}
+		});
+		document.querySelector('#friends-next-page').addEventListener('click', () => {
+			if (json.next_page !== null){
+				this.friendsResponse(json.next_page)
+			}
+		});
+	},
 
     attachEventListeners: function() {
         const form = document.getElementById('profile-form');
@@ -182,7 +207,7 @@ const ProfileView = {
         avatarInput.addEventListener('change', this.handleAvatarUpload);
 
         const addFriendBtn = document.getElementById('add-friend-btn');
-        addFriendBtn.addEventListener('click', this.handleAddFriend);
+        addFriendBtn.addEventListener('click', ()=>this.handleAddFriend());
     },
 
     handleProfileUpdate: async function(e) {
@@ -272,7 +297,7 @@ const ProfileView = {
     
                 matchHistoryDiv.innerHTML = `
 				
-                    <table class="table table-dark">
+                    <table class="table table-primary">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -309,7 +334,7 @@ const ProfileView = {
         }
     },
 
-    handleAddFriend: async function() {
+    handleAddFriend: async function () {
         const friendUsername = document.getElementById('friend-username').value;
         if (!friendUsername) {
             alert('Please enter a friend\'s username');
@@ -329,9 +354,7 @@ const ProfileView = {
             if (response.ok) {
                 //alert('Friend added successfully');
                 // Aggiorna la lista degli amici
-                const friendsList = document.getElementById('friends-list');
-                friendsList.innerHTML += `<li>${friendUsername}</li>`;
-                document.getElementById('friend-username').value = '';
+                this.friendsResponse(1);
             } else {
                 const errorData = await response.json();
                 alert('Failed to add friend: ' + errorData.error);

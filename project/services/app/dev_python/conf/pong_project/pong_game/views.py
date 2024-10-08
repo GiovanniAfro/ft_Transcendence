@@ -1,6 +1,7 @@
 import random
 import logging
 from django.views.generic import ListView
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -224,13 +225,30 @@ class GameDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = GameSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
+
+
 class FriendListView(APIView):
-    permission_classes = [IsAuthenticated]
-    paginate_by = 10
-    def get(self, request):
-        friends = request.user.friends.all()
-        serializer = UserSerializer(friends, many=True)
-        return Response(serializer.data)
+	permission_classes = [IsAuthenticated]
+	def get(self, request):
+		friends = request.user.friends.all()
+		paginator = Paginator(friends, 5)  # Show 25 contacts per page.
+		page_number = request.GET.get("page", 1)
+		try:
+			page_number = int(page_number)
+		except ValueError:
+			page_number = 1
+		page_obj = paginator.get_page(page_number)
+		serializer = UserSerializer(list(page_obj), many=True)
+		output = {
+			'previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+			'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            'actual_page': page_obj.number,
+            'start_index': page_obj.start_index(),
+            'end_index': page_obj.end_index(),
+			'data': serializer.data
+		}
+		return Response(output)
 
 class AddFriendView(APIView):
     permission_classes = [IsAuthenticated]
