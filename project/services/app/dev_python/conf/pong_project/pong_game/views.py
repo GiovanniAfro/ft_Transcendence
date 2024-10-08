@@ -1,5 +1,6 @@
 import random
 import logging
+from django.views.generic import ListView
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -225,7 +226,7 @@ class GameDetailView(generics.RetrieveUpdateAPIView):
 
 class FriendListView(APIView):
     permission_classes = [IsAuthenticated]
-
+    paginate_by = 10
     def get(self, request):
         friends = request.user.friends.all()
         serializer = UserSerializer(friends, many=True)

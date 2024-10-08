@@ -1,0 +1,26 @@
+<h1>Lista degli utenti</h1>
+<ul>
+  {% for user in users %}
+    <li>{{ user.username }} - {{ user.email }}</li>
+  {% empty %}
+    <li>Nessun utente disponibile.</li>
+  {% endfor %}
+</ul>
+
+<div class="pagination-box">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+      <a href="?page=1">&laquo; Prima</a>
+      <a href="?page={{ page_obj.previous_page_number }}">Precedente</a>
+    {% endif %}
+
+    <span class="current">
+      Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Successiva</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">Ultima &raquo;</a>
+    {% endif %}
+  </span>
+</div>
