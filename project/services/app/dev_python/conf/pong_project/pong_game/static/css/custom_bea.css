@@ -1,8 +1,4 @@
-.box-light {
-	box-shadow:0 0 20px #00fffb, 0 0 40px #0081bc
-}
-
- .pos-center {
+.pos-center {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -21,6 +17,23 @@
 
 }
 
+.box-light {
+	box-shadow:0 0 20px #00fffb, 0 0 40px #0081bc
+}
+
 .text-light {
 	text-shadow:0 0 20px #00fffb, 0 0 40px #0081bc
+}
+
+.card-opacity {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word; 
+	backdrop-filter: blur(15px);
+    background-clip: border-box;
+    border: 0 solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+	box-shadow:0 0 20px #00fffb, 0 0 40px #0081bc
 }

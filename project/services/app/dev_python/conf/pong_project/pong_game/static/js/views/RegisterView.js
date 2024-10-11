@@ -2,40 +2,42 @@ const RegisterView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-		<card>	
+        <card>	
         	<div class="main-body">
 				<div class="row justify-content-md-center">
             		<div class="col-md-4 mb-3">
-            		  <div class="card">
-            		    <div class="card-body">
-        					<form id="register-form">
-        			    	<h1 class="h3 mb-3 font-weight-normal" style="text-align:center;">Please Register Yourself</h1>
-							<h1 class="h3 mb-3 font-weight-normal" style="text-align:center;">NO FAKE DATA OR GTFO</h1>
-							<div class="row">
-								<div class="col-sm">
-									<input type="text" id="username" class="form-control" placeholder="Username" required style="text-align:center;">
-									<p></p>
-									<input type="email" id="email" class="form-control" placeholder="Email" required style="text-align:center;">
-								</div>
-								<div class="col-sm">
-        			    			<input type="password" id="password" class="form-control" placeholder="Password" required style="text-align:center;">
-									<p></p>
-									<input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" required style="text-align:center;">
-								</div>
-							</div>
-							<div class="text-center">
-        			    		<p></p>
-        			    		<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-								<p></p>
-								<img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200" >
-							</div>
-        					</form>
-						</div>
-					</div>
-				</div>
-        	</div>
+            		    <div class="card-opacity">
+            		        <div class="card-body text-center">
+        					    <form id="register-form">
+        			    	        <h1 class="h3 mb-3 font-weight-normal" style="font-size: xx-large; font-weight: bold; color: #0e1422;">Please register yourself</h1>
+							        <h1 class="h3 mb-3 font-weight-normal" style="font-size: large; font-weight: bold; color: #0e1422;">No fake data or gtfo</h1>
+							        <div class="row">
+								    <div class="col-sm">
+									    <input type="text" id="username" class="form-control" placeholder="Username" required style="text-align:center;">
+									    <p></p>
+									    <input type="email" id="email" class="form-control" placeholder="Email" required style="text-align:center;">
+								    </div>
+								    <div class="col-sm">
+        			    			    <input type="password" id="password" class="form-control" placeholder="Password" required style="text-align:center;">
+									    <p></p>
+									    <input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" required style="text-align:center;">
+								    </div>
+							        </div>
+							        <div class="text-center">
+        			    		        <p></p>
+        			    		        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+								        <p></p>
+								        <img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200" >
+							        </div>
+                                     <p></p>
+                                    <p id="register-message" style="text-align:center; font-weight: bold; font-size: small; color: #0e1422;"></p>
+        					    </form>
+						    </div>
+					    </div>
+				    </div>
+        	    </div>
+            </div>
 		</card>
-        <p id="register-message"></p>
         `;
         this.attachEventListeners();
     },

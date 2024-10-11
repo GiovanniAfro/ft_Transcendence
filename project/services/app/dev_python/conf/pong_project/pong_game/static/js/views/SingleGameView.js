@@ -222,36 +222,47 @@ const SingleGameView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-            <div class="container mt-4">
-                <h2>Single Game</h2>
-                <div class="row">
-                    <div class="col-md-6">
-                        <form id="player2Form">
-                            <div class="mb-3">
-                                <label for="player2Name" class="form-label">Player 2 Name:</label>
-                                <input type="text" class="form-control" id="player2Name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="player2Type" class="form-label">Player 2 Type:</label>
-                                <select class="form-select" id="player2Type">
-                                    <option value="alias">Temporary Alias</option>
-                                    <option value="registered">Registered User</option>
-                                </select>
-                            </div>
-                            <div id="registeredUserFields" style="display:none;">
-                                <div class="mb-3">
-                                    <label for="player2Username" class="form-label">Username:</label>
-                                    <input type="text" class="form-control" id="player2Username">
+        <card>	
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		    <div class="card-opacity">
+            		        <div class="card-body text-center">
+                            <h1 class="h3 mb-3 font-weight-normal" style="font-size: xx-large; font-weight: bold; color: #0e1422;">Single Game</h1>
+                                <div class="row">
+                                        <form id="player2Form">
+                                            <div class="mb-3">
+                                                <label for="player2Name" class="form-label">Player 2 Name:</label> 
+                                                <input type="text" class="form-control" id="player2Name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="player2Type" class="form-label">Player 2 Type:</label>
+                                                <select class="form-select" id="player2Type">
+                                                    <option value="alias">Temporary Alias</option>
+                                                    <option value="registered">Registered User</option>
+                                                </select>
+                                            </div>
+                                            <div id="registeredUserFields" style="display:none;">
+                                                <div class="mb-3">
+                                                    <label for="player2Username" class="form-label">Username:</label>
+                                                    <input type="text" class="form-control" id="player2Username">
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Start Game</button>
+                                            <p></p>
+                                            <img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200">
+                                            </form>
+                                    
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Start Game</button>
-                        </form>
-                    </div>
-                    <div class="col-md-6">
-                        <canvas id="pongCanvas" width="900" height="700" style="border:1px solid #000000; display: none;"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
+        </card>
+        <div class="col-md-12 d-flex justify-content-center" style="margin-top: 20px;">
+            <canvas id="pongCanvas" width="900" height="700" style="border:1px solid #000000; display: none;"></canvas>
+        </div>
         `;
 
         this.setupEventListeners();
