@@ -2,7 +2,7 @@ const LoginView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-		<card>	
+		<card>
         	<div class="main-body">
 				<div class="row justify-content-md-center">
             		<div class="col-md-4 mb-3">
@@ -38,13 +38,13 @@ const LoginView = {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const messageElement = document.getElementById('login-message');
-    
+
         const result = await auth.login(username, password);
-    
+
         if (result.success || result.requires_2fa_setup || result.requires_2fa) {
             messageElement.textContent = 'Login successful!';
             setTimeout(() => {
-                window.location.hash = '#home';
+                window.location.hash = '#profile';
             }, 1000);
         //}
 		// else if (result.requires_2fa) {
@@ -56,7 +56,7 @@ const LoginView = {
         //    setTimeout(() => {
         //        window.location.hash = '#setup2fa';
         //    }, 1000);
-        } 
+        }
 		else {
             messageElement.textContent = result.error;
         }

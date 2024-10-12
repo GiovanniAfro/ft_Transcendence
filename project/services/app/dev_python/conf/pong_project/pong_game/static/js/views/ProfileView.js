@@ -1,31 +1,31 @@
 const ProfileView = {
-    render: async function() {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            window.location.hash = '#login';
-            return;
-        }
-        const app = document.getElementById('app');
-        app.innerHTML = '<h2>Loading profile...</h2>';
+        render: async function() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.hash = '#login';
+                return;
+            }
+            const app = document.getElementById('app');
+            app.innerHTML = '<h2>Loading profile...</h2>';
 
-        try {
-            const profileResponse = await fetch('/api/accounts/me/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const statsResponse = await fetch('/api/user/stats/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            try {
+                const profileResponse = await fetch('/api/accounts/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const statsResponse = await fetch('/api/user/stats/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-            if (profileResponse.ok && statsResponse.ok) {
-                const profileData = await profileResponse.json();
-                this.profileData = profileData; // Assegna profileData come proprietà
-                const statsData = await statsResponse.json();
-                
-                app.innerHTML = `
+                if (profileResponse.ok && statsResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    this.profileData = profileData; // Assegna profileData come proprietà
+                    const statsData = await statsResponse.json();
+
+                    app.innerHTML = `
 				  <div class="container">
     <div class="main-body">
           <!-- Breadcrumb -->
@@ -60,37 +60,22 @@ const ProfileView = {
             </div>
             <div class="col-md-8">
 			<div class="row gutters-sm">
-              <div class="card mb-3">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">qua match/editable/lista amici</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      username
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Email</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      email editable
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">altra roba</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                     boh
-                    </div>
-                  </div>
-                  <hr>
+                <div class="card mb-3">
+        	              <h3>Friends</h3>
+        	              <ul id="friends-list">
+        	              </ul>
+			    	<div class="row w-100">
+			    		<h3 class="mb-0">Friend's Username:</h3>
+			    		<p></p>
+        	              	<div class="col-6 w-50">
+        	              	    <input type="text" id="friend-username" class="form-control w-100" placeholder="Friend">
+			    		</div>
+			    		<div class="col-6 w-50">
+        	              	    <button id="add-friend-btn" class="btn btn-danger">Add Friend</button>
+        	              	</div>
+			    	</div>
+                    <p></p>
                 </div>
-              </div>
 			</div>
               <div class="row gutters-sm">
                   <div class="card h-100 w-100">
@@ -118,27 +103,6 @@ const ProfileView = {
     </div>
 <div class="container">	
 	<div class="row">
-	<div class="col-sm-6 mb-3">
-      	<div class="card h-100">
-        	<div class="card-body">
-        		<div class="col-md-6">
-        	            <h3>Friends</h3>
-        	            <ul id="friends-list">
-        	            </ul>
-						<div class="row w-100">
-							<h3 class="mb-0">Friend's Username:</h3>
-							<p></p>
-        	            	<div class="col-6 w-50">
-        	            	    <input type="text" id="friend-username" class="form-control w-100" placeholder="Friend">
-							</div>
-							<div class="col-6 w-50">
-        	            	    <button id="add-friend-btn" class="btn btn-danger">Add Friend</button>
-        	            	</div>
-						</div>
-        	    </div>
-        	</div>
-      	</div>
-    </div>
     <div class="col card h-100">
         <h3>Match History</h3>
         <div id="match-history"></div>
@@ -146,28 +110,28 @@ const ProfileView = {
     </div>	
 </div>
 						`;
-				this.friendsResponse(1);
-                this.attachEventListeners();
-                this.loadMatchHistory();
-            } else {
-                app.innerHTML = '<h2>Failed to load profile</h2>';
+                    this.friendsResponse(1);
+                    this.attachEventListeners();
+                    this.loadMatchHistory();
+                } else {
+                    app.innerHTML = '<h2>Failed to load profile</h2>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                app.innerHTML = '<h2>Error loading profile</h2>';
             }
-        } catch (error) {
-            console.error('Error:', error);
-            app.innerHTML = '<h2>Error loading profile</h2>';
-        }
-    },
-	friendsResponse: async function (page) {
-		const token = localStorage.getItem('access_token');
-        if (!token) {
-            window.location.hash = '#login';
-            return;
-        }
+        },
+        friendsResponse: async function(page) {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.hash = '#login';
+                return;
+            }
 
-		const result = await fetch(`/api/friends/?page=${page}`, {headers: {'Authorization': `Bearer ${token}`}});
-		const json = await result.json();
-		const friendsContainer = document.getElementById('friends-list');
-		const list = json.data.map(friend => `
+            const result = await fetch(`/api/friends/?page=${page}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const json = await result.json();
+            const friendsContainer = document.getElementById('friends-list');
+            const list = json.data.map(friend => `
 			<li>
 				${friend.username} 
 				<span class="${friend.is_online ? 'online' : 'offline'}">
@@ -176,7 +140,7 @@ const ProfileView = {
 			</li>
 		`).join('');
 
-		friendsContainer.innerHTML = `
+            friendsContainer.innerHTML = `
 			${list}
 			<div class="d-flex gap-2">
 				<button id="friends-prev-page" class="btn btn-primary" ${json.previous_page !== null ? '' : 'disabled'}>Previous</button>
@@ -184,118 +148,118 @@ const ProfileView = {
 				<button id="friends-next-page" class="btn btn-primary" ${json.next_page !== null  ? '' : 'disabled'}>Next</button>
 			</div>
 		`;
-		document.querySelector('#friends-prev-page').addEventListener('click', () =>{
-			if (json.previous_page !== null) {
-				this.friendsResponse(json.previous_page);
-			}
-		});
-		document.querySelector('#friends-next-page').addEventListener('click', () => {
-			if (json.next_page !== null){
-				this.friendsResponse(json.next_page)
-			}
-		});
-	},
-
-    attachEventListeners: function() {
-        const form = document.getElementById('profile-form');
-        form.addEventListener('submit', this.handleProfileUpdate);
-    
-        const changeAvatarBtn = document.getElementById('change-avatar-btn');
-        changeAvatarBtn.addEventListener('click', this.handleAvatarChange);
-    
-        const avatarInput = document.getElementById('avatar-input');
-        avatarInput.addEventListener('change', this.handleAvatarUpload);
-
-        const addFriendBtn = document.getElementById('add-friend-btn');
-        addFriendBtn.addEventListener('click', ()=>this.handleAddFriend());
-    },
-
-    handleProfileUpdate: async function(e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
-        const updateData = { username, email };
-
-        try {
-            const response = await fetch('/api/accounts/me/', {
-                method: 'PATCH',  // Cambiato da PUT a PATCH
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                },
-                body: JSON.stringify(updateData)
+            document.querySelector('#friends-prev-page').addEventListener('click', () => {
+                if (json.previous_page !== null) {
+                    this.friendsResponse(json.previous_page);
+                }
             });
+            document.querySelector('#friends-next-page').addEventListener('click', () => {
+                if (json.next_page !== null) {
+                    this.friendsResponse(json.next_page)
+                }
+            });
+        },
 
-            if (response.ok) {
-                const responseData = await response.json();
-                alert('Profile updated successfully');
-                document.getElementById('username').value = responseData.username;
-                document.getElementById('email').value = responseData.email || '';
-            } else {
-                const errorData = await response.json();
-                alert('Failed to update profile: ' + JSON.stringify(errorData));
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while updating profile');
-        }
-    },
+        attachEventListeners: function() {
+            const form = document.getElementById('profile-form');
+            form.addEventListener('submit', this.handleProfileUpdate);
 
-    handleAvatarChange: function() {
-        console.log('Avatar change button clicked');
-        document.getElementById('avatar-input').click();
-    },
-    
-    handleAvatarUpload: async function(e) {
-        console.log('Avatar file selected', e.target.files[0]);
-        const file = e.target.files[0];
-        if (file) {
-            const formData = new FormData();
-            formData.append('avatar', file);
-    
+            const changeAvatarBtn = document.getElementById('change-avatar-btn');
+            changeAvatarBtn.addEventListener('click', this.handleAvatarChange);
+
+            const avatarInput = document.getElementById('avatar-input');
+            avatarInput.addEventListener('change', this.handleAvatarUpload);
+
+            const addFriendBtn = document.getElementById('add-friend-btn');
+            addFriendBtn.addEventListener('click', () => this.handleAddFriend());
+        },
+
+        handleProfileUpdate: async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const updateData = { username, email };
+
             try {
                 const response = await fetch('/api/accounts/me/', {
-                    method: 'PATCH',
+                    method: 'PATCH', // Cambiato da PUT a PATCH
                     headers: {
+                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                     },
-                    body: formData
+                    body: JSON.stringify(updateData)
                 });
-    
+
                 if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('avatar-preview').src = data.avatar;
-                    alert('Avatar updated successfully');
+                    const responseData = await response.json();
+                    alert('Profile updated successfully');
+                    document.getElementById('username').value = responseData.username;
+                    document.getElementById('email').value = responseData.email || '';
                 } else {
                     const errorData = await response.json();
-                    alert('Failed to update avatar: ' + JSON.stringify(errorData));
+                    alert('Failed to update profile: ' + JSON.stringify(errorData));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while updating avatar');
+                alert('An error occurred while updating profile');
             }
-        }
-    },
+        },
 
-    loadMatchHistory: async function() {
-        const matchHistoryDiv = document.getElementById('match-history');
-        try {
-            const response = await fetch('/api/accounts/matches/', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        handleAvatarChange: function() {
+            console.log('Avatar change button clicked');
+            document.getElementById('avatar-input').click();
+        },
+
+        handleAvatarUpload: async function(e) {
+            console.log('Avatar file selected', e.target.files[0]);
+            const file = e.target.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('avatar', file);
+
+                try {
+                    const response = await fetch('/api/accounts/me/', {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('avatar-preview').src = data.avatar;
+                        alert('Avatar updated successfully');
+                    } else {
+                        const errorData = await response.json();
+                        alert('Failed to update avatar: ' + JSON.stringify(errorData));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating avatar');
                 }
-            });
-            if (response.ok) {
-                const matches = await response.json();
-                console.log('Matches:', matches);
-                const username = this.profileData.username;
-    
-                if (matches.length === 0) {
-                    matchHistoryDiv.innerHTML = '<p>No matches found.</p>';
-                    return;
-                }
-    
-                matchHistoryDiv.innerHTML = `
+            }
+        },
+
+        loadMatchHistory: async function() {
+                const matchHistoryDiv = document.getElementById('match-history');
+                try {
+                    const response = await fetch('/api/accounts/matches/', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
+                    });
+                    if (response.ok) {
+                        const matches = await response.json();
+                        console.log('Matches:', matches);
+                        const username = this.profileData.username;
+
+                        if (matches.length === 0) {
+                            matchHistoryDiv.innerHTML = '<p>No matches found.</p>';
+                            return;
+                        }
+
+                        matchHistoryDiv.innerHTML = `
 				
                     <table class="table table-primary">
                         <thead>

@@ -2,6 +2,8 @@ FROM bitnami/python:3.12.6
 
 RUN apt-get update && apt-get install -y netcat-openbsd
 
+ADD conf/requirements.txt ./
+RUN	pip install -r requirements.txt
 
 COPY conf/ ./
 COPY tools/ /entrypoint/

@@ -232,7 +232,7 @@ class FriendListView(APIView):
 	permission_classes = [IsAuthenticated]
 	def get(self, request):
 		friends = request.user.friends.all()
-		paginator = Paginator(friends, 5)  # Show 25 contacts per page.
+		paginator = Paginator(friends, 4)  # Show 25 contacts per page.
 		page_number = request.GET.get("page", 1)
 		try:
 			page_number = int(page_number)
