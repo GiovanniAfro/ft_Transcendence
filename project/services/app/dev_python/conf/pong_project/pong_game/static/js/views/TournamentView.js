@@ -1,28 +1,35 @@
 const TournamentView = {
-    render: async function(tournamentId) {
-        const app = document.getElementById('app');
-        
-        if (tournamentId) {
-            // Visualizza i dettagli di un torneo specifico
-            await this.renderTournamentDetails(tournamentId);
-        } else {
-            // Visualizza la lista di tutti i tornei
-            await this.renderTournamentList();
-        }
-    },
+        render: async function(tournamentId) {
+            const app = document.getElementById('app');
 
-    renderTournamentList: async function() {
-        const app = document.getElementById('app');
-        const tournaments = await this.getTournaments();
+            if (tournamentId) {
+                // Visualizza i dettagli di un torneo specifico
+                await this.renderTournamentDetails(tournamentId);
+            } else {
+                // Visualizza la lista di tutti i tornei
+                await this.renderTournamentList();
+            }
+        },
 
-        let html = '<h2>Your Tournaments</h2>';
-
-        if (tournaments.length === 0) {
-            html += '<p>You have not created any tournaments yet.</p>';
-        } else {
-            html += '<ul>';
-            tournaments.forEach(tournament => {
-                html += `
+        renderTournamentList: async function() {
+                const app = document.getElementById('app');
+                const tournaments = await this.getTournaments();
+                // we need to put in this let html the initializing of DIV CARD ETC...
+                let html = `
+		<card>
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card-opacity">
+            		    <div class="card-body text-center">
+                `;
+                html += '<h2>Your Tournaments</h2>';
+                if (tournaments.length === 0) {
+                    html += '<p>You have not created any tournaments yet.</p>';
+                } else {
+                    html += '<ul>';
+                    tournaments.forEach(tournament => {
+                                html += `
                     <li>
                         <a href="#tournament/${tournament.id}">${tournament.name}</a> - ${tournament.status}
                         (${tournament.participants.length}/${tournament.max_participants} participants)
@@ -37,6 +44,14 @@ const TournamentView = {
         }
 
         html += '<button onclick="TournamentView.createTournament()">Create New Tournament</button>';
+        html += `
+                    <\div>
+				<\div>
+            <\div>
+        <\div>
+    <\div>
+<\card>
+                `;
         app.innerHTML = html;
     },
 
@@ -44,8 +59,17 @@ const TournamentView = {
         const app = document.getElementById('app');
         try {
             const tournament = await this.getTournament(tournamentId);
-            
+            // we need to put in this let html the initializing of DIV CARD ETC...
             let html = `
+            <card>
+                <div class="main-body">
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-4 mb-3">
+                          <div class="card-opacity">
+                            <div class="card-body text-center">
+                    `;
+
+            html += `
                 <h2>${tournament.name}</h2>
                 <p>Status: ${tournament.status}</p>
                 <p>Current Round: ${tournament.current_round}</p>
@@ -90,7 +114,19 @@ const TournamentView = {
             }
     
             html += '<br><a href="#tournament">Back to Tournament List</a>';
-    
+
+            //closing the div and card opened at the start of let html
+            html +=`
+                    <\div>
+				<\div>
+            <\div>
+        <\div>
+    <\div>
+<\card>         
+            
+            
+            `;
+
             app.innerHTML = html;
     
             // Add event listeners

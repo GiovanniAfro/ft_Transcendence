@@ -60,6 +60,18 @@ python pong_project/manage.py createsuperuser --noinput
 python pong_project/manage.py shell -c "
 from accounts.models import CustomUser;
 
+easteregg = CustomUser(
+    username='pietropacciani',
+    email='ilmostro@firenze.it',
+    first_name='Pietro',
+    last_name='Pacciani',
+    is_active=True,
+    is_superuser=False,
+    is_staff=False
+);
+easteregg.set_password('ilveromostro');  # Cripta la password
+easteregg.save();  # Salva l'utente nel database
+
 for i in range(1, 100):  # Da 1 a 10
     user = CustomUser(
         username=f'test{i}',  # Crea username dinamico test1, test2, ..., test10
@@ -72,19 +84,6 @@ for i in range(1, 100):  # Da 1 a 10
     )
     user.set_password(f'test{i}')  # Cripta la password dinamica
     user.save()  # Salva l'utente nel database
-
-gianni = CustomUser(
-    username='test1',
-    email='test1@test.it',
-    first_name='Test1',
-    last_name='',
-    is_active=True,
-    is_superuser=False,
-    is_staff=False
-);
-gianni.set_password('test1');  # Cripta la password
-gianni.save();  # Salva l'utente nel database
-
 
 "
 
