@@ -103,9 +103,27 @@ const SingleGameView = {
         }
 
         // Collisione con le racchette
-        if (this.checkPaddleCollision(this.player1Paddle) || this.checkPaddleCollision(this.player2Paddle)) {
-            this.ball.dx *= -1.05; // Aumenta leggermente la velocità ad ogni rimbalzo
+        if (this.checkPaddleCollision(this.player1Paddle)){
+            // Calcola il punto di collisione della pallina con la racchetta
+            const collisionPoint = (this.ball.y - (this.player1Paddle.y + this.player1Paddle.height / 2)) / (this.player1Paddle.height / 2);
+            // Cambia direzione e aumenta leggermente la velocità ad ogni rimbalzo
+            this.ball.dx *= -1.05;
+            // Cambia la direzione verticale in base al punto di impatto
+            this.ball.dy = collisionPoint * 6;
+            // Sposta la palla fuori dalla racchetta
+            this.ball.x = this.player1Paddle.x + this.player1Paddle.width + this.ball.radius;
         }
+        else if (this.checkPaddleCollision(this.player2Paddle)){
+            const collisionPoint = (this.ball.y - (this.player2Paddle.y + this.player2Paddle.height / 2)) / (this.player2Paddle.height / 2);
+            this.ball.dx *= -1.05;
+            this.ball.dy = collisionPoint * 6;
+            this.ball.x = this.player2Paddle.x - this.ball.radius;
+        }
+
+        // Limita velocità
+        // const maxSpeed = 12;
+        // this.ball.dx = Math.max(Math.min(this.ball.dx, maxSpeed), -maxSpeed);
+        // this.ball.dy = Math.max(Math.min(this.ball.dy, maxSpeed), -maxSpeed);
 
         // Segna punti
         if (this.ball.x < 0) {
@@ -123,11 +141,16 @@ const SingleGameView = {
     },
 
     checkPaddleCollision: function(paddle) {
+        const ballNextX = this.ball.x + this.ball.dx;
+        const ballNextY = this.ball.y + this.ball.dy;
+
         return (
-            this.ball.x - this.ball.radius < paddle.x + paddle.width &&
-            this.ball.x + this.ball.radius > paddle.x &&
-            this.ball.y > paddle.y &&
-            this.ball.y < paddle.y + paddle.height
+            ballNextX - this.ball.radius < paddle.x + paddle.width &&
+            ballNextX + this.ball.radius > paddle.x &&
+            ballNextY > paddle.y &&
+            ballNextY < paddle.y + paddle.height
+            // this.ball.y > paddle.y &&
+            // this.ball.y < paddle.y + paddle.height
         );
     },
 
