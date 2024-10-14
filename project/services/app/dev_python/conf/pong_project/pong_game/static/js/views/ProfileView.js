@@ -32,7 +32,7 @@ const ProfileView = {
 
           <div class="row gutters-sm">
             <div class="col-md-4 mb-3 h-100">
-              <div class="card">
+              <div class="card-opacity">
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center text-center">
                   <form id="profile-form">
@@ -60,12 +60,13 @@ const ProfileView = {
             </div>
             <div class="col-md-8">
 			<div class="row gutters-sm">
-                <div class="card mb-3">
-        	              <h3>Friends</h3>
+                <div class="card-opacity" >
+        	              <h3 style="font-size: xx-large; font-weight: bold; color: #0e1422; text-align:center;">Friends</h3>
         	              <ul id="friends-list">
         	              </ul>
+                          <p></p>
 			    	<div class="row w-100">
-			    		<h3 class="mb-0">Friend's Username:</h3>
+			    		<h3 class="mb-0" style="font-size: x-large; font-weight: medium; color: #0e1422;">Friend's Username:</h3>
 			    		<p></p>
         	              	<div class="col-6 w-50">
         	              	    <input type="text" id="friend-username" class="form-control w-100" placeholder="Friend">
@@ -78,17 +79,17 @@ const ProfileView = {
                 </div>
 			</div>
               <div class="row gutters-sm">
-                  <div class="card h-100 w-100">
+                  <div class="card-opacity">
                     <div class="card-body">
 					<div class="row">
-                      	<div class="p-3 col-6">
+                      	<div class="p-3 col-6" style="color: #0e1422;">
                         	<h6 class="card-title">Games Played: ${statsData.games_played}</h6>
                       	</div>
                       	<div class="p-3 col-6" style="text-align:right;">
 						  	<h6 class="card-title">Games Won: ${statsData.games_won_count}</h6>
                       	</div>
-                      	<div class="p-3 col-6">
-                      	  <h6 class="card-title">Total Score: ${statsData.total_score}</h6>
+                      	<div class="p-3 col-6" style="color: #0e1422;">
+                      	  <h6 class="card-title;">Total Score: ${statsData.total_score}</h6>
                       	</div>
 					    <div class="p-3 col-6" style="text-align:right;">
                       	  <h6 class="card-title">Win Rate: ${statsData.win_rate}%</h6>
@@ -102,9 +103,9 @@ const ProfileView = {
         </div>
     </div>
 <div class="container">	
-	<div class="row">
-    <div class="col card h-100">
-        <h3>Match History</h3>
+	<div class="row  text-align:center;" >
+    <div class="card-opacity">
+        <h3 style="font-size: xx-large; font-weight: bold; color: #0e1422; text-align:center;">Match History</h3>
         <div id="match-history"></div>
         </div>
     </div>	

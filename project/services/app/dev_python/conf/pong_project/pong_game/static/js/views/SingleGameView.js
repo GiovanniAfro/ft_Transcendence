@@ -255,11 +255,11 @@ const SingleGameView = {
                                 <div class="row">
                                         <form id="player2Form">
                                             <div class="mb-3">
-                                                <label for="player2Name" class="form-label">Player 2 Name:</label> 
+                                                <label for="player2Name" class="form-label" style="color: #0e1422;">Player 2 Name:</label> 
                                                 <input type="text" class="form-control" id="player2Name" required>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="player2Type" class="form-label">Player 2 Type:</label>
+                                                <label for="player2Type" class="form-label" style="color: #0e1422;">Player 2 Type:</label>
                                                 <select class="form-select" id="player2Type">
                                                     <option value="alias">Temporary Alias</option>
                                                     <option value="registered">Registered User</option>
