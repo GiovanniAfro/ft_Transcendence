@@ -149,8 +149,13 @@ const GameView = {
 
     checkCollisions: function() {
         // Collisions with top and bottom edges
-        if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > this.canvas.height) {
+        if (this.ball.y - this.ball.radius < 0) {
             this.ball.dy *= -1;
+            this.ball.y = this.ball.radius;
+        }
+        else if (this.ball.y + this.ball.radius > this.canvas.height) {
+            this.ball.dy *= -1;
+            this.ball.y = this.canvas.height - this.ball.radius;
         }
 
         // Collisions with paddles

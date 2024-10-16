@@ -98,8 +98,13 @@ const SingleGameView = {
         this.ball.y += this.ball.dy;
 
         // Collisione con i bordi superiore e inferiore
-        if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > this.canvas.height) {
+        if (this.ball.y - this.ball.radius < 0) {
             this.ball.dy *= -1;
+            this.ball.y = this.ball.radius;
+        }
+        else if (this.ball.y + this.ball.radius > this.canvas.height) {
+            this.ball.dy *= -1;
+            this.ball.y = this.canvas.height - this.ball.radius;
         }
 
         // Collisione con le racchette
