@@ -111,6 +111,7 @@ const ProfileView = {
     </div>	
 </div>
 						`;
+                    this.loadMatchHistory(1);
                     this.friendsResponse(1);
                     this.attachEventListeners();
                     this.loadMatchHistory();
@@ -143,7 +144,8 @@ const ProfileView = {
 
             friendsContainer.innerHTML = `
 			${list}
-			<div class="d-flex gap-2">
+            <p></p>
+			<div class="d-flex justify-content-center gap-2">
 				<button id="friends-prev-page" class="btn btn-primary" ${json.previous_page !== null ? '' : 'disabled'}>Previous</button>
 				<div>Page ${json.actual_page}</div>
 				<button id="friends-next-page" class="btn btn-primary" ${json.next_page !== null  ? '' : 'disabled'}>Next</button>
@@ -296,9 +298,9 @@ const ProfileView = {
 						<span class="label label-primary">Page ${output1.matches_actual_page}</span>
 						<button id="matches-next-page" class="btn btn-primary" ${output1.matches_next_page !== null  ? '' : 'disabled'}>Next</button>
 					</div>
-                    <p></p>                    
+                    <p></p>
                 `;
-                document.querySelector('#matches-prev-page').addEventListener('click', () =>{
+                document.querySelector('#matches-prev-page').addEventListener('click', () =>{0
                     if (output1.matches_previous_page !== null) {
                         this.loadMatchHistory(output1.matches_previous_page);
                     }
