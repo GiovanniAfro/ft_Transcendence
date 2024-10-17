@@ -82,6 +82,7 @@ const TournamentView = {
 
                     if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
                         html += `<button class="btn btn-primary" id="addParticipantBtn">Add Participant</button>`;
+                        html += '<p></p>';
                     }
 
                     if (tournament.status !== 'REGISTRATION') {
@@ -287,7 +288,14 @@ const TournamentView = {
     showTournamentResults: async function(tournamentId) {
         try {
             const tournament = await this.getTournament(tournamentId);
-            let resultsHtml = `<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">${tournament.name} - Tournament Results</h2>`;
+            let resultsHtml = `
+            <card>
+                <div class="main-body">
+                    <div class="row justify-content-md-center w-auto">
+                          <div class="card-opacity">
+                            <div class="card-body text-center ">
+            `;
+            resultsHtml += `<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">${tournament.name} - Tournament Results</h2>`;
     
             // Partecipanti
             resultsHtml += `<h3 style="font-size: large; font-weight: bold; color: #0e1422;">Participants:</h3><ul>`;
@@ -324,7 +332,15 @@ const TournamentView = {
                 const finalMatch = tournament.matches[tournament.matches.length - 1];
                 resultsHtml += `<h3 style="font-size: xx-large; font-weight: bold; color: green;">Tournament Winner: ${finalMatch.winner_alias}</h3>`;
             }
-    
+            
+            resultsHtml += `
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</card>        
+            `;
             // Mostra i risultati in un modal o in una nuova pagina
             const modal = document.createElement('div');
             modal.style.position = 'fixed';
@@ -332,19 +348,21 @@ const TournamentView = {
             modal.style.top = '0';
             modal.style.width = '100%';
             modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
             modal.style.overflowY = 'auto';
-    
+            modal.className = 'modal text-center card-opacity';
+
             const modalContent = document.createElement('div');
             modalContent.style.backgroundColor = '#fff';
             modalContent.style.margin = '10% auto';
             modalContent.style.padding = '20px';
-            modalContent.style.width = '80%';
+            modalContent.style.width = 'auto'
             modalContent.innerHTML = resultsHtml;
+            modalContent.className = 'text-center card-opacity';
     
             const closeBtn = document.createElement('button');
             closeBtn.textContent = 'Close';
             closeBtn.onclick = () => document.body.removeChild(modal);
+            closeBtn.className = 'btn btn-primary textcenter justify-content-center';
             modalContent.appendChild(closeBtn);
     
             modal.appendChild(modalContent);
