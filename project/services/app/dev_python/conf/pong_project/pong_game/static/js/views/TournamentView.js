@@ -34,7 +34,7 @@ const TournamentView = {
                         <a href="#tournament/${tournament.id}">${tournament.name}</a> - ${tournament.status}
                         (${tournament.participants.length}/${tournament.max_participants} participants)
                         ${tournament.status === 'REGISTRATION' ?
-                            `<button onclick="TournamentView.joinTournament(${tournament.id})">Add Participant</button>` :
+                            `<button class="btn btn-primary" onclick="TournamentView.joinTournament(${tournament.id})">Add Participant</button>` :
                             ''
                         }
                     </li>
@@ -43,7 +43,7 @@ const TournamentView = {
             html += '</ul>';
         }
 
-        html += '<button onclick="TournamentView.createTournament()">Create New Tournament</button>';
+        html += '<button class="btn btn-primary" onclick="TournamentView.createTournament()">Create New Tournament</button>';
         html += `
                     <\div>
 				<\div>
@@ -66,7 +66,7 @@ const TournamentView = {
                     <div class="row justify-content-md-center">
                         <div class="col-md-4 mb-3">
                           <div class="card-opacity">
-                            <div class="card-body text-center">
+                            <div class="card-body text-center ">
                     `;
 
             html += `
@@ -82,13 +82,13 @@ const TournamentView = {
             `;
     
             if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
-                html += `<button id="addParticipantBtn">Add Participant</button>`;
+                html += `<button class="btn btn-primary" id="addParticipantBtn">Add Participant</button>`;
             }
     
             if (tournament.status !== 'REGISTRATION') {
                 html += `
-                    <button id="showResultsBtn">Show Tournament Results</button>
-                    <button id="showBracketBtn">Show Tournament Bracket</button>
+                    <button class="btn btn-primary" id="showResultsBtn">Show Tournament Results</button>
+                    <button class="btn btn-primary" id="showBracketBtn">Show Tournament Bracket</button>
                 `;
     
                 html += `
@@ -101,7 +101,7 @@ const TournamentView = {
                                     Round ${m.round}: ${m.player1_alias} vs ${m.player2_alias}
                                     ${m.winner_alias ? `(Winner: ${m.winner_alias})` : ''}
                                     ${!m.winner_alias && tournament.status === 'IN_PROGRESS' ? 
-                                        `<button class="playMatchBtn" data-match-id="${m.id}">Play Match</button>` : 
+                                        `<button class="playMatchBtn btn btn-primary" data-match-id="${m.id}">Play Match</button>` : 
                                         ''}
                                 </li>
                             `).join('')}
@@ -368,7 +368,7 @@ const TournamentView = {
                 <div class="modal-content">
                     <h2>${tournament.name} - Tournament Bracket</h2>
                     ${bracketHtml}
-                    <button id="closeBracketBtn">Close</button>
+                    <button class="btn btn-primary" id="closeBracketBtn">Close</button>
                 </div>
             `;
     
