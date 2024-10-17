@@ -40,16 +40,16 @@ const ProfileView = {
                     <img src="${profileData.avatar || "/static/img/default_avatar.png"}" alt="Admin" class="rounded-circle" width="150" height="150">
                     <div class="mt-3">
                       <div class="mb-3">
-                        <label for="username" class="form-label">Username:</label>
+                        <label for="username" class="form-label"><h3 style="color: white"  >Username:</h3></label>
                         <input type="text" class="form-control" id="username" value="${profileData.username}">
                         <input type="file" id="avatar-input" style="display: none;" accept="image/*">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email:</label>
+                            <label for="email" class="form-label"><h3 style="color: white"  >Email:</h3></label>
                             <input type="email" class="form-control" id="email" value="${profileData.email}">
                         </div>
                         <p></p>
                         <button class="btn btn-primary" id="change-avatar-btn">Change Avatar</button>
-                        <button type="submit" class="btn btn-outline-primary">Update Profile</button>
+                        <button type="submit" class="btn btn-danger">Update Profile</button>
                       </div>
                     </div>
                   </div>
@@ -115,7 +115,7 @@ const ProfileView = {
                     this.attachEventListeners();
                     this.loadMatchHistory();
                 } else {
-                    app.innerHTML = '<h2>Failed to load profile</h2>';
+                    app.innerHTML = '<h2 style="color:red; text-align:center;">Failed to load profile</h2>';
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -242,16 +242,18 @@ const ProfileView = {
             }
         },
 
-        loadMatchHistory: async function() {
+        loadMatchHistory: async function(page) {
                 const matchHistoryDiv = document.getElementById('match-history');
                 try {
-                    const response = await fetch('/api/accounts/matches/', {
+                    const response = await fetch(`/api/accounts/matches/?page=${page}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                         }
                     });
                     if (response.ok) {
-                        const matches = await response.json();
+                        const output1 = await response.json();
+                        const matches = output1.matches;
+                        console.log('output1:', output1);
                         console.log('Matches:', matches);
                         const username = this.profileData.username;
 
@@ -289,9 +291,25 @@ const ProfileView = {
                             }).join('')}
                         </tbody>
                     </table>
+                    <div class="gap-2 text-center">
+						<button id="matches-prev-page" class="btn btn-primary" ${output1.matches_previous_page !== null ? '' : 'disabled'}>Previous</button>
+						<span class="label label-primary">Page ${output1.matches_actual_page}</span>
+						<button id="matches-next-page" class="btn btn-primary" ${output1.matches_next_page !== null  ? '' : 'disabled'}>Next</button>
+					</div>
+                    <p></p>                    
                 `;
+                document.querySelector('#matches-prev-page').addEventListener('click', () =>{
+                    if (output1.matches_previous_page !== null) {
+                        this.loadMatchHistory(output1.matches_previous_page);
+                    }
+                });
+             document.querySelector('#matches-next-page').addEventListener('click', () => {
+                    if (output1.matches_next_page !== null){
+                        this.loadMatchHistory(output1.matches_next_page)
+                    }
+                });
             } else {
-                matchHistoryDiv.innerHTML = '<p>Failed to load match history</p>';
+                matchHistoryDiv.innerHTML = '<h4 style="color:yellow; text-align:center;">Failed to load match history, it seems you have 0 game played, GO TO PLAY THE GAMEEEEEEEE</p>';
             }
         } catch (error) {
             console.error('Error:', error);

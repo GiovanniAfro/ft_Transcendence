@@ -179,32 +179,52 @@ class UserStatsView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-class MatchHistoryView(generics.ListAPIView):
+class MatchHistoryView(APIView):
     serializer_class = GameSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self, request):
+    # def get_querygetset(self):
+        # user = self.request.user
+        # games = Game.objects.filter(Q(player1=user) | Q(player2=user))
+        # paginator = Paginator(games, 5)
+        # page_number = self.request.GET.get("page", 1)
+        # logger.info(f"Requested page: {page_number}")
+        # try:
+            # page_obj = int(page_number)
+        # except ValueError:
+            # page_obj = paginator.page(1)
+        # page_obj = paginator.get_page(page_obj)
+        # output1 = {
+            # 'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            # 'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            # 'matches_actual_page': page_obj.number,
+            # 'matches_start_index': page_obj.start_index(),
+            # 'matches_end_index': page_obj.end_index(),
+            #    'games': games
+        # }
+        # return output1
+    def get(self, request):
         user = self.request.user
+        
         games = Game.objects.filter(Q(player1=user) | Q(player2=user))
-        logger.info(f"Found {len(games)} games for user {user.username}")
-        paginator = Paginator(games, 5)
-        logger.info(f"Paginating with {paginator.num_pages} pages")
-        page_number = request.GET.get_queryset("page", 1)
-        logger.info(f"Requested page: {page_number}")
-        #try:
-        #    page_obj = paginator.page(page_number)
-        #except EmptyPage:
-        #    page_obj = paginator.page(1)
-        #page_obj = paginator.page(page_number)
-        #output1 = (
-        #    'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
-        #    'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-        #    'matches_actual_page': page_obj.number,
-        #    'matches_start_index': page_obj.start_index(),
-        #    'matches_end_index': page_obj.end_index(),
-        #    'Matches': games
-        #)
-        return games
+        paginator = Paginator(games, 5)  # Show 25 contacts per page.
+        page_number = request.GET.get("page", 1)
+        try:
+            page_number = int(page_number)
+        except ValueError:
+            page_number = 1
+        page_obj = paginator.get_page(page_number)
+        games_serialized = GameSerializer(list(page_obj), many=True)
+        output1 = {
+            'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            'matches_actual_page': page_obj.number,
+            'matches_start_index': page_obj.start_index(),
+            'matches_end_index': page_obj.end_index(),
+            'matches': games_serialized.data
+        }
+        return Response(output1)
+
 
 class FollowUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]

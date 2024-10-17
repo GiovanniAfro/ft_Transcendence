@@ -12,10 +12,10 @@ const TournamentView = {
         },
 
         renderTournamentList: async function() {
-                const app = document.getElementById('app');
-                const tournaments = await this.getTournaments();
-                // we need to put in this let html the initializing of DIV CARD ETC...
-                let html = `
+            const app = document.getElementById('app');
+            const tournaments = await this.getTournaments();
+            // we need to put in this let html the initializing of DIV CARD ETC...
+            let html = `
 		<card>
         	<div class="main-body">
 				<div class="row justify-content-md-center">
@@ -23,28 +23,27 @@ const TournamentView = {
             		  <div class="card-opacity">
             		    <div class="card-body text-center">
                 `;
-                html += '<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">Your Tournaments</h2>';
-                if (tournaments.length === 0) {
-                    html += '<p style="color: #0e1422;">You have not created any tournaments yet.</p>';
-                } else {
-                    html += '<ul>';
-                    tournaments.forEach(tournament => {
-                                html += `
-                   <div style="color: #0e1422;">
-                        <a href="#tournament/${tournament.id}">${tournament.name}</a> - ${tournament.status}
-                        (${tournament.participants.length}/${tournament.max_participants} participants)
-                        ${tournament.status === 'REGISTRATION' ?
-                            `<button class="btn btn-primary" onclick="TournamentView.joinTournament(${tournament.id})">Add Participant</button>` :
-                            ''
-                        }
-                    </div>
+            html += '<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">Your Tournaments</h2>';
+            if (tournaments.length === 0) {
+                html += '<p style="color: #0e1422;">You have not created any tournaments yet.</p>';
+            } else {
+                html += '<ul>';
+                tournaments.forEach(tournament => {
+                    html += `
+                   
+                    <a  href="#tournament/${tournament.id}">
+                        <div class="btn btn-warning text-center" >
+                            ${tournament.name} - ${tournament.status} (${tournament.participants.length}/${tournament.max_participants} participants)
+                        </div>
+                    </a>
+                    <p></p>
                 `;
-            });
-            html += '</ul>';
-        }
+                });
+                html += '</ul>';
+            }
 
-        html += '<button class="btn btn-primary" onclick="TournamentView.createTournament()">Create New Tournament</button>';
-        html += `
+            html += '<button class="btn btn-danger" onclick="TournamentView.createTournament()">Create New Tournament</button>';
+            html += `
                     <\div>
 				<\div>
             <\div>
@@ -52,15 +51,15 @@ const TournamentView = {
     <\div>
 <\card>
                 `;
-        app.innerHTML = html;
-    },
+            app.innerHTML = html;
+        },
 
-    renderTournamentDetails: async function(tournamentId) {
-        const app = document.getElementById('app');
-        try {
-            const tournament = await this.getTournament(tournamentId);
-            // we need to put in this let html the initializing of DIV CARD ETC...
-            let html = `
+        renderTournamentDetails: async function(tournamentId) {
+                const app = document.getElementById('app');
+                try {
+                    const tournament = await this.getTournament(tournamentId);
+                    // we need to put in this let html the initializing of DIV CARD ETC...
+                    let html = `
             <card>
                 <div class="main-body">
                     <div class="row justify-content-md-center">
@@ -69,7 +68,7 @@ const TournamentView = {
                             <div class="card-body text-center ">
                     `;
 
-            html += `
+                    html += `
                 <h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">${tournament.name}</h2>
                 <p style="color: #0e1422;">Status: ${tournament.status}</p>
                 <p style="color: #0e1422;">Current Round: ${tournament.current_round}</p>
@@ -80,19 +79,19 @@ const TournamentView = {
                      ${tournament.participants.map(p => p.alias).join(', ')}
                 </div>
             `;
-    
-            if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
-                html += `<button class="btn btn-primary" id="addParticipantBtn">Add Participant</button>`;
-            }
-    
-            if (tournament.status !== 'REGISTRATION') {
-                html += `
+
+                    if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
+                        html += `<button class="btn btn-primary" id="addParticipantBtn">Add Participant</button>`;
+                    }
+
+                    if (tournament.status !== 'REGISTRATION') {
+                        html += `
                  <p></p>
                     <button class="btn btn-primary" id="showResultsBtn">Show Tournament Results</button>
                     <button class="btn btn-primary" id="showBracketBtn">Show Tournament Bracket</button>
                 `;
-    
-                html += `
+
+                        html += `
                  <p></p>
                     <h3 style="font-size: x-large; font-weight: bold; color: #0e1422;">Current Round Matches:</h3>
                     <div style="color: #0e1422;">
@@ -116,7 +115,7 @@ const TournamentView = {
                 html += `<h3 style="font-size: x-large; font-weight: bold; color: green;">Tournament Winner: ${tournament.matches[tournament.matches.length - 1].winner_alias}</h3>`;
             }
     
-            html += '<br><a href="#tournament" style="color: #10a8d6">Back to Tournament List</a>';
+            html += '<br><a class="link-tournament" href="#tournament"><div class="btn btn-success ">Back to Tournament List</div></a>';
 
             //closing the div and card opened at the start of let html
             html +=`

@@ -94,4 +94,9 @@ dev:
 	@docker compose -p "ft_transcendence" --profile dev up -d --build
 	@echo
 
+dev-tailpython: dev
+	@echo "\n$(BLUE)[+] Tailing python logs ..."
+	sleep 1
+	docker exec -it dev_python tail "-f" "./pong_project/django.log"
+
 clean-dev: clean dev
