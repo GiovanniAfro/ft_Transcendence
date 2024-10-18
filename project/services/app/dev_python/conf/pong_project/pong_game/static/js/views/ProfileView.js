@@ -115,6 +115,7 @@ const ProfileView = {
                     this.friendsResponse(1);
                     this.attachEventListeners();
                     this.loadMatchHistory();
+                    this.loadOnlineFriends();
                 } else {
                     app.innerHTML = '<h2 style="color:red; text-align:center;">Failed to load profile</h2>';
                 }
@@ -175,6 +176,8 @@ const ProfileView = {
 
             const addFriendBtn = document.getElementById('add-friend-btn');
             addFriendBtn.addEventListener('click', () => this.handleAddFriend());
+            setInterval(this.loadOnlineFriends.bind(this), 30000);
+
         },
 
         handleProfileUpdate: async function(e) {
@@ -348,5 +351,31 @@ const ProfileView = {
             console.error('Error:', error);
             alert('An error occurred while adding friend');
         }
-    }
+    },
+
+    loadOnlineFriends: async function() {
+        try {
+            const response = await fetch('/api/accounts/friends/status/', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+            if (response.ok) {
+                const friends = await response.json();
+                const friendsList = document.getElementById('friends-list');
+                if (friendsList) {  // Aggiungi questo controllo
+                    friendsList.innerHTML = friends.map(friend => `
+                        <li>
+                            ${friend.username} 
+                            <span class="${friend.is_online ? 'online' : 'offline'}">
+                                (${friend.is_online ? 'Online' : 'Offline'})
+                            </span>
+                        </li>
+                    `).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error loading friends:', error);
+        }
+    },
 };

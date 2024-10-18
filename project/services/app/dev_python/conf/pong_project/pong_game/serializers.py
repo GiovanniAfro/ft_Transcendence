@@ -3,6 +3,7 @@ from .models import Game, Lobby, MatchRequest, Tournament, TournamentParticipant
 from accounts.serializers import UserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import bleach
 
 CustomUser = get_user_model()
 User = get_user_model()
@@ -38,6 +39,25 @@ class GameSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'date_played', 'winner', 'player1', 'player1_username', 'player2_username', 'winner_username']
 
+    def validate_player2_alias(self, value):
+        return bleach.clean(value)
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if not request or not request.user:
+            raise serializers.ValidationError("Autenticazione richiesta.")
+        player1 = request.user
+        player2 = data.get('player2')
+        player2_alias = data.get('player2_alias')
+
+        if player2 and player2.id == player1.id:
+            raise serializers.ValidationError("Non puoi giocare contro te stesso.")
+    
+        if player2_alias and player2_alias == player1.username:
+            raise serializers.ValidationError("Non puoi usare il tuo username come alias per il giocatore 2.")
+
+        return data
+
     def create(self, validated_data):
         request = self.context.get('request')
         validated_data['player1'] = request.user
@@ -64,6 +84,9 @@ class TournamentParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = TournamentParticipant
         fields = ['id', 'alias', 'eliminated']
+    
+    def validate_alias(self, value):
+        return bleach.clean(value)
 
 class TournamentMatchSerializer(serializers.ModelSerializer):
     player1_alias = serializers.CharField(source='player1.alias', read_only=True)
@@ -83,6 +106,9 @@ class TournamentSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = ['id', 'name', 'creator', 'max_participants', 'status', 'current_round', 'created_at', 'participants', 'matches']
         read_only_fields = ('creator',)
+
+    def validate_name(self, value):
+        return bleach.clean(value)
 
     def validate_max_participants(self, value):
         if value not in [2, 4, 8, 16, 32]:

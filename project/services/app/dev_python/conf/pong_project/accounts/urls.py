@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserDetailView, RegisterView, UserStatsView, MatchHistoryView, FollowUserView, UnfollowUserView, TwoFactorSetupView, CustomTokenObtainPairView, Verify2FAView
+from .views import UserDetailView, RegisterView, UserStatsView, MatchHistoryView, FollowUserView, UnfollowUserView, TwoFactorSetupView, CustomTokenObtainPairView, Verify2FAView, OnlineFriendsView, FriendsStatusView
 from two_factor.urls import urlpatterns as tf_urls
 
 urlpatterns = [
@@ -10,6 +10,8 @@ urlpatterns = [
     path('matches/', MatchHistoryView.as_view(), name='user-match-history'),
     path('follow/<int:pk>/', FollowUserView.as_view(), name='follow-user'),
     path('unfollow/<int:pk>/', UnfollowUserView.as_view(), name='unfollow-user'),
+    path('friends/online/', OnlineFriendsView.as_view(), name='online-friends'),
+    path('friends/status/', FriendsStatusView.as_view(), name='friends-status'),
     
     # Nuovi percorsi per 2FA
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

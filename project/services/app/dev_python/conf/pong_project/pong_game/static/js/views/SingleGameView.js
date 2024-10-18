@@ -1,5 +1,10 @@
 const SingleGameView = {
     init: function(player1Name, player2Name) {
+        if (player1Name === player2Name) {
+            alert('Errore: i due giocatori non possono essere lo stesso utente');
+            window.location.hash = '#profile'; // Reindirizza al profilo
+            return;
+        }
         this.canvas = document.getElementById('pongCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.setupGame(player1Name, player2Name);
@@ -218,7 +223,7 @@ const SingleGameView = {
             score_player2: this.score.player2,
             status: 'FINISHED'
         };
-    
+
         fetch(`/api/single-game/${this.gameId}/`, {
             method: 'PUT',
             headers: {
@@ -230,7 +235,7 @@ const SingleGameView = {
         .then(response => {
             if (!response.ok) {
                 return response.json().then(data => {
-                    throw new Error(data.error || JSON.stringify(data) || 'Errore sconosciuto');
+                    throw new Error(data.error || data.non_field_errors[0] || 'Errore sconosciuto');
                 });
             }
             return response.json();
@@ -238,7 +243,6 @@ const SingleGameView = {
         .then(data => {
             console.log('Game result saved:', data);
             alert('Partita terminata e risultato salvato!');
-            // Reindirizza al profilo
             window.location.hash = '#profile';
         })
         .catch(error => {
@@ -300,6 +304,12 @@ const SingleGameView = {
             const player2Name = document.getElementById('player2Name').value;
             const player2Type = document.getElementById('player2Type').value;
             const player2Username = player2Type === 'registered' ? document.getElementById('player2Username').value : player2Name;
+            const currentUser = this.getCurrentUsername();
+        
+            if (player2Type === 'registered' && player2Username === currentUser) {
+                alert('Non puoi giocare contro te stesso!');
+                return;
+            }
 
             if (!player2Username) {
                 alert('Per favore, inserisci un nome per il giocatore 2.');
@@ -350,6 +360,7 @@ const SingleGameView = {
     getCurrentUsername: function() {
         const token = localStorage.getItem('access_token');
         if (!token) {
+            console.error('Token non trovato');
             return null;
         }
     

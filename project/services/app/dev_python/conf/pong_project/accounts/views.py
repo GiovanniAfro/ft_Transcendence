@@ -1,5 +1,6 @@
+from django.utils import timezone
+from datetime import timedelta
 import logging
-from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -250,3 +251,30 @@ class UnfollowUserView(APIView):
             return Response({"message": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class OnlineFriendsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        five_minutes_ago = timezone.now() - timedelta(minutes=5)
+        online_friends = user.friends.filter(last_activity__gte=five_minutes_ago)
+        serializer = UserSerializer(online_friends, many=True)
+        return Response(serializer.data)
+
+class FriendsStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        five_minutes_ago = timezone.now() - timedelta(minutes=5)
+        friends = user.friends.all()
+        
+        friend_data = []
+        for friend in friends:
+            friend_data.append({
+                'username': friend.username,
+                'is_online': friend.last_activity >= five_minutes_ago
+            })
+        
+        return Response(friend_data)
