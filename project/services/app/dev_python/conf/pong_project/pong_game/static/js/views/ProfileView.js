@@ -102,20 +102,19 @@ const ProfileView = {
           </div>
         </div>
     </div>
-<div class="container">	
+<div class="container">
 	<div class="row  text-align:center;" >
     <div class="card-opacity">
         <h3 style="font-size: xx-large; font-weight: bold; color: #0e1422; text-align:center;">Match History</h3>
         <div id="match-history"></div>
         </div>
-    </div>	
+    </div>
 </div>
 						`;
                     this.loadMatchHistory(1);
                     this.friendsResponse(1);
                     this.attachEventListeners();
-                    this.loadMatchHistory();
-                    this.loadOnlineFriends();
+                    //this.loadMatchHistory();
                 } else {
                     app.innerHTML = '<h2 style="color:red; text-align:center;">Failed to load profile</h2>';
                 }
@@ -131,17 +130,23 @@ const ProfileView = {
                 return;
             }
 
-            const result = await fetch(`/api/friends/?page=${page}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const result = await fetch(`/api/accounts/friends/status/?page=${page}`, { headers: { 'Authorization': `Bearer ${token}` } });
             const json = await result.json();
+            console.log('json_Friends:', json);
             const friendsContainer = document.getElementById('friends-list');
-            const list = json.data.map(friend => `
-			<li>
-				${friend.username} 
-				<span class="${friend.is_online ? 'online' : 'offline'}">
-					(${friend.is_online ? 'Online' : 'Offline'})
-				</span>
-			</li>
-		`).join('');
+            if (!friendsContainer)
+            {
+                console.log('Friends container not found');
+                return;
+            }
+              const list = json.data.map(friend => `
+			  <li>
+			  	${friend.username}
+			  	<span class="${friend.is_online ? 'online' : 'offline'}">
+			  		(${friend.is_online ? 'Online' : 'Offline'})
+			  	</span>
+			  </li>
+	          `).join('');
 
             friendsContainer.innerHTML = `
 			${list}
@@ -176,7 +181,7 @@ const ProfileView = {
 
             const addFriendBtn = document.getElementById('add-friend-btn');
             addFriendBtn.addEventListener('click', () => this.handleAddFriend());
-            setInterval(this.loadOnlineFriends.bind(this), 30000);
+            setInterval(this.friendsResponse, 10000);
 
         },
 
@@ -268,7 +273,7 @@ const ProfileView = {
                         }
 
                         matchHistoryDiv.innerHTML = `
-				
+
                     <table class="table table-primary">
                         <thead>
                             <tr>
@@ -353,7 +358,7 @@ const ProfileView = {
         }
     },
 
-    loadOnlineFriends: async function() {
+    loadOnlineFriends1: async function() {
         try {
             const response = await fetch('/api/accounts/friends/status/', {
                 headers: {
@@ -361,12 +366,13 @@ const ProfileView = {
                 }
             });
             if (response.ok) {
-                const friends = await response.json();
-                const friendsList = document.getElementById('friends-list');
-                if (friendsList) {  // Aggiungi questo controllo
-                    friendsList.innerHTML = friends.map(friend => `
+                const jsonData = await response.json();
+                const htmlFriendsList = document.getElementById('friends-list');
+                console.log('Friends:', jsonData);
+                if (htmlFriendsList) {  // Aggiungi questo controllo
+                    htmlFriendsList.innerHTML = jsonData.friends.map(friend => `
                         <li>
-                            ${friend.username} 
+                            ${friend.username}
                             <span class="${friend.is_online ? 'online' : 'offline'}">
                                 (${friend.is_online ? 'Online' : 'Offline'})
                             </span>

@@ -1,6 +1,7 @@
 from django.utils import timezone
 from datetime import timedelta
 import logging
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -206,7 +207,7 @@ class MatchHistoryView(APIView):
         # return output1
     def get(self, request):
         user = self.request.user
-        
+
         games = Game.objects.filter(Q(player1=user) | Q(player2=user))
         paginator = Paginator(games, 5)  # Show 25 contacts per page.
         page_number = request.GET.get("page", 1)
@@ -251,7 +252,7 @@ class UnfollowUserView(APIView):
             return Response({"message": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
 class OnlineFriendsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -269,12 +270,26 @@ class FriendsStatusView(APIView):
         user = request.user
         five_minutes_ago = timezone.now() - timedelta(minutes=5)
         friends = user.friends.all()
-        
+
+        paginator = Paginator(friends, 4)
+        page_number = request.GET.get("page", 1)
+        try:
+            page_number = int(page_number)
+        except ValueError:
+            page_number = 1
+        page_obj = paginator.get_page(page_number)
         friend_data = []
-        for friend in friends:
+        for friend in page_obj:
             friend_data.append({
                 'username': friend.username,
                 'is_online': friend.last_activity >= five_minutes_ago
             })
-        
-        return Response(friend_data)
+        output = {
+            'previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            'actual_page': page_obj.number,
+            'start_index': page_obj.start_index(),
+            'end_index': page_obj.end_index(),
+            'data': friend_data
+        }
+        return Response(output)
