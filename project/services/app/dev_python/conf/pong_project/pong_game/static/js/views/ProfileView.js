@@ -37,7 +37,7 @@ const ProfileView = {
                   <div class="d-flex flex-column align-items-center text-center">
                   <form id="profile-form">
                   <div class="d-flex flex-column align-items-center text-center">
-                    <img src="${profileData.avatar || "/static/img/default_avatar.png"}" alt="Admin" class="rounded-circle" width="150" height="150">
+                   <img id="avatar-preview" src="${profileData.avatar || "/static/img/default_avatar.png"}" alt="Admin" class="rounded-circle" width="150" height="150">
                     <div class="mt-3">
                       <div class="mb-3">
                         <label for="username" class="form-label"><h3 style="color: white"  >Username:</h3></label>
