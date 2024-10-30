@@ -31,10 +31,10 @@ up:
 	@rm -rf .env
 	@./setup/setup_iptables.sh
 	@./setup/setup_vault.sh
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile log-system up -d
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile monitor-system up -d
+	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
+	# @docker compose -p "ft_transcendence" --profile log-system up -d
+	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
+	# @docker compose -p "ft_transcendence" --profile monitor-system up -d
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
 	@docker compose -p "ft_transcendence" --profile app up -d 
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
