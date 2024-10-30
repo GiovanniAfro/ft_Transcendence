@@ -149,17 +149,36 @@ const GameView = {
 
     checkCollisions: function() {
         // Collisions with top and bottom edges
-        if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > this.canvas.height) {
+        if (this.ball.y - this.ball.radius < 0) {
             this.ball.dy *= -1;
+            this.ball.y = this.ball.radius;
+        }
+        else if (this.ball.y + this.ball.radius > this.canvas.height) {
+            this.ball.dy *= -1;
+            this.ball.y = this.canvas.height - this.ball.radius;
         }
 
         // Collisions with paddles
-        if (
-            (this.ball.x - this.ball.radius < this.paddle1.x + this.paddle1.width && this.ball.y > this.paddle1.y && this.ball.y < this.paddle1.y + this.paddle1.height) ||
-            (this.ball.x + this.ball.radius > this.paddle2.x && this.ball.y > this.paddle2.y && this.ball.y < this.paddle2.y + this.paddle2.height)
-        ) {
-            this.ball.dx *= -1.07; // Slightly increase speed on paddle hit
+        if (this.checkPaddleCollision(this.paddle1)) {
+            const collisionPoint = (this.ball.y - (this.paddle1.y + this.paddle1.height / 2)) / (this.paddle1.height / 2);
+            // Reverse and increase speed slightly
+            this.ball.dx *= -1.07;
+            // Adjust the vertical speed based on collision point
+            this.ball.dy = collisionPoint * 6;
+            // Prevent multiple collisions by moving the ball out
+            this.ball.x = this.paddle1.x + this.paddle1.width + this.ball.radius;
         }
+        else if (this.checkPaddleCollision(this.paddle2)) {
+            const collisionPoint = (this.ball.y - (this.paddle2.y + this.paddle2.height / 2)) / (this.paddle2.height / 2);
+            this.ball.dx *= -1.07;
+            this.ball.dy = collisionPoint * 6;
+            this.ball.x = this.paddle2.x - this.ball.radius;
+        }
+
+        // Limit ball speed or increase paddle speed also?
+        // const maxSpeed = 12;
+        // this.ball.dx = Math.max(Math.min(this.ball.dx, maxSpeed), -maxSpeed);
+        // this.ball.dy = Math.max(Math.min(this.ball.dy, maxSpeed), -maxSpeed);
 
         // Punteggio
         if (this.ball.x < 0) {
@@ -176,6 +195,20 @@ const GameView = {
             this.endGame();  // Chiama direttamente endGame invece di usare alert
             this.isTournamentGame = currentIsTournamentGame;
         }
+    },
+
+    checkPaddleCollision: function(paddle) {
+        const ballNextX = this.ball.x + this.ball.dx;
+        const ballNextY = this.ball.y + this.ball.dy;
+
+        return (
+            ballNextX - this.ball.radius < paddle.x + paddle.width &&
+            ballNextX + this.ball.radius > paddle.x &&
+            ballNextY > paddle.y &&
+            ballNextY < paddle.y + paddle.height
+            // this.ball.y > paddle.y &&
+            // this.ball.y < paddle.y + paddle.height
+        );
     },
 
     draw: function() {

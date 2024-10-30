@@ -2,13 +2,29 @@ const LoginView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p id="login-message"></p>
+		<card>
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card-opacity">
+            		    <div class="card-body text-center">
+        					<form id="login-form" class="form-signin">
+        					    <img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200" >
+        					    <h1 class="h3 font-weight-normal" style="font-size: xx-large; font-weight: bold; color: #0e1422;">Please sign in</h1>
+        					    <label class="sr-only">Username</label>
+        					    <input type="text" id="username" class="form-control" placeholder="Username" required style="text-align:center;">
+        					    <label for="inputPassword" class="sr-only">Password</label>
+        					    <input type="password" id="password" class="form-control" placeholder="Password" required style="text-align:center;">
+        					    <p></p>
+        					    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                                <p></p>
+                                <p id="login-message" style="text-align:center; font-weight: bold; font-size: small; color: #0e1422;"></p>
+        					</form>
+						</div>
+					</div>
+				</div>
+        	</div>
+		</card>
         `;
         this.attachEventListeners();
     },
@@ -23,26 +39,25 @@ const LoginView = {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const messageElement = document.getElementById('login-message');
-    
+
         const result = await auth.login(username, password);
-    
+
         if (result.success || result.requires_2fa_setup || result.requires_2fa) {
             messageElement.textContent = 'Login successful!';
             setTimeout(() => {
-                window.location.hash = '#home';
+                window.location.hash = '#profile';
             }, 1000);
-        //}
-		// else if (result.requires_2fa) {
-        //    // Salva l'username per l'uso successivo nella verifica 2FA
-        //    this.username = username;
-        //    this.show2FAForm();
-        //} else if (result.requires_2fa_setup) {
-        //    messageElement.textContent = 'Please set up 2FA for your account.';
-        //    setTimeout(() => {
-        //        window.location.hash = '#setup2fa';
-        //    }, 1000);
-        } 
-		else {
+            //}
+            // else if (result.requires_2fa) {
+            //    // Salva l'username per l'uso successivo nella verifica 2FA
+            //    this.username = username;
+            //    this.show2FAForm();
+            //} else if (result.requires_2fa_setup) {
+            //    messageElement.textContent = 'Please set up 2FA for your account.';
+            //    setTimeout(() => {
+            //        window.location.hash = '#setup2fa';
+            //    }, 1000);
+        } else {
             messageElement.textContent = result.error;
         }
     },

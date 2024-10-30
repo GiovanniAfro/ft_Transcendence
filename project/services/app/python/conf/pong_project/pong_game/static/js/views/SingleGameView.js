@@ -1,5 +1,10 @@
 const SingleGameView = {
     init: function(player1Name, player2Name) {
+        if (player1Name === player2Name) {
+            alert('Errore: i due giocatori non possono essere lo stesso utente');
+            window.location.hash = '#profile'; // Reindirizza al profilo
+            return;
+        }
         this.canvas = document.getElementById('pongCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.setupGame(player1Name, player2Name);
@@ -98,14 +103,37 @@ const SingleGameView = {
         this.ball.y += this.ball.dy;
 
         // Collisione con i bordi superiore e inferiore
-        if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > this.canvas.height) {
+        if (this.ball.y - this.ball.radius < 0) {
             this.ball.dy *= -1;
+            this.ball.y = this.ball.radius;
+        }
+        else if (this.ball.y + this.ball.radius > this.canvas.height) {
+            this.ball.dy *= -1;
+            this.ball.y = this.canvas.height - this.ball.radius;
         }
 
         // Collisione con le racchette
-        if (this.checkPaddleCollision(this.player1Paddle) || this.checkPaddleCollision(this.player2Paddle)) {
-            this.ball.dx *= -1.05; // Aumenta leggermente la velocità ad ogni rimbalzo
+        if (this.checkPaddleCollision(this.player1Paddle)){
+            // Calcola il punto di collisione della pallina con la racchetta
+            const collisionPoint = (this.ball.y - (this.player1Paddle.y + this.player1Paddle.height / 2)) / (this.player1Paddle.height / 2);
+            // Cambia direzione e aumenta leggermente la velocità ad ogni rimbalzo
+            this.ball.dx *= -1.05;
+            // Cambia la direzione verticale in base al punto di impatto
+            this.ball.dy = collisionPoint * 6;
+            // Sposta la palla fuori dalla racchetta
+            this.ball.x = this.player1Paddle.x + this.player1Paddle.width + this.ball.radius;
         }
+        else if (this.checkPaddleCollision(this.player2Paddle)){
+            const collisionPoint = (this.ball.y - (this.player2Paddle.y + this.player2Paddle.height / 2)) / (this.player2Paddle.height / 2);
+            this.ball.dx *= -1.05;
+            this.ball.dy = collisionPoint * 6;
+            this.ball.x = this.player2Paddle.x - this.ball.radius;
+        }
+
+        // Limita velocità
+        // const maxSpeed = 12;
+        // this.ball.dx = Math.max(Math.min(this.ball.dx, maxSpeed), -maxSpeed);
+        // this.ball.dy = Math.max(Math.min(this.ball.dy, maxSpeed), -maxSpeed);
 
         // Segna punti
         if (this.ball.x < 0) {
@@ -123,11 +151,16 @@ const SingleGameView = {
     },
 
     checkPaddleCollision: function(paddle) {
+        const ballNextX = this.ball.x + this.ball.dx;
+        const ballNextY = this.ball.y + this.ball.dy;
+
         return (
-            this.ball.x - this.ball.radius < paddle.x + paddle.width &&
-            this.ball.x + this.ball.radius > paddle.x &&
-            this.ball.y > paddle.y &&
-            this.ball.y < paddle.y + paddle.height
+            ballNextX - this.ball.radius < paddle.x + paddle.width &&
+            ballNextX + this.ball.radius > paddle.x &&
+            ballNextY > paddle.y &&
+            ballNextY < paddle.y + paddle.height
+            // this.ball.y > paddle.y &&
+            // this.ball.y < paddle.y + paddle.height
         );
     },
 
@@ -190,7 +223,7 @@ const SingleGameView = {
             score_player2: this.score.player2,
             status: 'FINISHED'
         };
-    
+
         fetch(`/api/single-game/${this.gameId}/`, {
             method: 'PUT',
             headers: {
@@ -202,7 +235,7 @@ const SingleGameView = {
         .then(response => {
             if (!response.ok) {
                 return response.json().then(data => {
-                    throw new Error(data.error || JSON.stringify(data) || 'Errore sconosciuto');
+                    throw new Error(data.error || data.non_field_errors[0] || 'Errore sconosciuto');
                 });
             }
             return response.json();
@@ -210,7 +243,6 @@ const SingleGameView = {
         .then(data => {
             console.log('Game result saved:', data);
             alert('Partita terminata e risultato salvato!');
-            // Reindirizza al profilo
             window.location.hash = '#profile';
         })
         .catch(error => {
@@ -222,36 +254,47 @@ const SingleGameView = {
     render: function() {
         const app = document.getElementById('app');
         app.innerHTML = `
-            <div class="container mt-4">
-                <h2>Single Game</h2>
-                <div class="row">
-                    <div class="col-md-6">
-                        <form id="player2Form">
-                            <div class="mb-3">
-                                <label for="player2Name" class="form-label">Player 2 Name:</label>
-                                <input type="text" class="form-control" id="player2Name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="player2Type" class="form-label">Player 2 Type:</label>
-                                <select class="form-select" id="player2Type">
-                                    <option value="alias">Temporary Alias</option>
-                                    <option value="registered">Registered User</option>
-                                </select>
-                            </div>
-                            <div id="registeredUserFields" style="display:none;">
-                                <div class="mb-3">
-                                    <label for="player2Username" class="form-label">Username:</label>
-                                    <input type="text" class="form-control" id="player2Username">
+        <card>	
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		    <div class="card-opacity">
+            		        <div class="card-body text-center">
+                            <h1 class="h3 mb-3 font-weight-normal" style="font-size: xx-large; font-weight: bold; color: #0e1422;">Single Game</h1>
+                                <div class="row">
+                                        <form id="player2Form">
+                                            <div class="mb-3">
+                                                <label for="player2Name" class="form-label" style="color: #0e1422;">Player 2 Name:</label> 
+                                                <input type="text" class="form-control" id="player2Name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="player2Type" class="form-label" style="color: #0e1422;">Player 2 Type:</label>
+                                                <select class="form-select" id="player2Type">
+                                                    <option value="alias">Temporary Alias</option>
+                                                    <option value="registered">Registered User</option>
+                                                </select>
+                                            </div>
+                                            <div id="registeredUserFields" style="display:none;">
+                                                <div class="mb-3">
+                                                    <label for="player2Username" class="form-label">Username:</label>
+                                                    <input type="text" class="form-control" id="player2Username">
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Start Game</button>
+                                            <p></p>
+                                            <img  src="/static/img/logo1.jpeg" class="rounded-circle" alt="" width="200" height="200">
+                                            </form>
+                                    
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Start Game</button>
-                        </form>
-                    </div>
-                    <div class="col-md-6">
-                        <canvas id="pongCanvas" width="900" height="700" style="border:1px solid #000000; display: none;"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
+        </card>
+        <div class="col-md-12 d-flex justify-content-center" style="margin-top: 20px;">
+            <canvas id="pongCanvas" width="900" height="700" style="border:1px solid #000000; display: none;"></canvas>
+        </div>
         `;
 
         this.setupEventListeners();
@@ -261,6 +304,12 @@ const SingleGameView = {
             const player2Name = document.getElementById('player2Name').value;
             const player2Type = document.getElementById('player2Type').value;
             const player2Username = player2Type === 'registered' ? document.getElementById('player2Username').value : player2Name;
+            const currentUser = this.getCurrentUsername();
+        
+            if (player2Type === 'registered' && player2Username === currentUser) {
+                alert('Non puoi giocare contro te stesso!');
+                return;
+            }
 
             if (!player2Username) {
                 alert('Per favore, inserisci un nome per il giocatore 2.');
@@ -311,6 +360,7 @@ const SingleGameView = {
     getCurrentUsername: function() {
         const token = localStorage.getItem('access_token');
         if (!token) {
+            console.error('Token non trovato');
             return null;
         }
     

@@ -106,8 +106,9 @@ const auth = {
         const tournamentLink = document.getElementById('tournament-link');
         const singleGameLink = document.getElementById('singlegame-link'); 
 
-        if (isAuthenticated) {
-            loginLink.style.display = 'none';
+        //if (isAuthenticated && is2FAAuthenticated) {
+		if (isAuthenticated) {
+			loginLink.style.display = 'none';
             registerLink.style.display = 'none';
             logoutLink.style.display = 'block';
             profileLink.style.display = 'block';

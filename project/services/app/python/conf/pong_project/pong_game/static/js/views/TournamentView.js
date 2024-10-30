@@ -1,96 +1,135 @@
 const TournamentView = {
-    render: async function(tournamentId) {
-        const app = document.getElementById('app');
-        
-        if (tournamentId) {
-            // Visualizza i dettagli di un torneo specifico
-            await this.renderTournamentDetails(tournamentId);
-        } else {
-            // Visualizza la lista di tutti i tornei
-            await this.renderTournamentList();
-        }
-    },
+        render: async function(tournamentId) {
+            const app = document.getElementById('app');
 
-    renderTournamentList: async function() {
-        const app = document.getElementById('app');
-        const tournaments = await this.getTournaments();
-
-        let html = '<h2>Your Tournaments</h2>';
-
-        if (tournaments.length === 0) {
-            html += '<p>You have not created any tournaments yet.</p>';
-        } else {
-            html += '<ul>';
-            tournaments.forEach(tournament => {
-                html += `
-                    <li>
-                        <a href="#tournament/${tournament.id}">${tournament.name}</a> - ${tournament.status}
-                        (${tournament.participants.length}/${tournament.max_participants} participants)
-                        ${tournament.status === 'REGISTRATION' ?
-                            `<button onclick="TournamentView.joinTournament(${tournament.id})">Add Participant</button>` :
-                            ''
-                        }
-                    </li>
-                `;
-            });
-            html += '</ul>';
-        }
-
-        html += '<button onclick="TournamentView.createTournament()">Create New Tournament</button>';
-        app.innerHTML = html;
-    },
-
-    renderTournamentDetails: async function(tournamentId) {
-        const app = document.getElementById('app');
-        try {
-            const tournament = await this.getTournament(tournamentId);
-            
-            let html = `
-                <h2>${tournament.name}</h2>
-                <p>Status: ${tournament.status}</p>
-                <p>Current Round: ${tournament.current_round}</p>
-                <p>Participants: ${tournament.participants.length}/${tournament.max_participants}</p>
-                
-                <h3>Participants:</h3>
-                <ul>
-                    ${tournament.participants.map(p => `<li>${p.alias}</li>`).join('')}
-                </ul>
-            `;
-    
-            if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
-                html += `<button id="addParticipantBtn">Add Participant</button>`;
+            if (tournamentId) {
+                // Visualizza i dettagli di un torneo specifico
+                await this.renderTournamentDetails(tournamentId);
+            } else {
+                // Visualizza la lista di tutti i tornei
+                await this.renderTournamentList();
             }
-    
-            if (tournament.status !== 'REGISTRATION') {
-                html += `
-                    <button id="showResultsBtn">Show Tournament Results</button>
-                    <button id="showBracketBtn">Show Tournament Bracket</button>
+        },
+
+        renderTournamentList: async function() {
+            const app = document.getElementById('app');
+            const tournaments = await this.getTournaments();
+            // we need to put in this let html the initializing of DIV CARD ETC...
+            let html = `
+		<card>
+        	<div class="main-body">
+				<div class="row justify-content-md-center">
+            		<div class="col-md-4 mb-3">
+            		  <div class="card-opacity">
+            		    <div class="card-body text-center">
                 `;
-    
-                html += `
-                    <h3>Current Round Matches:</h3>
-                    <ul>
+            html += '<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">Your Tournaments</h2>';
+            if (tournaments.length === 0) {
+                html += '<p style="color: #0e1422;">You have not created any tournaments yet.</p>';
+            } else {
+                html += '<ul>';
+                tournaments.forEach(tournament => {
+                    html += `
+                   
+                    <a  href="#tournament/${tournament.id}">
+                        <div class="btn btn-warning text-center" >
+                            ${tournament.name} - ${tournament.status} (${tournament.participants.length}/${tournament.max_participants} participants)
+                        </div>
+                    </a>
+                    <p></p>
+                `;
+                });
+                html += '</ul>';
+            }
+
+            html += '<button class="btn btn-danger" onclick="TournamentView.createTournament()">Create New Tournament</button>';
+            html += `
+                    <\div>
+				<\div>
+            <\div>
+        <\div>
+    <\div>
+<\card>
+                `;
+            app.innerHTML = html;
+        },
+
+        renderTournamentDetails: async function(tournamentId) {
+                const app = document.getElementById('app');
+                try {
+                    const tournament = await this.getTournament(tournamentId);
+                    // we need to put in this let html the initializing of DIV CARD ETC...
+                    let html = `
+            <card>
+                <div class="main-body">
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-4 mb-3">
+                          <div class="card-opacity">
+                            <div class="card-body text-center ">
+                    `;
+
+                    html += `
+                <h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">${tournament.name}</h2>
+                <p style="color: #0e1422;">Status: ${tournament.status}</p>
+                <p style="color: #0e1422;">Current Round: ${tournament.current_round}</p>
+                <p style="color: #0e1422;">Participants: ${tournament.participants.length}/${tournament.max_participants}</p>
+                
+                <h3 style="font-size: x-large; font-weight: bold; color: #0e1422;">Participants:</h3>
+                <div style="color: #0e1422;">
+                     ${tournament.participants.map(p => p.alias).join(', ')}
+                </div>
+            `;
+
+                    if (tournament.status === 'REGISTRATION' && tournament.participants.length < tournament.max_participants) {
+                        html += `<button class="btn btn-primary" id="addParticipantBtn">Add Participant</button>`;
+                        html += '<p></p>';
+                    }
+
+                    if (tournament.status !== 'REGISTRATION') {
+                        html += `
+                 <p></p>
+                    <button class="btn btn-primary" id="showResultsBtn">Show Tournament Results</button>
+                    <button class="btn btn-primary" id="showBracketBtn">Show Tournament Bracket</button>
+                `;
+
+                        html += `
+                 <p></p>
+                    <h3 style="font-size: x-large; font-weight: bold; color: #0e1422;">Current Round Matches:</h3>
+                    <div style="color: #0e1422;">
                         ${tournament.matches
                             .filter(m => m.round === tournament.current_round)
                             .map(m => `
-                                <li>
+                                <div>
                                     Round ${m.round}: ${m.player1_alias} vs ${m.player2_alias}
                                     ${m.winner_alias ? `(Winner: ${m.winner_alias})` : ''}
                                     ${!m.winner_alias && tournament.status === 'IN_PROGRESS' ? 
-                                        `<button class="playMatchBtn" data-match-id="${m.id}">Play Match</button>` : 
+                                        `<button class="playMatchBtn btn btn-primary" data-match-id="${m.id}">Play Match</button>` : 
                                         ''}
-                                </li>
+                                </div>
                             `).join('')}
-                    </ul>
+                    </div>
+                    <p></p>
                 `;
             }
     
             if (tournament.status === 'FINISHED') {
-                html += `<h3>Tournament Winner: ${tournament.matches[tournament.matches.length - 1].winner_alias}</h3>`;
+                html += `<h3 style="font-size: x-large; font-weight: bold; color: green;">Tournament Winner: ${tournament.matches[tournament.matches.length - 1].winner_alias}</h3>`;
             }
     
-            html += '<br><a href="#tournament">Back to Tournament List</a>';
-    
+            html += '<br><a class="link-tournament" href="#tournament"><div class="btn btn-success ">Back to Tournament List</div></a>';
+
+            //closing the div and card opened at the start of let html
+            html +=`
+                    <\div>
+				<\div>
+            <\div>
+        <\div>
+    <\div>
+<\card>         
+            
+            
+            `;
+
             app.innerHTML = html;
     
             // Add event listeners
@@ -249,10 +288,17 @@ const TournamentView = {
     showTournamentResults: async function(tournamentId) {
         try {
             const tournament = await this.getTournament(tournamentId);
-            let resultsHtml = `<h2>${tournament.name} - Tournament Results</h2>`;
+            let resultsHtml = `
+            <card>
+                <div class="main-body">
+                    <div class="row justify-content-md-center w-auto">
+                          <div class="card-opacity">
+                            <div class="card-body text-center ">
+            `;
+            resultsHtml += `<h2 style="font-size: xx-large; font-weight: bold; color: #0e1422;">${tournament.name} - Tournament Results</h2>`;
     
             // Partecipanti
-            resultsHtml += `<h3>Participants:</h3><ul>`;
+            resultsHtml += `<h3 style="font-size: large; font-weight: bold; color: #0e1422;">Participants:</h3><ul>`;
             tournament.participants.forEach(p => {
                 resultsHtml += `<li>${p.alias}</li>`;
             });
@@ -268,7 +314,7 @@ const TournamentView = {
             });
     
             Object.keys(roundMatches).sort((a, b) => a - b).forEach(round => {
-                resultsHtml += `<h3>Round ${round}:</h3><ul>`;
+                resultsHtml += `<h3 style="font-size: large; font-weight: bold; color: #0e1422;">Round ${round}:</h3><ul>`;
                 roundMatches[round].forEach(match => {
                     resultsHtml += `<li>${match.player1_alias} vs ${match.player2_alias}: `;
                     if (match.winner_alias) {
@@ -284,9 +330,17 @@ const TournamentView = {
             // Vincitore del torneo
             if (tournament.status === 'FINISHED') {
                 const finalMatch = tournament.matches[tournament.matches.length - 1];
-                resultsHtml += `<h3>Tournament Winner: ${finalMatch.winner_alias}</h3>`;
+                resultsHtml += `<h3 style="font-size: xx-large; font-weight: bold; color: green;">Tournament Winner: ${finalMatch.winner_alias}</h3>`;
             }
-    
+            
+            resultsHtml += `
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</card>        
+            `;
             // Mostra i risultati in un modal o in una nuova pagina
             const modal = document.createElement('div');
             modal.style.position = 'fixed';
@@ -294,19 +348,21 @@ const TournamentView = {
             modal.style.top = '0';
             modal.style.width = '100%';
             modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
             modal.style.overflowY = 'auto';
-    
+            modal.className = 'modal text-center card-opacity';
+
             const modalContent = document.createElement('div');
             modalContent.style.backgroundColor = '#fff';
             modalContent.style.margin = '10% auto';
             modalContent.style.padding = '20px';
-            modalContent.style.width = '80%';
+            modalContent.style.width = 'auto'
             modalContent.innerHTML = resultsHtml;
+            modalContent.className = 'text-center card-opacity';
     
             const closeBtn = document.createElement('button');
             closeBtn.textContent = 'Close';
             closeBtn.onclick = () => document.body.removeChild(modal);
+            closeBtn.className = 'btn btn-primary textcenter justify-content-center';
             modalContent.appendChild(closeBtn);
     
             modal.appendChild(modalContent);
@@ -330,9 +386,9 @@ const TournamentView = {
             modal.style.display = 'block'; // Ensure the modal is visible
             modal.innerHTML = `
                 <div class="modal-content">
-                    <h2>${tournament.name} - Tournament Bracket</h2>
+                    <h2 style="font-size: xx-large; font-weight: bold; color: #0e1422; text-align: center">${tournament.name} - Tournament Bracket</h2>
                     ${bracketHtml}
-                    <button id="closeBracketBtn">Close</button>
+                    <button class="btn btn-primary" id="closeBracketBtn">Close</button>
                 </div>
             `;
     
@@ -357,7 +413,7 @@ const TournamentView = {
         let bracketHtml = '<div class="tournament-bracket">';
         Object.keys(rounds).sort((a, b) => a - b).forEach(round => {
             bracketHtml += `<div class="round">`;
-            bracketHtml += `<h3>Round ${round}</h3>`;
+            bracketHtml += `<h3 style="font-size: large; font-weight: bold; color: #0e1422;">Round ${round}</h3>`;
             rounds[round].forEach(match => {
                 bracketHtml += `
                     <div class="match">

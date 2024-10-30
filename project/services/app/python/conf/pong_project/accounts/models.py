@@ -26,6 +26,13 @@ class CustomUser(AbstractUser):
     def match_history(self):
         from pong_game.models import Game
         return Game.objects.filter(models.Q(player1=self) | models.Q(player2=self))
+    
+
+    def get_friends(self, obj):
+        return ", ".join([friend.username for friend in obj.friends.all()])
+    
+    get_friends.short_description = 'Friends'
+    get_friends.admin_order_field = 'friends__username' 
 
     def __str__(self):
         return self.username

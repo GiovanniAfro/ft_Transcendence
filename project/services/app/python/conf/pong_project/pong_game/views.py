@@ -1,5 +1,7 @@
 import random
 import logging
+from django.views.generic import ListView
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -223,13 +225,30 @@ class GameDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = GameSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class FriendListView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        friends = request.user.friends.all()
-        serializer = UserSerializer(friends, many=True)
-        return Response(serializer.data)
+
+
+class FriendListView(APIView):
+	permission_classes = [IsAuthenticated]
+	def get(self, request):
+		friends = request.user.friends.all()
+		paginator = Paginator(friends, 4)  # Show 25 contacts per page.
+		page_number = request.GET.get("page", 1)
+		try:
+			page_number = int(page_number)
+		except ValueError:
+			page_number = 1
+		page_obj = paginator.get_page(page_number)
+		serializer = UserSerializer(list(page_obj), many=True)
+		output = {
+			'previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+			'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+            'actual_page': page_obj.number,
+            'start_index': page_obj.start_index(),
+            'end_index': page_obj.end_index(),
+			'data': serializer.data
+		}
+		return Response(output)
 
 class AddFriendView(APIView):
     permission_classes = [IsAuthenticated]
@@ -321,11 +340,14 @@ class SingleGameView(APIView):
         logger.info(f"Received POST request to SingleGameView: {request.data}")
         player2_type = request.data.get('player2_type')
         player2_name = request.data.get('player2_name')
-        
+
         if not player2_name:
             logger.error("Player 2 name is empty")
             return Response({'error': 'Player 2 name is required'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if player2_name == request.user.username:
+            logger.error("Player trying to play against themselves")
+            return Response({'error': 'Non puoi giocare contro te stesso'}, status=status.HTTP_400_BAD_REQUEST)
         game_data = {
             'is_single_game': True,
             'status': 'IN_PROGRESS'
@@ -334,6 +356,9 @@ class SingleGameView(APIView):
         if player2_type == 'registered':
             try:
                 player2 = User.objects.get(username=player2_name)
+                if player2 == request.user:
+                    logger.error("Player trying to play against themselves")
+                    return Response({'error': 'Non puoi giocare contro te stesso'}, status=status.HTTP_400_BAD_REQUEST)
                 game_data['player2'] = player2.id
             except User.DoesNotExist:
                 logger.error(f"Player 2 not found: {player2_name}")
@@ -356,7 +381,7 @@ class SingleGameView(APIView):
         except Game.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = GameSerializer(game, data=request.data, partial=True)
+        serializer = GameSerializer(game, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             game = serializer.save()
 
@@ -387,7 +412,7 @@ class SingleGameView(APIView):
 
             return Response(serializer.data)
         else:
-            logger.error(f"Serializer errors: {serializer.errors}")
+            
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UpdateScoreView(APIView):

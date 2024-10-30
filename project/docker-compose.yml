@@ -126,126 +126,126 @@ services:
                 tag: "postgresql"
         restart: no
 
-    # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
-    elasticsearch:
-        profiles:
-            - log-system
-        container_name: elasticsearch
-        build:
-            context: ./services/log-system/elasticsearch/
-        environment:
-            ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
-        volumes:
-            - elasticsearch:/bitnami
-        ports:
-            - 9200:9200
-        networks:
-            log-system:
-                ipv4_address: 10.0.2.1
-        restart: no
+    # # LOG-SYSTEM-SEGMENT ------------------------------------------------------>
+    # elasticsearch:
+    #     profiles:
+    #         - log-system
+    #     container_name: elasticsearch
+    #     build:
+    #         context: ./services/log-system/elasticsearch/
+    #     environment:
+    #         ELASTICSEARCH_VAULT_TOKEN: ${ELASTICSEARCH_VAULT_TOKEN}
+    #     volumes:
+    #         - elasticsearch:/bitnami
+    #     ports:
+    #         - 9200:9200
+    #     networks:
+    #         log-system:
+    #             ipv4_address: 10.0.2.1
+    #     restart: no
 
-    logstash:
-        profiles:
-            - log-system
-        container_name: logstash
-        build:
-            context: ./services/log-system/logstash
-        environment:
-            LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
-        volumes:
-            - logstash:/bitnami
-        networks:
-            log-system:
-                ipv4_address: 10.0.2.2
-        restart: no
-        depends_on:
-            - elasticsearch
+    # logstash:
+    #     profiles:
+    #         - log-system
+    #     container_name: logstash
+    #     build:
+    #         context: ./services/log-system/logstash
+    #     environment:
+    #         LOGSTASH_VAULT_TOKEN: ${LOGSTASH_VAULT_TOKEN}
+    #     volumes:
+    #         - logstash:/bitnami
+    #     networks:
+    #         log-system:
+    #             ipv4_address: 10.0.2.2
+    #     restart: no
+    #     depends_on:
+    #         - elasticsearch
 
-    kibana:
-        profiles:
-            - log-system
-        container_name: kibana
-        build:
-            context: ./services/log-system/kibana
-        environment:
-            KIBANA_VAULT_TOKEN: ${KIBANA_VAULT_TOKEN}
-        volumes:
-            - kibana:/bitnami
-        ports:
-            - 5601:5601
-        networks:
-            log-system:
-                ipv4_address: 10.0.2.3
-        restart: no
-        depends_on:
-            - logstash
+    # kibana:
+    #     profiles:
+    #         - log-system
+    #     container_name: kibana
+    #     build:
+    #         context: ./services/log-system/kibana
+    #     environment:
+    #         KIBANA_VAULT_TOKEN: ${KIBANA_VAULT_TOKEN}
+    #     volumes:
+    #         - kibana:/bitnami
+    #     ports:
+    #         - 5601:5601
+    #     networks:
+    #         log-system:
+    #             ipv4_address: 10.0.2.3
+    #     restart: no
+    #     depends_on:
+    #         - logstash
     
-    # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
-    prometheus:
-        profiles:
-            - monitor-system
-        container_name: prometheus
-        build:
-            context: ./services/monitor-system/prometheus
-        environment:
-            PROMETHEUS_VAULT_TOKEN: ${PROMETHEUS_VAULT_TOKEN}
-        volumes:
-            - prometheus:/bitnami
-        ports:
-            - 9090:9090
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.1
-        restart: no
+    # # MONITOR-SYSTEM-SEGMENT -------------------------------------------------->
+    # prometheus:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: prometheus
+    #     build:
+    #         context: ./services/monitor-system/prometheus
+    #     environment:
+    #         PROMETHEUS_VAULT_TOKEN: ${PROMETHEUS_VAULT_TOKEN}
+    #     volumes:
+    #         - prometheus:/bitnami
+    #     ports:
+    #         - 9090:9090
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.1
+    #     restart: no
 
-    grafana:
-        profiles:
-            - monitor-system
-        container_name: grafana
-        build:
-            context: ./services/monitor-system/grafana
-        environment:
-            GRAFANA_VAULT_TOKEN: ${GRAFANA_VAULT_TOKEN}
-        volumes:
-            - grafana:/bitnami
-        ports:
-            - 3000:3000
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.2
-        restart: no
-        depends_on:
-            - prometheus
+    # grafana:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: grafana
+    #     build:
+    #         context: ./services/monitor-system/grafana
+    #     environment:
+    #         GRAFANA_VAULT_TOKEN: ${GRAFANA_VAULT_TOKEN}
+    #     volumes:
+    #         - grafana:/bitnami
+    #     ports:
+    #         - 3000:3000
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.2
+    #     restart: no
+    #     depends_on:
+    #         - prometheus
 
-    postgres-exporter:
-        profiles:
-            - monitor-system
-        container_name: postgres-exporter
-        build:
-            context: ./services/monitor-system/postgres-exporter
-        environment:
-            POSTGRES_EXPORTER_VAULT_TOKEN: ${POSTGRES_EXPORTER_VAULT_TOKEN}
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.4
-        restart: no
-        depends_on:
-            - prometheus
+    # postgres-exporter:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: postgres-exporter
+    #     build:
+    #         context: ./services/monitor-system/postgres-exporter
+    #     environment:
+    #         POSTGRES_EXPORTER_VAULT_TOKEN: ${POSTGRES_EXPORTER_VAULT_TOKEN}
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.4
+    #     restart: no
+    #     depends_on:
+    #         - prometheus
     
-    nginx-exporter:
-        profiles:
-            - monitor-system
-        container_name: nginx-exporter
-        build:
-            context: ./services/monitor-system/nginx-exporter
-        environment:
-            NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
-        networks:
-            monitor-system:
-                ipv4_address: 10.0.3.3
-        restart: no
-        depends_on:
-            - prometheus
+    # nginx-exporter:
+    #     profiles:
+    #         - monitor-system
+    #     container_name: nginx-exporter
+    #     build:
+    #         context: ./services/monitor-system/nginx-exporter
+    #     environment:
+    #         NGINX_EXPORTER_VAULT_TOKEN: ${NGINX_EXPORTER_VAULT_TOKEN}
+    #     networks:
+    #         monitor-system:
+    #             ipv4_address: 10.0.3.3
+    #     restart: no
+    #     depends_on:
+    #         - prometheus
 
     # PROXY-WAF-SEGMENT ------------------------------------------------------->
     nginx:

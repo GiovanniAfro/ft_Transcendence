@@ -1,5 +1,3 @@
-from django.utils import timezone
-from datetime import timedelta
 import logging
 from django.core.paginator import Paginator
 from django.shortcuts import render
@@ -181,52 +179,29 @@ class UserStatsView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-class MatchHistoryView(APIView):
+class MatchHistoryView(generics.ListAPIView):
     serializer_class = GameSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    # def get_querygetset(self):
-        # user = self.request.user
-        # games = Game.objects.filter(Q(player1=user) | Q(player2=user))
-        # paginator = Paginator(games, 5)
-        # page_number = self.request.GET.get("page", 1)
-        # logger.info(f"Requested page: {page_number}")
-        # try:
-            # page_obj = int(page_number)
-        # except ValueError:
-            # page_obj = paginator.page(1)
-        # page_obj = paginator.get_page(page_obj)
-        # output1 = {
-            # 'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
-            # 'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-            # 'matches_actual_page': page_obj.number,
-            # 'matches_start_index': page_obj.start_index(),
-            # 'matches_end_index': page_obj.end_index(),
-            #    'games': games
-        # }
-        # return output1
-    def get(self, request):
+    def get_queryset(self):
         user = self.request.user
-
-        games = Game.objects.filter(Q(player1=user) | Q(player2=user))
-        paginator = Paginator(games, 5)  # Show 25 contacts per page.
-        page_number = request.GET.get("page", 1)
-        try:
-            page_number = int(page_number)
-        except ValueError:
-            page_number = 1
-        page_obj = paginator.get_page(page_number)
-        games_serialized = GameSerializer(list(page_obj), many=True)
-        output1 = {
-            'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
-            'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-            'matches_actual_page': page_obj.number,
-            'matches_start_index': page_obj.start_index(),
-            'matches_end_index': page_obj.end_index(),
-            'matches': games_serialized.data
-        }
-        return Response(output1)
-
+    #    games = Game.objects.filter(Q(player1=user) | Q(player2=user))
+    #    paginator = Paginator(games, 5)
+    #    page_number = request.GET.get('page', 2)
+    #    try:
+    #        page_obj = paginator.page(page_number)
+    #    except EmptyPage:
+    #        page_obj = paginator.page(1)
+    #    page_obj = paginator.page(page_number)
+    #    output1 = (
+    #        'matches_previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+    #        'matches_next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+    #        'matches_actual_page': page_obj.number,
+    #        'matches_start_index': page_obj.start_index(),
+    #        'matches_end_index': page_obj.end_index(),
+    #        'Matches': games
+    #    )
+    #    return Response(output1)
+        return Game.objects.filter(Q(player1=user) | Q(player2=user))
 
 class FollowUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -252,44 +227,3 @@ class UnfollowUserView(APIView):
             return Response({"message": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
-class OnlineFriendsView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        five_minutes_ago = timezone.now() - timedelta(minutes=5)
-        online_friends = user.friends.filter(last_activity__gte=five_minutes_ago)
-        serializer = UserSerializer(online_friends, many=True)
-        return Response(serializer.data)
-
-class FriendsStatusView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        five_minutes_ago = timezone.now() - timedelta(minutes=5)
-        friends = user.friends.all()
-
-        paginator = Paginator(friends, 4)
-        page_number = request.GET.get("page", 1)
-        try:
-            page_number = int(page_number)
-        except ValueError:
-            page_number = 1
-        page_obj = paginator.get_page(page_number)
-        friend_data = []
-        for friend in page_obj:
-            friend_data.append({
-                'username': friend.username,
-                'is_online': friend.last_activity >= five_minutes_ago
-            })
-        output = {
-            'previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
-            'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-            'actual_page': page_obj.number,
-            'start_index': page_obj.start_index(),
-            'end_index': page_obj.end_index(),
-            'data': friend_data
-        }
-        return Response(output)
