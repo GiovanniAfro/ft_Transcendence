@@ -22,7 +22,7 @@ services:
             DJANGO_SUPERUSER_USERNAME: "admin"
             DJANGO_SUPERUSER_EMAIL: "admin@django.it"
         volumes:
-            - django_static_files:/app/pong_project/static
+            - django_staticfiles:/app/pong_project/static
         ports:
             - 8000:8000
         networks:
@@ -92,7 +92,8 @@ services:
         environment:
             PYTHON_VAULT_TOKEN: ${PYTHON_VAULT_TOKEN}
         volumes:
-            - django_static_files:/app/pong_project/static
+            - django_staticfiles:/app/pong_project/static
+            - django_mediafiles:/app/pong_project/media
         networks:
             app:
                 ipv4_address: 10.0.1.1
@@ -261,7 +262,8 @@ services:
             - "80:8080"
             - "443:8443"
         volumes:
-            - django_static_files:/app/pong_project/static
+            - django_staticfiles:/app/pong_project/static
+            - django_mediafiles:/app/pong_project/media
         networks:
             proxy-waf:
                 ipv4_address: 10.0.4.1
@@ -288,7 +290,9 @@ volumes:
 
     grafana:
 
-    django_static_files:
+    django_staticfiles:
+
+    django_mediafiles:
 
 networks:
     secrets:
