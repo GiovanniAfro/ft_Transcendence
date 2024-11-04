@@ -97,7 +97,7 @@ const auth = {
     updateNavbar: function() {
         const isAuthenticated = this.isAuthenticated();
         const is2FAAuthenticated = this.is2FAAuthenticated();
-
+    
         const loginLink = document.getElementById('login-link');
         const registerLink = document.getElementById('register-link');
         const logoutLink = document.getElementById('logout-link');
@@ -105,26 +105,27 @@ const auth = {
         const gameLink = document.getElementById('game-link');
         const tournamentLink = document.getElementById('tournament-link');
         const singleGameLink = document.getElementById('singlegame-link'); 
-
-        //if (isAuthenticated && is2FAAuthenticated) {
-		if (isAuthenticated) {
-			loginLink.style.display = 'none';
+    
+        if (isAuthenticated && is2FAAuthenticated) {
+            // Utente completamente autenticato
+            loginLink.style.display = 'none';
             registerLink.style.display = 'none';
             logoutLink.style.display = 'block';
             profileLink.style.display = 'block';
             gameLink.style.display = 'none';
             tournamentLink.style.display = 'block';
             singleGameLink.style.display = 'block'; 
-        //} else if (isAuthenticated && !is2FAAuthenticated) {
-        //    // L'utente è autenticato ma non ha completato la 2FA
-        //    loginLink.style.display = 'none';
-        //    registerLink.style.display = 'none';
-        //    logoutLink.style.display = 'block';
-        //    profileLink.style.display = 'none';
-        //    gameLink.style.display = 'none';
-        //    tournamentLink.style.display = 'none';
-        //    singleGameLink.style.display = 'none'; 
+        } else if (isAuthenticated && !is2FAAuthenticated) {
+            // Utente autenticato ma senza 2FA completata
+            loginLink.style.display = 'none';
+            registerLink.style.display = 'none';
+            logoutLink.style.display = 'block';
+            profileLink.style.display = 'none';
+            gameLink.style.display = 'none';
+            tournamentLink.style.display = 'none';
+            singleGameLink.style.display = 'none'; 
         } else {
+            // Utente non autenticato
             loginLink.style.display = 'block';
             registerLink.style.display = 'block';
             logoutLink.style.display = 'none';
@@ -134,6 +135,7 @@ const auth = {
             singleGameLink.style.display = 'none';  
         }
     },
+    
 
     getCurrentUser: function() {
         const token = localStorage.getItem('access_token');
