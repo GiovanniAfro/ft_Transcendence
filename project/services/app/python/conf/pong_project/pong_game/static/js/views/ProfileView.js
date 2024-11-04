@@ -308,16 +308,24 @@ const ProfileView = {
 					</div>
                     <p></p>
                 `;
-                document.querySelector('#matches-prev-page').addEventListener('click', () =>{0
-                    if (output1.matches_previous_page !== null) {
-                        this.loadMatchHistory(output1.matches_previous_page);
-                    }
-                });
-             document.querySelector('#matches-next-page').addEventListener('click', () => {
-                    if (output1.matches_next_page !== null){
-                        this.loadMatchHistory(output1.matches_next_page)
-                    }
-                });
+                const prevButton = document.querySelector('#matches-prev-page');
+                const nextButton = document.querySelector('#matches-next-page');
+
+                if (prevButton) {
+                    prevButton.addEventListener('click', () => {
+                        if (output1.matches_previous_page !== null) {
+                            this.loadMatchHistory(output1.matches_previous_page);
+                        }
+                    });
+                }
+
+                if (nextButton) {
+                    nextButton.addEventListener('click', () => {
+                        if (output1.matches_next_page !== null) {
+                            this.loadMatchHistory(output1.matches_next_page);
+                        }
+                    });
+                }
             } else {
                 matchHistoryDiv.innerHTML = '<h4 style="color:yellow; text-align:center;">Failed to load match history, it seems you have 0 game played, GO TO PLAY THE GAMEEEEEEEE</p>';
             }
