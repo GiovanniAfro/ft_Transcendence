@@ -126,10 +126,10 @@ const ProfileView = {
         friendsResponse: async function(page) {
             const token = localStorage.getItem('access_token');
             if (!token) {
-                window.location.hash = '#login';
-                return;
+                console.log('No token available for friends update');
+                return; // Semplicemente esce senza reindirizzare
             }
-
+            
             const result = await fetch(`/api/accounts/friends/status/?page=${page}`, { headers: { 'Authorization': `Bearer ${token}` } });
             const json = await result.json();
             console.log('json_Friends:', json);
