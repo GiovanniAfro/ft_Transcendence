@@ -31,10 +31,10 @@ up:
 	@rm -rf .env
 	@./setup/setup_iptables.sh
 	@./setup/setup_vault.sh
-	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
-	# @docker compose -p "ft_transcendence" --profile log-system up -d
-	# @echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
-	# @docker compose -p "ft_transcendence" --profile monitor-system up -d
+	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
+	@docker compose -p "ft_transcendence" --profile log-system up -d
+	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)MONITOR-SYSTEM $(BLUE)profile ..." 
+	@docker compose -p "ft_transcendence" --profile monitor-system up -d
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
 	@docker compose -p "ft_transcendence" --profile app up -d 
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
@@ -87,16 +87,3 @@ fclean: clean
 	@echo "\n$(BLUE)[+] Cleaning Completed$(NC)"
 
 re: clean up
-
-dev:
-	@./setup/setup_iptables.sh
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)DEV $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile dev up -d --build
-	@echo
-
-dev-tailpython: dev
-	@echo "\n$(BLUE)[+] Tailing python logs ..."
-	sleep 1
-	docker exec -it dev_python tail "-f" "./pong_project/django.log"
-
-clean-dev: clean dev
