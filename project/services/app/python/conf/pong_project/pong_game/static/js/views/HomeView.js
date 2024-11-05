@@ -9,7 +9,7 @@ const HomeView = {
             		    <div class="home-title">
                         <h1 class="h3 font-weight-normal" style="text-align:center;">
                           <span style="font-size: xx-large; font-weight: bold; color: #0e1422;">Welcome to Pong Game!</span><br>
-                          <span style="font-size: medium; font-weight: normal; color: #0e1422;">Proceed with registration to play.</span>
+                          <span style="font-size: medium; font-weight: normal; color: #0e1422;">For any issues or questions, please contact our team at TrascendenceHelp@gmail.com.</span>
                         </h1>
                         </div>
                       </div>
