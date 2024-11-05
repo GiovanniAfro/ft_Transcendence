@@ -49,6 +49,9 @@ const SingleGameView = {
     },
 
     handleKeyDown: function(e) {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault();
+        }
         this.keysPressed[e.key] = true;
     },
 
