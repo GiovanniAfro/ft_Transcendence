@@ -82,7 +82,12 @@ const RegisterView = {
                     window.location.hash = '#login';
                 }, 2000);
             } else {
-                messageElement.textContent = `Registrazione fallita: ${data.message || JSON.stringify(data)}`;
+                // Controlla se ci sono errori specifici per lo username
+                if (data.errors && data.errors.username) {
+                    messageElement.textContent = `Username già in uso. Scegli un altro username.`;
+                } else {
+                    messageElement.textContent = `Registrazione fallita: ${data.message || JSON.stringify(data)}`;
+                }
             }
         } catch (error) {
             console.error('Error:', error);
