@@ -205,20 +205,27 @@ services:
             NGINX_ALWAYS_TLS_REDIRECT: ${NGINX_ALWAYS_TLS_REDIRECT:-}
             BACKEND: ${BACKEND:-}
             SSL_PORT: ${SSL_PORT:-}
+            SSL_CERT: ${SSL_CERT:-}
+            SSL_CERT_KEY: ${SSL_CERT_KEY:-}
+            SSL_VERIFY: ${SSL_VERIFY:-}
             PROXY_SSL_CERT: ${PROXY_SSL_CERT:-}
             PROXY_SSL_CERT_KEY: ${PROXY_SSL_CERT_KEY:-}
             PROXY_SSL_PROTOCOLS: ${PROXY_SSL_PROTOCOLS:-}
             PROXY_SSL_CIPHERS: ${PROXY_SSL_CIPHERS:-}
             PROXY_SSL_PREFER_CIPHERS: ${PROXY_SSL_PREFER_CIPHERS:-}
             ALLOWED_METHODS: ${ALLOWED_METHODS:-}
-            # MODSEC_RULE_ENGINE: "off"
+            METRICS_ALLOW_FROM: ${METRICS_ALLOW_FROM:-}
         ports:
             - "80:8080"
             - "443:8443"
         volumes:
-            - .tmp/tls/:/tls/
+            - ./setup/.tmp/tls/nginx.crt:/tls/nginx.crt
+            - ./setup/.tmp/tls/nginx.key:/tls/nginx.key
+            - ./setup/.tmp/tls/ca.crt:/tls/ca.crt
+            - ./setup/.tmp/tls/ca_chain.crt:/tls/ca_chain.crt
             # - ./services/proxy-waf/nginx/conf/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
             - ./services/proxy-waf/nginx/conf/location_common.conf:/etc/nginx/templates/includes/location_common.conf.template
+            - ./services/proxy-waf/nginx/conf/default.conf:/etc/nginx/templates/conf.d/default.conf.template
             - django_staticfiles:/app/pong_project/static
             - django_mediafiles:/app/pong_project/media
         networks:
