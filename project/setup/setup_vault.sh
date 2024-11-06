@@ -9,9 +9,6 @@ NC='\033[0m'
 
 # Create Setup Container ------------------------------------------------------>
 echo -e "\n$BLUE[+] Creating a container for vault setup"
-# Create TMP Directory ------------------------------------------------------->>
-mkdir -p setup/.tmp
-echo -e "$BLUE    - Created$WHITE_B .tmp$BLUE directoy"
 
 # Create Network ------------------------------------------------------------->>
 docker network inspect secrets >/dev/null 2>&1 || docker network create \
@@ -211,7 +208,7 @@ echo -e "$BLUE    - Enabled the kv secrets engine at:$WHITE_B secret/"
 
 # Import Secrets to Vault ---------------------------------------------------->>
 containers=("python" "postgresql" "elasticsearch" "logstash" "kibana" "grafana" 
-	"postgres-exporter" "nginx-exporter")
+	"postgres-exporter" "nginx-exporter" "nginx")
 
 echo -e "$BLUE - Import secrets to vault:"
 
@@ -332,7 +329,6 @@ echo -e "\n$BLUE[+] Clenaup"
 docker container stop vault-setup >/dev/null
 docker container rm vault-setup >/dev/null
 docker network rm secrets >/dev/null
-rm -rf setup/.tmp
 
 # Create Vault Container ------------------------------------------------------>
 echo -e "\n$BLUE[+] Compose$WHITE_B SECRETS$BLUE profile ..."

@@ -29,6 +29,7 @@ all: up
 
 up:
 	@rm -rf .env
+	@mkdir -p setup/.tmp
 	@./setup/setup_iptables.sh
 	@./setup/setup_vault.sh
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)LOG-SYSTEM $(BLUE)profile ..." 
@@ -37,9 +38,8 @@ up:
 	@docker compose -p "ft_transcendence" --profile monitor-system up -d
 	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)APP $(BLUE)profile ..." 
 	@docker compose -p "ft_transcendence" --profile app up -d 
-	@echo "\n$(BLUE)[+] Compose $(WHITE_BOLD)PROXY-WAF $(BLUE)profile ..." 
-	@docker compose -p "ft_transcendence" --profile proxy-waf up -d
-	@rm -rf .env
+	@./setup/setup_nginx.sh
+	@rm -rf .env && rm -rf setup/.tmp
 	@echo
 
 clean:
