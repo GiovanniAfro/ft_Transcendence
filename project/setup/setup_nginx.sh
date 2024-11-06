@@ -35,7 +35,7 @@ echo "PROXY_SSL_CERT_KEY=$(echo "$envs" | jq -r '.data.PROXY_SSL_CERT_KEY')" >> 
 echo "PROXY_SSL_PROTOCOLS=$(echo "$envs" | jq -r '.data.PROXY_SSL_PROTOCOLS')" >> .env
 echo "PROXY_SSL_CIPHERS=$(echo "$envs" | jq -r '.data.PROXY_SSL_CIPHERS')" >> .env
 echo "PROXY_SSL_PREFER_CIPHERS=$(echo "$envs" | jq -r '.data.PROXY_SSL_PREFER_CIPHERS')" >> .env
-echo "PROXY_SSL_VERIFY=$(echo "$envs" | jq -r '.data.PROXY_SSL_VERIFY')" >> .env
+echo "ALLOWED_METHODS=$(echo "$envs" | jq -r '.data.ALLOWED_METHODS')" >> .env
 
 # Create Nginx Container ------------------------------------------------------>
 docker compose -p "ft_transcendence" --profile proxy-waf up -d
